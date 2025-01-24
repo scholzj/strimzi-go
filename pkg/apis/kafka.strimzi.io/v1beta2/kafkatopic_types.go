@@ -35,7 +35,7 @@ type KafkaTopicSpec struct {
 	TopicName string `json:"topicName,omitempty"`
 
 	// +optional
-	Config map[string]string `json:"config,omitempty"`
+	Config JSONValue `json:"config,omitempty"`
 }
 
 type KafkaTopicStatus struct {
@@ -44,4 +44,28 @@ type KafkaTopicStatus struct {
 	ObservedGeneration int32 `json:"observedGeneration,omitempty"`
 
 	TopicName string `json:"topicName,omitempty"`
+}
+
+type JSONValue map[string]interface{}
+
+func (in *JSONValue) DeepCopy() *JSONValue {
+	if in == nil {
+		return nil
+	}
+
+	out := new(JSONValue)
+	in.DeepCopyInto(out)
+
+	return out
+}
+
+func (in *JSONValue) DeepCopyInto(out *JSONValue) {
+	if in != nil {
+		*out = make(map[string]interface{}, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+
+	return
 }
