@@ -13,7 +13,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
-	"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimzi "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
 	strimziinformer "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions"
@@ -129,7 +128,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	addedSignal := make(chan struct{})
 	defer close(addedSignal)
 	onAdd := func(new interface{}) {
-		newKt := new.(*v1beta2.KafkaTopic)
+		newKt := new.(*kafkav1beta2.KafkaTopic)
 		log.Printf("New topic %s in namespace %s", newKt.Name, newKt.Namespace)
 		added++
 		addedSignal <- struct{}{}
@@ -138,8 +137,8 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	defer close(updatedSignal)
 	updated := 0
 	onUpdate := func(old interface{}, new interface{}) {
-		newKt := new.(*v1beta2.KafkaTopic)
-		oldKt := old.(*v1beta2.KafkaTopic)
+		newKt := new.(*kafkav1beta2.KafkaTopic)
+		oldKt := old.(*kafkav1beta2.KafkaTopic)
 		log.Printf("Updated topic %s in namespace %s", newKt.Name, oldKt.Namespace)
 		updated++
 		updatedSignal <- struct{}{}
@@ -148,7 +147,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	defer close(deletedSignal)
 	deleted := 0
 	onDelete := func(old interface{}) {
-		oldKt := old.(*v1beta2.KafkaTopic)
+		oldKt := old.(*kafkav1beta2.KafkaTopic)
 		log.Printf("Deleted topic %s in namespace %s", oldKt.Name, oldKt.Namespace)
 		deleted++
 		deletedSignal <- struct{}{}
