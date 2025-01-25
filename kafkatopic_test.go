@@ -34,14 +34,12 @@ func GetConfig() (*rest.Config, error) {
 func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 	config, err := GetConfig()
 	if err != nil {
-		log.Fatal(err)
-		t.FailNow()
+		t.Fatal(err)
 	}
 
 	clientset, err := strimzi.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
-		t.FailNow()
+		t.Fatal(err)
 	}
 
 	newTopic := &kafkav1beta2.KafkaTopic{
@@ -114,14 +112,12 @@ func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 func TestKafkaTopicInformerAndLister(t *testing.T) {
 	config, err := GetConfig()
 	if err != nil {
-		log.Fatal(err)
-		t.FailNow()
+		t.Fatal(err)
 	}
 
 	clientset, err := strimzi.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
-		t.FailNow()
+		t.Fatal(err)
 	}
 
 	added := 0
@@ -154,7 +150,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	}
 
 	// Create informer and lister
-	factory := strimziinformer.NewSharedInformerFactoryWithOptions(clientset, time.Duration(time.Hour*1))
+	factory := strimziinformer.NewSharedInformerFactoryWithOptions(clientset, time.Hour*1)
 	informer := factory.Kafka().V1beta2().KafkaTopics()
 	_, err = informer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    onAdd,
