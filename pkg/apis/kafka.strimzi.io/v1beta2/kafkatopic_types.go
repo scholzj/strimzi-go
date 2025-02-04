@@ -61,27 +61,3 @@ type KafkaTopicStatus struct {
 
 	TopicName string `json:"topicName,omitempty"`
 }
-
-type JSONValue map[string]interface{}
-
-func (in *JSONValue) DeepCopy() *JSONValue {
-	if in == nil {
-		return nil
-	}
-
-	out := new(JSONValue)
-	in.DeepCopyInto(out)
-
-	return out
-}
-
-func (in *JSONValue) DeepCopyInto(out *JSONValue) {
-	if in != nil {
-		*out = make(map[string]interface{}, len(*in))
-		for key, val := range *in {
-			(*out)[key] = val
-		}
-	}
-
-	return
-}
