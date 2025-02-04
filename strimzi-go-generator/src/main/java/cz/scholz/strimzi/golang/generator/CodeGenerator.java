@@ -1,5 +1,6 @@
 package cz.scholz.strimzi.golang.generator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.strimzi.api.annotations.ApiVersion;
 import io.strimzi.api.kafka.model.topic.KafkaTopic;
@@ -10,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -39,7 +42,7 @@ public class CodeGenerator {
     private final Stack<Class<?>> toBeGenerated = new Stack<>();
     private final Set<Class<?>> alreadyGenerated = new HashSet<>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         LOGGER.info("Generating Strimzi Golang APIs into {}", OUTPUT_PATH);
 
         CodeGenerator codeGenerator = new CodeGenerator();
@@ -51,7 +54,7 @@ public class CodeGenerator {
         out = new OutputStreamWriter(new FileOutputStream(OUTPUT_PATH), StandardCharsets.UTF_8);
     }
 
-    private void generate() throws IOException {
+    private void generate() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         headerBoilerplate();
         generatePackage();
         generateImports();
@@ -67,19 +70,6 @@ public class CodeGenerator {
             generateType(propertyType);
         }
     }
-
-    /// / +genclient
-    /// / +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-    //
-    //type KafkaTopic struct {
-    //	metav1.TypeMeta   `json:",inline"`
-    //	metav1.ObjectMeta `json:"metadata,omitempty"`
-    //
-    //	Spec KafkaTopicSpec `json:"spec"`
-    //
-    //	// +optional
-    //	Status KafkaTopicStatus `json:"status,omitempty"`
-    //}
 
     private void generateCrd(Class<?> crd) throws IOException {
         generateCrdList(crd);
@@ -104,10 +94,6 @@ public class CodeGenerator {
                 if (!toBeGenerated.contains(property.getType().getType()) && !alreadyGenerated.contains(property.getType().getType())) {
                     toBeGenerated.push(property.getType().getType());
                 }
-
-                //if (!toBeGenerated.contains(property) && !alreadyGenerated.contains(property)) {
-                //    toBeGenerated.push(property);
-                //}
             }
         }
 
@@ -122,15 +108,10 @@ public class CodeGenerator {
                 && ((ParameterizedType) propertyType.getGenericType()).getRawType().equals(Map.class)
                 && ((ParameterizedType) propertyType.getGenericType()).getActualTypeArguments()[0].equals(Integer.class)) {
             LOGGER.error("Unsupported type {}", returnType);
-            //System.err.println("It's OK");
-            //schema = nf.objectNode();
-            //schema.put("type", "object");
-            //schema.putObject("patternProperties").set("-?[0-9]+", buildArraySchema(crApiVersion, property, new io.strimzi.crdgenerator.PropertyType(null, ((ParameterizedType) propertyType.getGenericType()).getActualTypeArguments()[1]), description));
         } else if (propertyType.getGenericType() instanceof ParameterizedType
                 && ((ParameterizedType) propertyType.getGenericType()).getRawType().equals(Map.class)
                 && propertyType.isMapOfTypes(String.class, Quantity.class)) {
             LOGGER.error("Unsupported type {}", returnType);
-            //schema = buildQuantityTypeSchema();
         } else if (Map.class.equals(returnType)) {
             if (propertyType.isMapOfTypes(String.class, String.class)) {
                 generateField(property.getGolangName(), "map[string]string", property.getName());
@@ -139,17 +120,15 @@ public class CodeGenerator {
             } else {
                 LOGGER.error("Unsupported Map type {}", returnType);
             }
-            //schema = addSimpleTypeConstraints(crApiVersion, buildBasicTypeSchema(property, returnType), property);
         } else if (Schema.isJsonScalarType(returnType)) {
             if (returnType.isEnum()) {
-                LOGGER.error("Unsupported type {}", returnType);
+                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName());
+                addToStackIfNeeded(returnType);
             } else {
                 generateField(property.getGolangName(), typeName(returnType), property.getName());
             }
         } else if (returnType.isArray() || List.class.equals(returnType)) {
-            //LOGGER.error("Unsupported type {}", returnType);
             generateArrayField(property);
-            //schema = buildArraySchema(crApiVersion, property, property.getType(), description);
         } else {
             generateField(property.getGolangName(), property.getType().getType().getSimpleName(), property.getName());
             addToStackIfNeeded(property.getType().getType());
@@ -218,18 +197,36 @@ public class CodeGenerator {
         out.append(TAB).append(goName).append(" ").append(type).append(" ").append("`json:\"").append(jsonName).append(",omitempty\"`").append(NL);
     }
 
-    private void generateType(Class<?> type) throws IOException {
-        LOGGER.info("Generating {} property", type.getSimpleName());
-        out.append(NL)
-                .append("type ").append(type.getSimpleName()).append(" struct {").append(NL);
+    private void generateType(Class<?> type) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (type.isEnum())  {
+            LOGGER.info("Generating {} enum type", type.getSimpleName());
+            out.append(NL)
+                    .append("type ").append(type.getSimpleName()).append(" string").append(NL)
+                    .append(NL)
+                    .append("const (").append(NL);
 
-        Map<String, Property> properties = Property.properties(API_VERSION, type);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Method valuesMethod = type.getMethod("values");
+            Enum<?>[] enums = (Enum<?>[]) valuesMethod.invoke(null);
 
-        for (Property property : properties.values()) {
-            generateField(property);
+            for (Enum<?> e : enums) {
+                out.append(TAB).append(e.toString()).append(" ").append(type.getSimpleName()).append(" = ").append(objectMapper.writeValueAsString(e)).append(NL);
+            }
+
+            out.append(")").append(NL);
+        } else {
+            LOGGER.info("Generating {} type", type.getSimpleName());
+            out.append(NL)
+                    .append("type ").append(type.getSimpleName()).append(" struct {").append(NL);
+
+            Map<String, Property> properties = Property.properties(API_VERSION, type);
+
+            for (Property property : properties.values()) {
+                generateField(property);
+            }
+
+            out.append("}").append(NL);
         }
-
-        out.append("}").append(NL);
     }
 
     private void generateCrdList(Class<?> crd) throws IOException {
