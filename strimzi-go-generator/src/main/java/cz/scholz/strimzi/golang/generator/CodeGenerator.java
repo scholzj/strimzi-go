@@ -81,7 +81,7 @@ public class CodeGenerator {
                 .append(NL)
                 .append("type ").append(crd.getSimpleName()).append(" struct {").append(NL)
                 .append(TAB).append("metav1.TypeMeta `json:\",inline\"`").append(NL)
-                .append(TAB).append("metav1.ListMeta `json:\"metadata,omitempty\"`").append(NL)
+                .append(TAB).append("metav1.ObjectMeta `json:\"metadata,omitempty\"`").append(NL)
                 .append(TAB).append(NL);
 
         Map<String, Property> properties = Property.properties(API_VERSION, crd);
