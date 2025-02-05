@@ -3,7 +3,9 @@ package cz.scholz.strimzi.golang.generator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.strimzi.api.annotations.ApiVersion;
+import io.strimzi.api.kafka.model.connector.KafkaConnector;
 import io.strimzi.api.kafka.model.topic.KafkaTopic;
+import io.strimzi.api.kafka.model.user.KafkaUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,8 +19,10 @@ import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -36,7 +40,7 @@ public class CodeGenerator {
 
     private static final List<String> IGNORED_PROPERTIES = List.of("apiVersion", "kind", "metadata");
 
-    private static final List<Class<?>> CRDS = List.of(KafkaTopic.class);
+    private static final List<Class<?>> CRDS = List.of(KafkaTopic.class, KafkaConnector.class, KafkaUser.class);
 
     private final OutputStreamWriter out;
     private final Stack<Class<?>> toBeGenerated = new Stack<>();
@@ -74,7 +78,7 @@ public class CodeGenerator {
     private void generateCrd(Class<?> crd) throws IOException {
         generateCrdList(crd);
 
-        LOGGER.info("Generating {} type", crd.getSimpleName());
+        LOGGER.info("Generating {} CRD type", crd.getSimpleName());
         out.append(NL)
                 .append("// +genclient").append(NL)
                 .append("// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object").append(NL)
@@ -153,7 +157,7 @@ public class CodeGenerator {
         } else if (long.class.equals(type) || Long.class.equals(type)) {
             return "int64";
         } else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
-            return "boolean";
+            return "bool";
         } else if (float.class.equals(type) || Float.class.equals(type)) {
             return "float32";
         } else if (Double.class.equals(type) || double.class.equals(type)) {
@@ -198,11 +202,10 @@ public class CodeGenerator {
     }
 
     private void generateType(Class<?> type) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (type.isEnum())  {
+        if (type.isEnum()) {
             LOGGER.info("Generating {} enum type", type.getSimpleName());
             out.append(NL)
                     .append("type ").append(type.getSimpleName()).append(" string").append(NL)
-                    .append(NL)
                     .append("const (").append(NL);
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -214,6 +217,42 @@ public class CodeGenerator {
             }
 
             out.append(")").append(NL);
+        } else if (Property.isPolymorphic(type)) {
+            LOGGER.info("Generating {} poloymorphic type", type.getSimpleName());
+
+            // Generates the type constant
+            String typeType = type.getSimpleName() + "Type";
+            List<String> typeNames = Property.subtypeNames(type);
+
+            out.append(NL)
+                    .append("type ").append(typeType).append(" string").append(NL)
+                    .append("const (").append(NL);
+
+            for (String typeName : typeNames) {
+                out.append(TAB).append(validConstName(typeName.toUpperCase(Locale.ROOT))).append(" ").append(typeType).append(" = \"").append(typeName).append("\"").append(NL);
+            }
+
+            out.append(")").append(NL);
+
+            // Generate union or properties
+            List<Class<?>> subtypes = Property.subtypes(type);
+            Map<String, Property> properties = new HashMap<>();
+            for (Class<?> subtype : subtypes) {
+                properties.putAll(Property.properties(API_VERSION, subtype));
+            }
+
+            out.append(NL)
+                    .append("type ").append(type.getSimpleName()).append(" struct {").append(NL);
+
+            for (Property property : properties.values()) {
+                if ("type".equals(property.getName())) {
+                    generateField(property.getGolangName(), typeType, property.getName());
+                } else {
+                    generateField(property);
+                }
+            }
+
+            out.append("}").append(NL);
         } else {
             LOGGER.info("Generating {} type", type.getSimpleName());
             out.append(NL)
@@ -229,8 +268,12 @@ public class CodeGenerator {
         }
     }
 
+    private static String validConstName(String constName) {
+        return constName.replace("-", "_");
+    }
+
     private void generateCrdList(Class<?> crd) throws IOException {
-        LOGGER.info("Generating {} list type", crd.getSimpleName());
+        LOGGER.info("Generating {} CRD list type", crd.getSimpleName());
 
         out.append(NL)
                 .append("// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object").append(NL)
