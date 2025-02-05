@@ -56,7 +56,6 @@ type ReplicasChangeStatus struct {
 }
 
 type ReplicasChangeState string
-
 const (
     PENDING ReplicasChangeState = "pending"
     ONGOING ReplicasChangeState = "ongoing"

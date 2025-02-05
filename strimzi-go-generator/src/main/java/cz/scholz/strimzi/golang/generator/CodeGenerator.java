@@ -40,7 +40,7 @@ public class CodeGenerator {
 
     private static final List<String> IGNORED_PROPERTIES = List.of("apiVersion", "kind", "metadata");
 
-    private static final List<Class<?>> CRDS = List.of(KafkaTopic.class, KafkaConnector.class, KafkaUser.class);
+    private static final List<Class<?>> CRDS = List.of(KafkaTopic.class);
 
     private final OutputStreamWriter out;
     private final Stack<Class<?>> toBeGenerated = new Stack<>();
