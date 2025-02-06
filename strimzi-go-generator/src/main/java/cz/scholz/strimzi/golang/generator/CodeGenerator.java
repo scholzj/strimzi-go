@@ -41,6 +41,7 @@ public class CodeGenerator {
     private static final List<String> IGNORED_PROPERTIES = List.of("apiVersion", "kind", "metadata");
 
     private static final List<Class<?>> CRDS = List.of(KafkaTopic.class);
+    //private static final List<Class<?>> CRDS = List.of(KafkaTopic.class, KafkaConnector.class, KafkaUser.class);
 
     private final OutputStreamWriter out;
     private final Stack<Class<?>> toBeGenerated = new Stack<>();
@@ -134,7 +135,7 @@ public class CodeGenerator {
         } else if (returnType.isArray() || List.class.equals(returnType)) {
             generateArrayField(property);
         } else {
-            generateField(property.getGolangName(), property.getType().getType().getSimpleName(), property.getName());
+            generateField(property.getGolangName(), "*" + property.getType().getType().getSimpleName(), property.getName());
             addToStackIfNeeded(property.getType().getType());
         }
     }

@@ -46,8 +46,16 @@ func (in *KafkaTopic) DeepCopyInto(out *KafkaTopic) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
-	in.Spec.DeepCopyInto(&out.Spec)
-	in.Status.DeepCopyInto(&out.Status)
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(KafkaTopicSpec)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Status != nil {
+		in, out := &in.Status, &out.Status
+		*out = new(KafkaTopicStatus)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -127,7 +135,11 @@ func (in *KafkaTopicStatus) DeepCopyInto(out *KafkaTopicStatus) {
 		*out = make([]Condition, len(*in))
 		copy(*out, *in)
 	}
-	out.ReplicasChange = in.ReplicasChange
+	if in.ReplicasChange != nil {
+		in, out := &in.ReplicasChange, &out.ReplicasChange
+		*out = new(ReplicasChangeStatus)
+		**out = **in
+	}
 	return
 }
 

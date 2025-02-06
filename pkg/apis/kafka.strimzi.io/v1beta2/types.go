@@ -36,8 +36,8 @@ type KafkaTopic struct {
     metav1.TypeMeta `json:",inline"`
     metav1.ObjectMeta `json:"metadata,omitempty"`
     
-    Spec KafkaTopicSpec `json:"spec,omitempty"`
-    Status KafkaTopicStatus `json:"status,omitempty"`
+    Spec *KafkaTopicSpec `json:"spec,omitempty"`
+    Status *KafkaTopicStatus `json:"status,omitempty"`
 }
 
 type KafkaTopicStatus struct {
@@ -45,7 +45,7 @@ type KafkaTopicStatus struct {
     ObservedGeneration int64 `json:"observedGeneration,omitempty"`
     TopicName string `json:"topicName,omitempty"`
     TopicId string `json:"topicId,omitempty"`
-    ReplicasChange ReplicasChangeStatus `json:"replicasChange,omitempty"`
+    ReplicasChange *ReplicasChangeStatus `json:"replicasChange,omitempty"`
 }
 
 type ReplicasChangeStatus struct {

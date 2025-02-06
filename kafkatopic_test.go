@@ -2,7 +2,9 @@ package v1beta2
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -13,10 +15,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
+	"sigs.k8s.io/yaml"
+
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimzi "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
 	strimziinformer "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions"
 )
+
+const NAMESPACE = "default"
 
 func GetConfig() (*rest.Config, error) {
 	var kubeconfig string
@@ -46,7 +52,7 @@ func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "my-test-topic",
 		},
-		Spec: kafkav1beta2.KafkaTopicSpec{
+		Spec: &kafkav1beta2.KafkaTopicSpec{
 			Replicas:   3,
 			Partitions: 3,
 			Config:     kafkav1beta2.JSONValue{"retention.ms": 7200000, "segment.bytes": 1073741824},
@@ -54,13 +60,13 @@ func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 	}
 
 	// Create the topic
-	_, err = clientset.KafkaV1beta2().KafkaTopics("myproject").Create(context.TODO(), newTopic, metav1.CreateOptions{})
+	_, err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Create(context.TODO(), newTopic, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to create topic: %s", err.Error())
 	}
 
 	// Get the topic
-	topic, err := clientset.KafkaV1beta2().KafkaTopics("myproject").Get(context.TODO(), "my-test-topic", metav1.GetOptions{})
+	topic, err := clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Get(context.TODO(), "my-test-topic", metav1.GetOptions{})
 	if err != nil {
 		t.Fatalf("Failed to get topic: %s", err.Error())
 	}
@@ -76,13 +82,13 @@ func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 	updatedTopic.Spec.Partitions = 10
 	updatedTopic.Spec.Config["segment.bytes"] = 107374182
 
-	_, err = clientset.KafkaV1beta2().KafkaTopics("myproject").Update(context.TODO(), updatedTopic, metav1.UpdateOptions{})
+	_, err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Update(context.TODO(), updatedTopic, metav1.UpdateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to update topic: %s", err.Error())
 	}
 
 	// Get the topic
-	topic, err = clientset.KafkaV1beta2().KafkaTopics("myproject").Get(context.TODO(), "my-test-topic", metav1.GetOptions{})
+	topic, err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Get(context.TODO(), "my-test-topic", metav1.GetOptions{})
 	if err != nil {
 		t.Fatalf("Failed to get topic: %s", err.Error())
 	}
@@ -93,13 +99,13 @@ func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 	}
 
 	// Delete the topic
-	err = clientset.KafkaV1beta2().KafkaTopics("myproject").Delete(context.TODO(), "my-test-topic", metav1.DeleteOptions{})
+	err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), "my-test-topic", metav1.DeleteOptions{})
 	if err != nil {
 		t.Fatalf("Failed to delete topic: %s", err.Error())
 	}
 
 	// Check deletion
-	topic, err = clientset.KafkaV1beta2().KafkaTopics("myproject").Get(context.TODO(), "my-test-topic", metav1.GetOptions{})
+	topic, err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Get(context.TODO(), "my-test-topic", metav1.GetOptions{})
 	if err != nil {
 		if err.Error() != "kafkatopics.kafka.strimzi.io \"my-test-topic\" not found" {
 			t.Fatalf("Failed to get topic: %s", err.Error())
@@ -175,14 +181,14 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "my-test-topic2",
 		},
-		Spec: kafkav1beta2.KafkaTopicSpec{
+		Spec: &kafkav1beta2.KafkaTopicSpec{
 			Replicas:   3,
 			Partitions: 3,
 			Config:     kafkav1beta2.JSONValue{"retention.ms": 7200000, "segment.bytes": 1073741824},
 		},
 	}
 
-	_, err = clientset.KafkaV1beta2().KafkaTopics("myproject").Create(context.TODO(), newTopic, metav1.CreateOptions{})
+	_, err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Create(context.TODO(), newTopic, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to create topic: %s", err.Error())
 	}
@@ -190,7 +196,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	<-addedSignal
 
 	// Get the topic
-	topic, err := lister.KafkaTopics("myproject").Get("my-test-topic2")
+	topic, err := lister.KafkaTopics(NAMESPACE).Get("my-test-topic2")
 	if err != nil {
 		t.Fatalf("Failed to get topic: %s", err.Error())
 	}
@@ -206,7 +212,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	updatedTopic.Spec.Partitions = 10
 	updatedTopic.Spec.Config["segment.bytes"] = 107374182
 
-	_, err = clientset.KafkaV1beta2().KafkaTopics("myproject").Update(context.TODO(), updatedTopic, metav1.UpdateOptions{})
+	_, err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Update(context.TODO(), updatedTopic, metav1.UpdateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to update topic: %s", err.Error())
 	}
@@ -214,7 +220,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	<-updatedSignal
 
 	// Get the topic
-	topic, err = lister.KafkaTopics("myproject").Get("my-test-topic2")
+	topic, err = lister.KafkaTopics(NAMESPACE).Get("my-test-topic2")
 	if err != nil {
 		t.Fatalf("Failed to get topic: %s", err.Error())
 	}
@@ -225,7 +231,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	}
 
 	// Delete the topic
-	err = clientset.KafkaV1beta2().KafkaTopics("myproject").Delete(context.TODO(), "my-test-topic2", metav1.DeleteOptions{})
+	err = clientset.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), "my-test-topic2", metav1.DeleteOptions{})
 	if err != nil {
 		t.Fatalf("Failed to delete topic: %s", err.Error())
 	}
@@ -233,7 +239,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	<-deletedSignal
 
 	// Check deletion
-	topic, err = lister.KafkaTopics("myproject").Get("my-test-topic2")
+	topic, err = lister.KafkaTopics(NAMESPACE).Get("my-test-topic2")
 	if err != nil {
 		if err.Error() != "kafkatopics.kafka.strimzi.io \"my-test-topic2\" not found" {
 			// pass
@@ -254,4 +260,25 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	if deleted != 1 {
 		t.Fatalf("Topic was not deleted once but %d", deleted)
 	}
+}
+
+func TestLoadUnload(t *testing.T) {
+	file, _ := filepath.Abs("./test/resources/KafkaTopic.yaml")
+	fileYaml, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatalf("Failed to read yaml file: %s", err.Error())
+	}
+
+	var kafkaTopic kafkav1beta2.KafkaTopic
+	err = yaml.Unmarshal(fileYaml, &kafkaTopic)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal the yaml: %s", err.Error())
+	}
+
+	serializedYaml, err := yaml.Marshal(kafkaTopic)
+	if err != nil {
+		t.Fatalf("Failed to marshal the yaml: %s", err.Error())
+	}
+	t.Logf("Test name: %s", t.Name())
+	assert.Equal(t, string(fileYaml), string(serializedYaml))
 }
