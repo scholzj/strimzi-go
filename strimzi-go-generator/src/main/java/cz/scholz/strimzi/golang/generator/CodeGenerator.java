@@ -3,7 +3,13 @@ package cz.scholz.strimzi.golang.generator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.strimzi.api.annotations.ApiVersion;
+import io.strimzi.api.kafka.model.bridge.KafkaBridge;
+import io.strimzi.api.kafka.model.connect.KafkaConnect;
 import io.strimzi.api.kafka.model.connector.KafkaConnector;
+import io.strimzi.api.kafka.model.kafka.Kafka;
+import io.strimzi.api.kafka.model.mirrormaker2.KafkaMirrorMaker2;
+import io.strimzi.api.kafka.model.nodepool.KafkaNodePool;
+import io.strimzi.api.kafka.model.rebalance.KafkaRebalance;
 import io.strimzi.api.kafka.model.topic.KafkaTopic;
 import io.strimzi.api.kafka.model.user.KafkaUser;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +47,7 @@ public class CodeGenerator {
     private static final List<String> IGNORED_PROPERTIES = List.of("apiVersion", "kind", "metadata");
 
     private static final List<Class<?>> CRDS = List.of(KafkaTopic.class);
-    //private static final List<Class<?>> CRDS = List.of(KafkaTopic.class, KafkaConnector.class, KafkaUser.class);
+    //private static final List<Class<?>> CRDS = List.of(Kafka.class, KafkaNodePool.class, KafkaConnect.class, KafkaMirrorMaker2.class, KafkaBridge.class, KafkaRebalance.class, KafkaTopic.class, KafkaConnector.class, KafkaUser.class);
 
     private final OutputStreamWriter out;
     private final Stack<Class<?>> toBeGenerated = new Stack<>();
@@ -109,13 +115,16 @@ public class CodeGenerator {
         PropertyType propertyType = property.getType();
         Class<?> returnType = propertyType.getType();
 
-        if (propertyType.getGenericType() instanceof ParameterizedType
+        if (returnType.getName().startsWith("io.fabric8.kubernetes.api.model.")) {
+            generateFabric8Field(property.getGolangName(), returnType, property.getName());
+        } else if (propertyType.getGenericType() instanceof ParameterizedType
                 && ((ParameterizedType) propertyType.getGenericType()).getRawType().equals(Map.class)
                 && ((ParameterizedType) propertyType.getGenericType()).getActualTypeArguments()[0].equals(Integer.class)) {
             LOGGER.error("Unsupported type {}", returnType);
         } else if (propertyType.getGenericType() instanceof ParameterizedType
                 && ((ParameterizedType) propertyType.getGenericType()).getRawType().equals(Map.class)
                 && propertyType.isMapOfTypes(String.class, Quantity.class)) {
+            // Should not be needed as we replace Fabric8 types with Kube types instead of parsing them
             LOGGER.error("Unsupported type {}", returnType);
         } else if (Map.class.equals(returnType)) {
             if (propertyType.isMapOfTypes(String.class, String.class)) {
@@ -192,10 +201,45 @@ public class CodeGenerator {
         Class<?> elementType = property.getType().arrayBase();
         if (isBasicType(elementType)) {
             generateField(property.getGolangName(), arrayMarker + typeName(elementType), property.getName());
+        } else if (elementType.getName().startsWith("io.fabric8.kubernetes.api.model.")) {
+            generateField(property.getGolangName(), arrayMarker + mapFabric8TypeToKubernetes(elementType), property.getName());
         } else {
             generateField(property.getGolangName(), arrayMarker + elementType.getSimpleName(), property.getName());
             addToStackIfNeeded(elementType);
         }
+    }
+
+    private void generateFabric8Field(String goName, Class<?> type, String jsonName) throws IOException {
+        out.append(TAB).append(goName).append(" *").append(mapFabric8TypeToKubernetes(type)).append(" ").append("`json:\"").append(jsonName).append(",omitempty\"`").append(NL);
+    }
+
+    private String mapFabric8TypeToKubernetes(Class<?> type) {
+        return switch (type.getName()) {
+            case "io.fabric8.kubernetes.api.model.Affinity" -> "corev1.Affinity";
+            case "io.fabric8.kubernetes.api.model.CSIVolumeSource" -> "corev1.CSIVolumeSource";
+            case "io.fabric8.kubernetes.api.model.ConfigMapKeySelector" -> "corev1.ConfigMapKeySelector";
+            case "io.fabric8.kubernetes.api.model.ConfigMapVolumeSource" -> "corev1.ConfigMapVolumeSource";
+            case "io.fabric8.kubernetes.api.model.EmptyDirVolumeSource" -> "corev1.EmptyDirVolumeSource";
+            case "io.fabric8.kubernetes.api.model.HostAlias" -> "corev1.HostAlias";
+            case "io.fabric8.kubernetes.api.model.LabelSelector" -> "corev1.LabelSelector";
+            case "io.fabric8.kubernetes.api.model.LocalObjectReference" -> "corev1.LocalObjectReference";
+            case "io.fabric8.kubernetes.api.model.PersistentVolumeClaimVolumeSource" -> "corev1.PersistentVolumeClaimVolumeSource";
+            case "io.fabric8.kubernetes.api.model.PodDNSConfig" -> "corev1.PodDNSConfig";
+            case "io.fabric8.kubernetes.api.model.PodSecurityContext" -> "corev1.PodSecurityContext";
+            case "io.fabric8.kubernetes.api.model.PodSecurityContextBuilder" -> "corev1.PodSecurityContextBuilder";
+            case "io.fabric8.kubernetes.api.model.ResourceRequirements" -> "corev1.ResourceRequirements";
+            case "io.fabric8.kubernetes.api.model.SecretKeySelector" -> "corev1.SecretKeySelector";
+            case "io.fabric8.kubernetes.api.model.SecretVolumeSource" -> "corev1.SecretVolumeSource";
+            case "io.fabric8.kubernetes.api.model.SecurityContext" -> "corev1.SecurityContext";
+            case "io.fabric8.kubernetes.api.model.Toleration" -> "corev1.Toleration";
+            case "io.fabric8.kubernetes.api.model.TopologySpreadConstraint" -> "corev1.TopologySpreadConstraint";
+            case "io.fabric8.kubernetes.api.model.VolumeMount" -> "corev1.VolumeMount";
+            case "io.fabric8.kubernetes.api.model.networking.v1.NetworkPolicyPeer" -> "networkingv1.NetworkPolicyPeer";
+            default -> {
+                LOGGER.error("Unmapped Fabric8 class {}", type.getName());
+                yield "";
+            }
+        };
     }
 
     private void generateField(String goName, String type, String jsonName) throws IOException {
@@ -214,7 +258,7 @@ public class CodeGenerator {
             Enum<?>[] enums = (Enum<?>[]) valuesMethod.invoke(null);
 
             for (Enum<?> e : enums) {
-                out.append(TAB).append(e.toString()).append(" ").append(type.getSimpleName()).append(" = ").append(objectMapper.writeValueAsString(e)).append(NL);
+                out.append(TAB).append(validConstName(e.toString(), type.getSimpleName())).append(" ").append(type.getSimpleName()).append(" = ").append(objectMapper.writeValueAsString(e)).append(NL);
             }
 
             out.append(")").append(NL);
@@ -230,7 +274,7 @@ public class CodeGenerator {
                     .append("const (").append(NL);
 
             for (String typeName : typeNames) {
-                out.append(TAB).append(validConstName(typeName.toUpperCase(Locale.ROOT))).append(" ").append(typeType).append(" = \"").append(typeName).append("\"").append(NL);
+                out.append(TAB).append(validConstName(typeName, typeType)).append(" ").append(typeType).append(" = \"").append(typeName).append("\"").append(NL);
             }
 
             out.append(")").append(NL);
@@ -269,8 +313,8 @@ public class CodeGenerator {
         }
     }
 
-    private static String validConstName(String constName) {
-        return constName.replace("-", "_");
+    private static String validConstName(String constName, String typeName) {
+        return (constName + "_" + typeName).replace("-", "_").toUpperCase(Locale.ROOT);
     }
 
     private void generateCrdList(Class<?> crd) throws IOException {
@@ -307,6 +351,8 @@ public class CodeGenerator {
         LOGGER.info("Generating imports");
         out.append(NL)
                 .append("import (").append(NL)
+                .append(TAB).append("corev1 \"k8s.io/api/core/v1\"").append(NL)
+                .append(TAB).append("networkingv1 \"k8s.io/api/networking/v1\"").append(NL)
                 .append(TAB).append("metav1 \"k8s.io/apimachinery/pkg/apis/meta/v1\"").append(NL)
                 .append(")").append(NL);
     }

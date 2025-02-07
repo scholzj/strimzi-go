@@ -15,6 +15,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.strimzi.api.annotations.ApiVersion;
 import io.strimzi.crdgenerator.annotations.PresentInVersions;
+import org.apache.logging.log4j.core.impl.LocationAwareLogEventFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -62,7 +63,13 @@ class Property implements AnnotatedElement {
     }
 
     public String getGolangName() {
-        return name.substring(0,1).toUpperCase() + name.substring(1);
+        String golangName = name;
+
+        if (golangName.startsWith("-")) {
+            golangName = golangName.substring(1);
+        }
+
+        return golangName.substring(0,1).toUpperCase(Locale.ROOT) + golangName.substring(1);
     }
 
     private static boolean isGetterName(Method method) {

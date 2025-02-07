@@ -17,6 +17,8 @@ limitations under the License.
 package v1beta2
 
 import (
+    corev1 "k8s.io/api/core/v1"
+    networkingv1 "k8s.io/api/networking/v1"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -57,8 +59,8 @@ type ReplicasChangeStatus struct {
 
 type ReplicasChangeState string
 const (
-    PENDING ReplicasChangeState = "pending"
-    ONGOING ReplicasChangeState = "ongoing"
+    PENDING_REPLICASCHANGESTATE ReplicasChangeState = "pending"
+    ONGOING_REPLICASCHANGESTATE ReplicasChangeState = "ongoing"
 )
 
 type Condition struct {
