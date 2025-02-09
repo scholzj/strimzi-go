@@ -18,4 +18,20 @@ limitations under the License.
 
 package v1beta2
 
+type KafkaExpansion interface{}
+
+type KafkaBridgeExpansion interface{}
+
+type KafkaConnectExpansion interface{}
+
+type KafkaConnectorExpansion interface{}
+
+type KafkaMirrorMaker2Expansion interface{}
+
+type KafkaNodePoolExpansion interface{}
+
+type KafkaRebalanceExpansion interface{}
+
 type KafkaTopicExpansion interface{}
+
+type KafkaUserExpansion interface{}

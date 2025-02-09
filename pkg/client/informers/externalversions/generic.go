@@ -53,8 +53,24 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=kafka.strimzi.io, Version=v1beta2
+	case v1beta2.SchemeGroupVersion.WithResource("kafkas"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().Kafkas().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkabridges"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaBridges().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkaconnects"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaConnects().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkaconnectors"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaConnectors().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkamirrormaker2s"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaMirrorMaker2s().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkanodepools"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaNodePools().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkarebalances"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaRebalances().Informer()}, nil
 	case v1beta2.SchemeGroupVersion.WithResource("kafkatopics"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaTopics().Informer()}, nil
+	case v1beta2.SchemeGroupVersion.WithResource("kafkausers"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaUsers().Informer()}, nil
 
 	}
 

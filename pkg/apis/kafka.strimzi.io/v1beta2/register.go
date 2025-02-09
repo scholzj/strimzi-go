@@ -48,8 +48,24 @@ func init() {
 // Adds the list of known types to api.Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
+		&Kafka{},
+		&KafkaList{},
+		&KafkaNodePool{},
+		&KafkaNodePoolList{},
+		&KafkaConnect{},
+		&KafkaConnectList{},
+		&KafkaMirrorMaker2{},
+		&KafkaMirrorMaker2List{},
+		&KafkaBridge{},
+		&KafkaBridgeList{},
+		&KafkaRebalance{},
+		&KafkaRebalanceList{},
 		&KafkaTopic{},
 		&KafkaTopicList{},
+		&KafkaConnector{},
+		&KafkaConnectorList{},
+		&KafkaUser{},
+		&KafkaUserList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

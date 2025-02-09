@@ -77,24 +77,3 @@ func TestSimpleKafkaUser(t *testing.T) {
 	var resource kafkav1beta2.KafkaUser
 	LoadUnload(t, "./resources/"+t.Name()+".yaml", resource)
 }
-
-//func TestSimpleKafkaTopic2(t *testing.T) {
-//	file, _ := filepath.Abs("./resources/TestSimpleKafkaTopic.yaml")
-//	fileYaml, err := os.ReadFile(file)
-//	if err != nil {
-//		t.Fatalf("Failed to read yaml file: %s", err.Error())
-//	}
-//
-//	var kafkaTopic kafkav1beta2.KafkaTopic
-//	err = yaml.Unmarshal(fileYaml, &kafkaTopic)
-//	if err != nil {
-//		t.Fatalf("Failed to unmarshal the yaml: %s", err.Error())
-//	}
-//
-//	serializedYaml, err := yaml.Marshal(kafkaTopic)
-//	if err != nil {
-//		t.Fatalf("Failed to marshal the yaml: %s", err.Error())
-//	}
-//	t.Logf("Test name: %s", t.Name())
-//	assert.Equal(t, string(fileYaml), string(serializedYaml))
-//}

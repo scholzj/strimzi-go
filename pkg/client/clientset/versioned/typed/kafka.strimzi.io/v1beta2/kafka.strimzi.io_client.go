@@ -28,7 +28,15 @@ import (
 
 type KafkaV1beta2Interface interface {
 	RESTClient() rest.Interface
+	KafkasGetter
+	KafkaBridgesGetter
+	KafkaConnectsGetter
+	KafkaConnectorsGetter
+	KafkaMirrorMaker2sGetter
+	KafkaNodePoolsGetter
+	KafkaRebalancesGetter
 	KafkaTopicsGetter
+	KafkaUsersGetter
 }
 
 // KafkaV1beta2Client is used to interact with features provided by the kafka.strimzi.io group.
@@ -36,8 +44,40 @@ type KafkaV1beta2Client struct {
 	restClient rest.Interface
 }
 
+func (c *KafkaV1beta2Client) Kafkas(namespace string) KafkaInterface {
+	return newKafkas(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaBridges(namespace string) KafkaBridgeInterface {
+	return newKafkaBridges(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaConnects(namespace string) KafkaConnectInterface {
+	return newKafkaConnects(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaConnectors(namespace string) KafkaConnectorInterface {
+	return newKafkaConnectors(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaMirrorMaker2s(namespace string) KafkaMirrorMaker2Interface {
+	return newKafkaMirrorMaker2s(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaNodePools(namespace string) KafkaNodePoolInterface {
+	return newKafkaNodePools(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaRebalances(namespace string) KafkaRebalanceInterface {
+	return newKafkaRebalances(c, namespace)
+}
+
 func (c *KafkaV1beta2Client) KafkaTopics(namespace string) KafkaTopicInterface {
 	return newKafkaTopics(c, namespace)
+}
+
+func (c *KafkaV1beta2Client) KafkaUsers(namespace string) KafkaUserInterface {
+	return newKafkaUsers(c, namespace)
 }
 
 // NewForConfig creates a new KafkaV1beta2Client for the given config.

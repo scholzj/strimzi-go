@@ -24,8 +24,24 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// Kafkas returns a KafkaInformer.
+	Kafkas() KafkaInformer
+	// KafkaBridges returns a KafkaBridgeInformer.
+	KafkaBridges() KafkaBridgeInformer
+	// KafkaConnects returns a KafkaConnectInformer.
+	KafkaConnects() KafkaConnectInformer
+	// KafkaConnectors returns a KafkaConnectorInformer.
+	KafkaConnectors() KafkaConnectorInformer
+	// KafkaMirrorMaker2s returns a KafkaMirrorMaker2Informer.
+	KafkaMirrorMaker2s() KafkaMirrorMaker2Informer
+	// KafkaNodePools returns a KafkaNodePoolInformer.
+	KafkaNodePools() KafkaNodePoolInformer
+	// KafkaRebalances returns a KafkaRebalanceInformer.
+	KafkaRebalances() KafkaRebalanceInformer
 	// KafkaTopics returns a KafkaTopicInformer.
 	KafkaTopics() KafkaTopicInformer
+	// KafkaUsers returns a KafkaUserInformer.
+	KafkaUsers() KafkaUserInformer
 }
 
 type version struct {
@@ -39,7 +55,47 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
+// Kafkas returns a KafkaInformer.
+func (v *version) Kafkas() KafkaInformer {
+	return &kafkaInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaBridges returns a KafkaBridgeInformer.
+func (v *version) KafkaBridges() KafkaBridgeInformer {
+	return &kafkaBridgeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaConnects returns a KafkaConnectInformer.
+func (v *version) KafkaConnects() KafkaConnectInformer {
+	return &kafkaConnectInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaConnectors returns a KafkaConnectorInformer.
+func (v *version) KafkaConnectors() KafkaConnectorInformer {
+	return &kafkaConnectorInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaMirrorMaker2s returns a KafkaMirrorMaker2Informer.
+func (v *version) KafkaMirrorMaker2s() KafkaMirrorMaker2Informer {
+	return &kafkaMirrorMaker2Informer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaNodePools returns a KafkaNodePoolInformer.
+func (v *version) KafkaNodePools() KafkaNodePoolInformer {
+	return &kafkaNodePoolInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaRebalances returns a KafkaRebalanceInformer.
+func (v *version) KafkaRebalances() KafkaRebalanceInformer {
+	return &kafkaRebalanceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // KafkaTopics returns a KafkaTopicInformer.
 func (v *version) KafkaTopics() KafkaTopicInformer {
 	return &kafkaTopicInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaUsers returns a KafkaUserInformer.
+func (v *version) KafkaUsers() KafkaUserInformer {
+	return &kafkaUserInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

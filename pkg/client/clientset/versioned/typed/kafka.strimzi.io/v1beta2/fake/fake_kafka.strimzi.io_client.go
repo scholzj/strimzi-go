@@ -28,8 +28,40 @@ type FakeKafkaV1beta2 struct {
 	*testing.Fake
 }
 
+func (c *FakeKafkaV1beta2) Kafkas(namespace string) v1beta2.KafkaInterface {
+	return newFakeKafkas(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaBridges(namespace string) v1beta2.KafkaBridgeInterface {
+	return newFakeKafkaBridges(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaConnects(namespace string) v1beta2.KafkaConnectInterface {
+	return newFakeKafkaConnects(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaConnectors(namespace string) v1beta2.KafkaConnectorInterface {
+	return newFakeKafkaConnectors(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaMirrorMaker2s(namespace string) v1beta2.KafkaMirrorMaker2Interface {
+	return newFakeKafkaMirrorMaker2s(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaNodePools(namespace string) v1beta2.KafkaNodePoolInterface {
+	return newFakeKafkaNodePools(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaRebalances(namespace string) v1beta2.KafkaRebalanceInterface {
+	return newFakeKafkaRebalances(c, namespace)
+}
+
 func (c *FakeKafkaV1beta2) KafkaTopics(namespace string) v1beta2.KafkaTopicInterface {
 	return newFakeKafkaTopics(c, namespace)
+}
+
+func (c *FakeKafkaV1beta2) KafkaUsers(namespace string) v1beta2.KafkaUserInterface {
+	return newFakeKafkaUsers(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

@@ -2,9 +2,7 @@ package v1beta2
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"log"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -14,8 +12,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-
-	"sigs.k8s.io/yaml"
 
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimzi "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
@@ -260,25 +256,4 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	if deleted != 1 {
 		t.Fatalf("Topic was not deleted once but %d", deleted)
 	}
-}
-
-func TestLoadUnload(t *testing.T) {
-	file, _ := filepath.Abs("./test/resources/KafkaTopic.yaml")
-	fileYaml, err := os.ReadFile(file)
-	if err != nil {
-		t.Fatalf("Failed to read yaml file: %s", err.Error())
-	}
-
-	var kafkaTopic kafkav1beta2.KafkaTopic
-	err = yaml.Unmarshal(fileYaml, &kafkaTopic)
-	if err != nil {
-		t.Fatalf("Failed to unmarshal the yaml: %s", err.Error())
-	}
-
-	serializedYaml, err := yaml.Marshal(kafkaTopic)
-	if err != nil {
-		t.Fatalf("Failed to marshal the yaml: %s", err.Error())
-	}
-	t.Logf("Test name: %s", t.Name())
-	assert.Equal(t, string(fileYaml), string(serializedYaml))
 }
