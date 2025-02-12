@@ -1,4 +1,4 @@
-package test
+package serialization
 
 import (
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"

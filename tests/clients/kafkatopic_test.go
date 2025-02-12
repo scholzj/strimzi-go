@@ -1,4 +1,4 @@
-package v1beta2
+package clients
 
 import (
 	"context"
