@@ -13,8 +13,7 @@ spec:
   storage:
     type: jbod
     volumes:
-    - deleteClaim: true
-      id: 0
+    - id: 0
       kraftMetadata: shared
       size: 100Gi
       type: persistent-claim

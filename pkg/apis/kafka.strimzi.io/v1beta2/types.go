@@ -981,7 +981,7 @@ type SingleVolumeStorage struct {
     Size string `json:"size,omitempty"`
     DeleteClaim bool `json:"deleteClaim,omitempty"`
     Selector map[string]string `json:"selector,omitempty"`
-    Id int32 `json:"id,omitempty"`
+    Id int32 `json:"id"`
     Overrides []PersistentClaimStorageOverride `json:"overrides,omitempty"`
     Type SingleVolumeStorageType `json:"type,omitempty"`
     Class string `json:"class,omitempty"`

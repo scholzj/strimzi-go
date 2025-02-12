@@ -7,6 +7,7 @@ import io.strimzi.api.kafka.model.bridge.KafkaBridge;
 import io.strimzi.api.kafka.model.connect.KafkaConnect;
 import io.strimzi.api.kafka.model.connector.KafkaConnector;
 import io.strimzi.api.kafka.model.kafka.Kafka;
+import io.strimzi.api.kafka.model.kafka.SingleVolumeStorage;
 import io.strimzi.api.kafka.model.mirrormaker2.KafkaMirrorMaker2;
 import io.strimzi.api.kafka.model.nodepool.KafkaNodePool;
 import io.strimzi.api.kafka.model.rebalance.KafkaRebalance;
@@ -110,7 +111,7 @@ public class CodeGenerator {
         // Generate the CRD fields
         for (Property property : properties.values()) {
             if (!IGNORED_PROPERTIES.contains(property.getName())) {
-                generateField(property);
+                generateField(property, true);
 
                 if (!toBeGenerated.contains(property.getType().getType()) && !alreadyGenerated.contains(property.getType().getType())) {
                     toBeGenerated.push(property.getType().getType());
@@ -121,7 +122,7 @@ public class CodeGenerator {
         out.append("}").append(NL);
     }
 
-    private void generateField(Property property) throws IOException {
+    private void generateField(Property property, boolean omitEmpty) throws IOException {
         PropertyType propertyType = property.getType();
         Class<?> returnType = propertyType.getType();
 
@@ -138,23 +139,23 @@ public class CodeGenerator {
             LOGGER.error("Unsupported type {}", returnType);
         } else if (Map.class.equals(returnType)) {
             if (propertyType.isMapOfTypes(String.class, String.class)) {
-                generateField(property.getGolangName(), "map[string]string", property.getName());
+                generateField(property.getGolangName(), "map[string]string", property.getName(), omitEmpty);
             } else if (propertyType.isMapOfTypes(String.class, Object.class)) {
-                generateField(property.getGolangName(), "JSONValue", property.getName());
+                generateField(property.getGolangName(), "JSONValue", property.getName(), omitEmpty);
             } else {
                 LOGGER.error("Unsupported Map type {}", returnType);
             }
         } else if (Schema.isJsonScalarType(returnType)) {
             if (returnType.isEnum()) {
-                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName());
+                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), omitEmpty);
                 addToStackIfNeeded(returnType);
             } else {
-                generateField(property.getGolangName(), typeName(returnType), property.getName());
+                generateField(property.getGolangName(), typeName(returnType), property.getName(), omitEmpty);
             }
         } else if (returnType.isArray() || List.class.equals(returnType)) {
-            generateArrayField(property);
+            generateArrayField(property, omitEmpty);
         } else {
-            generateField(property.getGolangName(), "*" + property.getType().getType().getSimpleName(), property.getName());
+            generateField(property.getGolangName(), "*" + property.getType().getType().getSimpleName(), property.getName(), omitEmpty);
             addToStackIfNeeded(property.getType().getType());
         }
     }
@@ -205,16 +206,16 @@ public class CodeGenerator {
                 || double.class.equals(type);
     }
 
-    private void generateArrayField(Property property) throws IOException   {
+    private void generateArrayField(Property property, boolean omitEmpty) throws IOException   {
         String arrayMarker = "[]".repeat(Math.max(0, property.getType().arrayDimension()));
 
         Class<?> elementType = property.getType().arrayBase();
         if (isBasicType(elementType)) {
-            generateField(property.getGolangName(), arrayMarker + typeName(elementType), property.getName());
+            generateField(property.getGolangName(), arrayMarker + typeName(elementType), property.getName(), omitEmpty);
         } else if (elementType.getName().startsWith("io.fabric8.kubernetes.api.model.")) {
-            generateField(property.getGolangName(), arrayMarker + mapFabric8TypeToKubernetes(elementType), property.getName());
+            generateField(property.getGolangName(), arrayMarker + mapFabric8TypeToKubernetes(elementType), property.getName(), omitEmpty);
         } else {
-            generateField(property.getGolangName(), arrayMarker + elementType.getSimpleName(), property.getName());
+            generateField(property.getGolangName(), arrayMarker + elementType.getSimpleName(), property.getName(), omitEmpty);
             addToStackIfNeeded(elementType);
         }
     }
@@ -252,8 +253,8 @@ public class CodeGenerator {
         };
     }
 
-    private void generateField(String goName, String type, String jsonName) throws IOException {
-        out.append(TAB).append(goName).append(" ").append(type).append(" ").append("`json:\"").append(jsonName).append(",omitempty\"`").append(NL);
+    private void generateField(String goName, String type, String jsonName, boolean omitEmpty) throws IOException {
+        out.append(TAB).append(goName).append(" ").append(type).append(" ").append("`json:\"").append(jsonName).append(omitEmpty ? ",omitempty\"`" : "\"`").append(NL);
     }
 
     private void generateType(Class<?> type) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -301,9 +302,19 @@ public class CodeGenerator {
 
             for (Property property : properties.values()) {
                 if ("type".equals(property.getName())) {
-                    generateField(property.getGolangName(), typeType, property.getName());
+                    generateField(property.getGolangName(), typeType, property.getName(), true);
                 } else {
-                    generateField(property);
+                    if ("id".equals(property.getName())
+                            && SingleVolumeStorage.class.getSimpleName().equals(type.getSimpleName())) {
+                        // The id field for JBOD volumes should not be omitted when set to 0 when serializing the objects.
+                        // So we need some special handling for it and not mark it as omit when empty.
+                        // This does not seem to be detectable in any other way in the Strimzi Java classes, so we just hardcode it here.
+                        LOGGER.info("Special handling for id field in SingleVolumeStorage");
+                        generateField(property, false);
+                    } else {
+                        generateField(property, true);
+                    }
+
                 }
             }
 
@@ -316,7 +327,7 @@ public class CodeGenerator {
             Map<String, Property> properties = Property.properties(API_VERSION, type);
 
             for (Property property : properties.values()) {
-                generateField(property);
+                generateField(property, true);
             }
 
             out.append("}").append(NL);
