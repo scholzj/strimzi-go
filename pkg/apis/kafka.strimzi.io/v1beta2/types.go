@@ -327,7 +327,7 @@ type KafkaConnectorStatus struct {
     Conditions []Condition `json:"conditions,omitempty"`
     ObservedGeneration int64 `json:"observedGeneration,omitempty"`
     AutoRestart *AutoRestartStatus `json:"autoRestart,omitempty"`
-    ConnectorStatus JSONValue `json:"connectorStatus,omitempty"`
+    ConnectorStatus MapStringObject `json:"connectorStatus,omitempty"`
     TasksMax int32 `json:"tasksMax,omitempty"`
     Topics []string `json:"topics,omitempty"`
 }
@@ -342,7 +342,7 @@ type KafkaConnectorSpec struct {
     Class string `json:"class,omitempty"`
     TasksMax int32 `json:"tasksMax,omitempty"`
     AutoRestart *AutoRestart `json:"autoRestart,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
     Pause bool `json:"pause,omitempty"`
     State ConnectorState `json:"state,omitempty"`
     ListOffsets *ListOffsets `json:"listOffsets,omitempty"`
@@ -394,14 +394,14 @@ type KafkaTopicSpec struct {
     TopicName string `json:"topicName,omitempty"`
     Partitions int32 `json:"partitions,omitempty"`
     Replicas int32 `json:"replicas,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
 }
 
 type KafkaRebalanceStatus struct {
     Conditions []Condition `json:"conditions,omitempty"`
     ObservedGeneration int64 `json:"observedGeneration,omitempty"`
     SessionId string `json:"sessionId,omitempty"`
-    OptimizationResult JSONValue `json:"optimizationResult,omitempty"`
+    OptimizationResult MapStringObject `json:"optimizationResult,omitempty"`
 }
 
 type KafkaRebalanceSpec struct {
@@ -603,17 +603,17 @@ type SystemProperty struct {
 
 type KafkaBridgeProducerSpec struct {
     Enabled bool `json:"enabled,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
 }
 
 type KafkaBridgeConsumerSpec struct {
     Enabled bool `json:"enabled,omitempty"`
     TimeoutSeconds int64 `json:"timeoutSeconds,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
 }
 
 type KafkaBridgeAdminClientSpec struct {
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
 }
 
 type KafkaBridgeHttpConfig struct {
@@ -816,7 +816,7 @@ type KafkaMirrorMaker2MirrorSpec struct {
 type KafkaMirrorMaker2ConnectorSpec struct {
     TasksMax int32 `json:"tasksMax,omitempty"`
     Pause bool `json:"pause,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
     State ConnectorState `json:"state,omitempty"`
     AutoRestart *AutoRestart `json:"autoRestart,omitempty"`
     ListOffsets *ListOffsets `json:"listOffsets,omitempty"`
@@ -828,7 +828,7 @@ type KafkaMirrorMaker2ClusterSpec struct {
     BootstrapServers string `json:"bootstrapServers,omitempty"`
     Tls *ClientTls `json:"tls,omitempty"`
     Authentication *KafkaClientAuthentication `json:"authentication,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
 }
 
 type KafkaConnectStatus struct {
@@ -847,7 +847,7 @@ type KafkaConnectSpec struct {
     BootstrapServers string `json:"bootstrapServers,omitempty"`
     Tls *ClientTls `json:"tls,omitempty"`
     Authentication *KafkaClientAuthentication `json:"authentication,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
     Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
     LivenessProbe *Probe `json:"livenessProbe,omitempty"`
     ReadinessProbe *Probe `json:"readinessProbe,omitempty"`
@@ -1133,7 +1133,7 @@ type CruiseControlSpec struct {
     Logging *Logging `json:"logging,omitempty"`
     Template *CruiseControlTemplate `json:"template,omitempty"`
     BrokerCapacity *BrokerCapacity `json:"brokerCapacity,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
     MetricsConfig *MetricsConfig `json:"metricsConfig,omitempty"`
     ApiUsers *CruiseControlApiUsers `json:"apiUsers,omitempty"`
     AutoRebalance []KafkaAutoRebalanceConfiguration `json:"autoRebalance,omitempty"`
@@ -1266,7 +1266,7 @@ type ZookeeperClusterSpec struct {
     Replicas int32 `json:"replicas,omitempty"`
     Image string `json:"image,omitempty"`
     Storage *SingleVolumeStorage `json:"storage,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
     LivenessProbe *Probe `json:"livenessProbe,omitempty"`
     ReadinessProbe *Probe `json:"readinessProbe,omitempty"`
     JvmOptions *JvmOptions `json:"jvmOptions,omitempty"`
@@ -1307,7 +1307,7 @@ type KafkaClusterSpec struct {
     Replicas int32 `json:"replicas,omitempty"`
     Image string `json:"image,omitempty"`
     Listeners []GenericKafkaListener `json:"listeners,omitempty"`
-    Config JSONValue `json:"config,omitempty"`
+    Config MapStringObject `json:"config,omitempty"`
     Storage *Storage `json:"storage,omitempty"`
     Authorization *KafkaAuthorization `json:"authorization,omitempty"`
     Rack *Rack `json:"rack,omitempty"`
@@ -1496,7 +1496,7 @@ type KafkaListenerAuthentication struct {
     IntrospectionEndpointUri string `json:"introspectionEndpointUri,omitempty"`
     ValidIssuerUri string `json:"validIssuerUri,omitempty"`
     ValidTokenType string `json:"validTokenType,omitempty"`
-    ListenerConfig JSONValue `json:"listenerConfig,omitempty"`
+    ListenerConfig MapStringObject `json:"listenerConfig,omitempty"`
     Type KafkaListenerAuthenticationType `json:"type,omitempty"`
     UserNamePrefix string `json:"userNamePrefix,omitempty"`
     FallbackUserNamePrefix string `json:"fallbackUserNamePrefix,omitempty"`

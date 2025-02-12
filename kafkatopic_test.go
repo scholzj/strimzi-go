@@ -51,7 +51,7 @@ func TestKafkaTopicCreateUpdateDeleteTest(t *testing.T) {
 		Spec: &kafkav1beta2.KafkaTopicSpec{
 			Replicas:   3,
 			Partitions: 3,
-			Config:     kafkav1beta2.JSONValue{"retention.ms": 7200000, "segment.bytes": 1073741824},
+			Config:     kafkav1beta2.MapStringObject{"retention.ms": 7200000, "segment.bytes": 1073741824},
 		},
 	}
 
@@ -180,7 +180,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 		Spec: &kafkav1beta2.KafkaTopicSpec{
 			Replicas:   3,
 			Partitions: 3,
-			Config:     kafkav1beta2.JSONValue{"retention.ms": 7200000, "segment.bytes": 1073741824},
+			Config:     kafkav1beta2.MapStringObject{"retention.ms": 7200000, "segment.bytes": 1073741824},
 		},
 	}
 

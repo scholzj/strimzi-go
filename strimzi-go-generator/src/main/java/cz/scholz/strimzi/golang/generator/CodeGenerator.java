@@ -141,7 +141,7 @@ public class CodeGenerator {
             if (propertyType.isMapOfTypes(String.class, String.class)) {
                 generateField(property.getGolangName(), "map[string]string", property.getName(), omitEmpty);
             } else if (propertyType.isMapOfTypes(String.class, Object.class)) {
-                generateField(property.getGolangName(), "JSONValue", property.getName(), omitEmpty);
+                generateField(property.getGolangName(), "MapStringObject", property.getName(), omitEmpty);
             } else {
                 LOGGER.error("Unsupported Map type {}", returnType);
             }

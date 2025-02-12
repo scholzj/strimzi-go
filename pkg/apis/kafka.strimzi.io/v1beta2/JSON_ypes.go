@@ -19,20 +19,20 @@ package v1beta2
 // A new type used to store Map<String, Object> fields in the CRDs.
 // This is needed because Golang CRD structures and generators don't support using map[string]interface{} directly
 
-type JSONValue map[string]interface{}
+type MapStringObject map[string]interface{}
 
-func (in *JSONValue) DeepCopy() *JSONValue {
+func (in *MapStringObject) DeepCopy() *MapStringObject {
 	if in == nil {
 		return nil
 	}
 
-	out := new(JSONValue)
+	out := new(MapStringObject)
 	in.DeepCopyInto(out)
 
 	return out
 }
 
-func (in *JSONValue) DeepCopyInto(out *JSONValue) {
+func (in *MapStringObject) DeepCopyInto(out *MapStringObject) {
 	if in != nil {
 		*out = make(map[string]interface{}, len(*in))
 		for key, val := range *in {
