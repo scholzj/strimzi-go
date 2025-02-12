@@ -166,6 +166,11 @@ class Property implements AnnotatedElement {
         return annotation != null && annotation.enabled();
     }
 
+    private static boolean isRequired(Method method) {
+        JsonProperty annotation = findAnnotation(JsonProperty.class, method, method.getDeclaringClass());
+        return annotation != null && annotation.required();
+    }
+
     private static boolean hasJsonIgnore(Method method) {
         JsonIgnore annotation = findAnnotation(JsonIgnore.class, method, method.getDeclaringClass());
         return annotation != null && annotation.value();

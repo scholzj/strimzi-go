@@ -1,0 +1,385 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"Kafka","metadata":{"annotations":{"strimzi.io/kraft":"enabled","strimzi.io/node-pools":"enabled"},"labels":{"app":"my-cluster"},"name":"my-cluster","namespace":"myproject"},"spec":{"clientsCa":{"validityDays":1000},"clusterCa":{"validityDays":1000},"entityOperator":{"template":{"deployment":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"pod":{"enableServiceLinks":false,"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}}},"topicOperator":{"logging":{"loggers":{"rootLogger.level":"DEBUG"},"type":"inline"},"resources":{"limits":{"cpu":"0.5","memory":"256Mi"},"requests":{"cpu":"0.2","memory":"256Mi"}}},"userOperator":{"logging":{"loggers":{"rootLogger.level":"INFO"},"type":"inline"},"resources":{"limits":{"cpu":"0.5","memory":"512Mi"},"requests":{"cpu":"0.2","memory":"512Mi"}}}},"kafka":{"authorization":{"superUsers":["CN=my-connect","my-connect","CN=my-bridge","my-bridge"],"type":"simple"},"config":{"auto.create.topics.enable":"false","default.replication.factor":3,"min.insync.replicas":2,"offsets.topic.replication.factor":3,"replica.selector.class":"org.apache.kafka.common.replica.RackAwareReplicaSelector","reserved.broker.max.id":10000,"transaction.state.log.min.isr":2,"transaction.state.log.replication.factor":3},"listeners":[{"authentication":{"type":"scram-sha-512"},"name":"plain","networkPolicyPeers":[{"podSelector":{"matchLabels":{"app":"kafka-consumer-sasl"}}},{"podSelector":{"matchLabels":{"app":"kafka-producer-sasl"}}},{"podSelector":{"matchLabels":{"app":"kafka-streams-sasl"}}},{"podSelector":{"matchLabels":{"app":"java-kafka-consumer"}}},{"podSelector":{"matchLabels":{"app":"java-kafka-producer"}}},{"podSelector":{"matchLabels":{"app":"java-kafka-streams"}}},{"podSelector":{"matchLabels":{"app":"my-connect"}}},{"podSelector":{"matchLabels":{"app":"my-connect-s2i"}}},{"podSelector":{"matchLabels":{"app":"my-bridge"}}}],"port":9092,"tls":false,"type":"internal"},{"authentication":{"type":"tls"},"name":"tls","networkPolicyPeers":[{"podSelector":{"matchLabels":{"app":"kafka-consumer"}}},{"podSelector":{"matchLabels":{"app":"kafka-producer"}}},{"podSelector":{"matchLabels":{"app":"kafka-streams"}}},{"podSelector":{"matchLabels":{"app":"java-kafka-consumer"}}},{"podSelector":{"matchLabels":{"app":"java-kafka-producer"}}},{"podSelector":{"matchLabels":{"app":"java-kafka-streams"}}},{"podSelector":{"matchLabels":{"app":"my-connect"}}},{"podSelector":{"matchLabels":{"app":"my-connect-s2i"}}},{"podSelector":{"matchLabels":{"app":"my-bridge"}}}],"port":9093,"tls":true,"type":"internal"},{"authentication":{"type":"tls"},"name":"external","port":9094,"tls":true,"type":"nodeport"}],"livenessProbe":{"initialDelaySeconds":15,"timeoutSeconds":5},"metricsConfig":{"type":"jmxPrometheusExporter","valueFrom":{"configMapKeyRef":{"key":"kafka-metrics.yaml","name":"kafka-metrics"}}},"rack":{"topologyKey":"kubernetes.io/hostname"},"readinessProbe":{"initialDelaySeconds":15,"timeoutSeconds":5},"template":{"bootstrapService":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"brokersService":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"clusterCaCert":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1z","key2":"label2z"}}},"externalBootstrapRoute":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"externalBootstrapService":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"perPodRoute":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"perPodService":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"persistentVolumeClaim":{"metadata":{"annotations":{"testAnno":"testValue"},"labels":{"testLabel":"testValue"}}},"pod":{"enableServiceLinks":false,"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1y","key2":"label2y"}}},"podDisruptionBudget":{"maxUnavailable":0},"podSet":{"metadata":{"annotations":{"akey1":"anno1Sps","akey2":"anno2Sps"},"labels":{"key1":"label1Sps","key2":"label2Sps"}}}}},"kafkaExporter":{"resources":{"limits":{"cpu":"0.5","memory":"256Mi"},"requests":{"cpu":"0.1","memory":"256Mi"}},"template":{"container":{"env":[{"name":"SOME-ENV","value":"someValue"}]},"deployment":{"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"pod":{"enableServiceLinks":false,"metadata":{"annotations":{"akey1":"label1","akey2":"label2"},"labels":{"key1":"label1","key2":"label2"}}}}}}}
+    strimzi.io/kraft: enabled
+    strimzi.io/node-pools: enabled
+  creationTimestamp: "2025-02-12T12:23:00Z"
+  generation: 1
+  labels:
+    app: my-cluster
+  name: my-cluster
+  namespace: myproject
+  resourceVersion: "3383615"
+  uid: 894c8746-813f-44c9-913f-9dc6e8b3eee4
+spec:
+  clientsCa:
+    validityDays: 1000
+  clusterCa:
+    validityDays: 1000
+  entityOperator:
+    template:
+      deployment:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      pod:
+        enableServiceLinks: true
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+    topicOperator:
+      logging:
+        loggers:
+          rootLogger.level: DEBUG
+        type: inline
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+        requests:
+          cpu: 200m
+          memory: 256Mi
+    userOperator:
+      logging:
+        loggers:
+          rootLogger.level: INFO
+        type: inline
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 200m
+          memory: 512Mi
+  kafka:
+    authorization:
+      superUsers:
+      - CN=my-connect
+      - my-connect
+      - CN=my-bridge
+      - my-bridge
+      type: simple
+    config:
+      auto.create.topics.enable: "false"
+      default.replication.factor: 3
+      min.insync.replicas: 2
+      offsets.topic.replication.factor: 3
+      replica.selector.class: org.apache.kafka.common.replica.RackAwareReplicaSelector
+      reserved.broker.max.id: 10000
+      transaction.state.log.min.isr: 2
+      transaction.state.log.replication.factor: 3
+    listeners:
+    - authentication:
+        type: scram-sha-512
+      name: plain
+      networkPolicyPeers:
+      - podSelector:
+          matchLabels:
+            app: kafka-consumer-sasl
+      - podSelector:
+          matchLabels:
+            app: kafka-producer-sasl
+      - podSelector:
+          matchLabels:
+            app: kafka-streams-sasl
+      - podSelector:
+          matchLabels:
+            app: java-kafka-consumer
+      - podSelector:
+          matchLabels:
+            app: java-kafka-producer
+      - podSelector:
+          matchLabels:
+            app: java-kafka-streams
+      - podSelector:
+          matchLabels:
+            app: my-connect
+      - podSelector:
+          matchLabels:
+            app: my-connect-s2i
+      - podSelector:
+          matchLabels:
+            app: my-bridge
+      port: 9092
+      tls: false
+      type: internal
+    - authentication:
+        type: tls
+      name: tls
+      networkPolicyPeers:
+      - podSelector:
+          matchLabels:
+            app: kafka-consumer
+      - podSelector:
+          matchLabels:
+            app: kafka-producer
+      - podSelector:
+          matchLabels:
+            app: kafka-streams
+      - podSelector:
+          matchLabels:
+            app: java-kafka-consumer
+      - podSelector:
+          matchLabels:
+            app: java-kafka-producer
+      - podSelector:
+          matchLabels:
+            app: java-kafka-streams
+      - podSelector:
+          matchLabels:
+            app: my-connect
+      - podSelector:
+          matchLabels:
+            app: my-connect-s2i
+      - podSelector:
+          matchLabels:
+            app: my-bridge
+      port: 9093
+      tls: true
+      type: internal
+    - authentication:
+        type: tls
+      name: external
+      port: 9094
+      tls: true
+      type: nodeport
+    livenessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          key: kafka-metrics.yaml
+          name: kafka-metrics
+    rack:
+      topologyKey: kubernetes.io/hostname
+    readinessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+    template:
+      bootstrapService:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      brokersService:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      clusterCaCert:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1z
+            key2: label2z
+      externalBootstrapRoute:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      externalBootstrapService:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      perPodRoute:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      perPodService:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      persistentVolumeClaim:
+        metadata:
+          annotations:
+            testAnno: testValue
+          labels:
+            testLabel: testValue
+      pod:
+        enableServiceLinks: true
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1y
+            key2: label2y
+      podDisruptionBudget:
+        maxUnavailable: 0
+      podSet:
+        metadata:
+          annotations:
+            akey1: anno1Sps
+            akey2: anno2Sps
+          labels:
+            key1: label1Sps
+            key2: label2Sps
+  kafkaExporter:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    template:
+      container:
+        env:
+        - name: SOME-ENV
+          value: someValue
+      deployment:
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+      pod:
+        enableServiceLinks: true
+        metadata:
+          annotations:
+            akey1: label1
+            akey2: label2
+          labels:
+            key1: label1
+            key2: label2
+status:
+  clusterId: 3YOWGNJ8RFed6n2a93ZDuA
+  conditions:
+  - lastTransitionTime: "2025-02-12T12:26:23.277600717Z"
+    status: "True"
+    type: Ready
+  kafkaMetadataState: KRaft
+  kafkaMetadataVersion: 3.9-IV0
+  kafkaNodePools:
+  - name: aston
+  - name: bodymoor
+  - name: controllers
+  - name: witton
+  kafkaVersion: 3.9.0
+  listeners:
+  - addresses:
+    - host: my-cluster-kafka-bootstrap.myproject.svc
+      port: 9092
+    bootstrapServers: my-cluster-kafka-bootstrap.myproject.svc:9092
+    name: plain
+  - addresses:
+    - host: my-cluster-kafka-bootstrap.myproject.svc
+      port: 9093
+    bootstrapServers: my-cluster-kafka-bootstrap.myproject.svc:9093
+    certificates:
+    - |
+      -----BEGIN CERTIFICATE-----
+      MIIFLTCCAxWgAwIBAgIUPYe4RN0nHQAaehCZnNoAUjg8Ch8wDQYJKoZIhvcNAQEN
+      BQAwLTETMBEGA1UECgwKaW8uc3RyaW16aTEWMBQGA1UEAwwNY2x1c3Rlci1jYSB2
+      MDAeFw0yNTAyMTIxMjIzMzVaFw0yNzExMDkxMjIzMzVaMC0xEzARBgNVBAoMCmlv
+      LnN0cmltemkxFjAUBgNVBAMMDWNsdXN0ZXItY2EgdjAwggIiMA0GCSqGSIb3DQEB
+      AQUAA4ICDwAwggIKAoICAQC1yPNqZrt5oDeMclIYY93DszMM4mmVz9FEZiNqQcZS
+      WSCEuNuVPw8/0aGsCkXN/Q3LTvo6awkeAZQeWugvdrT3tUFhaw8LwX+ahjeHVUp7
+      I3u5AOKphqbvd20wxT56NY+yvwmCMBNqK49P6aiAQFH7KfNV3oi63ZP5J5X04C7J
+      67AtfWJKMLrpsR4OiEHJ4BWPLsBQfAqaIfduzr4UGosYpt0ku6zrEwz+SxWr9YAT
+      BmcYoHF5TsbiDg0jNpI45/Mgl8oENZkYxdjgQj0mSE4LnaHI5YhYc69kQY3T37YH
+      P7N+HdyKdZKPHup+ghHsEV6sire8j/+l9qg84zqyoPobN1ukjlpTU9GsrfTcKefO
+      7tEG//sSsxRC4FDEeZiqzO66D4K8UsnWScJfqrhLe6ChQ0ExVnW9awk6kYxqHpPa
+      ZthTGv11IRCO8roGa9zTIKjJwiUO6WsbFv5S0QqvfYsKGt/78C2DjyLV2xw7LcXp
+      atPNI9OqH3n9ukd6kuSQeibBhN/2cPwjRC5hnh3fOzDliQ5z8yajlMWv7hqkh6lc
+      MZDASmJwOAeswc45wqIooGo40hav6rVNdDBQ8sre7iC0fihHvF3WiYTB7m1uYI1Y
+      Pp5f0DOPajnYMOBqLQIs6yRmYhQBwTtUSrvO0/r/yeJCyNwqu1nVIErde4FPxemf
+      YQIDAQABo0UwQzAdBgNVHQ4EFgQULpJ+1NVTD/y24JzkD695itq9kqMwEgYDVR0T
+      AQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAQYwDQYJKoZIhvcNAQENBQADggIB
+      AHHrviHQW4+zk2vdzezAH9tXHHKe+YJ8JA4FmqWXmiF9VKRTdlWXVVq7SxT6JZKH
+      WHDkOho4w4uoO5YR7PzNWcGdSLlXMuhOeYNMilr1VVFbqkbr96Cq+2hdpY9wp2m0
+      xCRJ1kzhgcnB84ZqtcdzoOr8oihM0BcPUPrpjkfybQtrIH8N0/BXa/8XDvOA80LG
+      dz6TtB1pQC7dBJXOj6CYlv8ODSPe2fMKadvQiTrqXcsoTStA6mAyLEAICHvgP4wl
+      ShMaKwVUyKrxDnR/m307JtT86rbHazTOf5wlSwYIbwjKbEuYNJqCvtBd0GEvEz+q
+      UmS/EEb8+lXP27ndErjU/TRxWB8O1tbXjuWOvK6SuyEG+1LEd2nK3vqmYn7AysPi
+      q1G0CAh9wrK/BsxqtzMCnlO7AnZOWAGMdTSpt8JezQcSATnM0V2xdtrruS0Qi/ai
+      L7K8Jv7WAgSMkkqHZ6gax1PlomF16R9aEijbkYgFhFZoogx/o2LkxxQH1Zi1LNMI
+      4hJ9N51X4jPWglMx0hXqPlimTmvWLlCu1iwHgMu3l+1qdTg572qIiiNlFn48Df38
+      GU5LyiiyPd7/FKai3H4W2T9efnRG0e+qVknzak2bAvVYW7LwqsY7OptklKnLo2OY
+      moFZd6upMc64g1cvxREEHJdcQH0p9GI4UF+eTpB92SCr
+      -----END CERTIFICATE-----
+    name: tls
+  - addresses:
+    - host: 192.168.1.73
+      port: 31792
+    bootstrapServers: 192.168.1.73:31792
+    certificates:
+    - |
+      -----BEGIN CERTIFICATE-----
+      MIIFLTCCAxWgAwIBAgIUPYe4RN0nHQAaehCZnNoAUjg8Ch8wDQYJKoZIhvcNAQEN
+      BQAwLTETMBEGA1UECgwKaW8uc3RyaW16aTEWMBQGA1UEAwwNY2x1c3Rlci1jYSB2
+      MDAeFw0yNTAyMTIxMjIzMzVaFw0yNzExMDkxMjIzMzVaMC0xEzARBgNVBAoMCmlv
+      LnN0cmltemkxFjAUBgNVBAMMDWNsdXN0ZXItY2EgdjAwggIiMA0GCSqGSIb3DQEB
+      AQUAA4ICDwAwggIKAoICAQC1yPNqZrt5oDeMclIYY93DszMM4mmVz9FEZiNqQcZS
+      WSCEuNuVPw8/0aGsCkXN/Q3LTvo6awkeAZQeWugvdrT3tUFhaw8LwX+ahjeHVUp7
+      I3u5AOKphqbvd20wxT56NY+yvwmCMBNqK49P6aiAQFH7KfNV3oi63ZP5J5X04C7J
+      67AtfWJKMLrpsR4OiEHJ4BWPLsBQfAqaIfduzr4UGosYpt0ku6zrEwz+SxWr9YAT
+      BmcYoHF5TsbiDg0jNpI45/Mgl8oENZkYxdjgQj0mSE4LnaHI5YhYc69kQY3T37YH
+      P7N+HdyKdZKPHup+ghHsEV6sire8j/+l9qg84zqyoPobN1ukjlpTU9GsrfTcKefO
+      7tEG//sSsxRC4FDEeZiqzO66D4K8UsnWScJfqrhLe6ChQ0ExVnW9awk6kYxqHpPa
+      ZthTGv11IRCO8roGa9zTIKjJwiUO6WsbFv5S0QqvfYsKGt/78C2DjyLV2xw7LcXp
+      atPNI9OqH3n9ukd6kuSQeibBhN/2cPwjRC5hnh3fOzDliQ5z8yajlMWv7hqkh6lc
+      MZDASmJwOAeswc45wqIooGo40hav6rVNdDBQ8sre7iC0fihHvF3WiYTB7m1uYI1Y
+      Pp5f0DOPajnYMOBqLQIs6yRmYhQBwTtUSrvO0/r/yeJCyNwqu1nVIErde4FPxemf
+      YQIDAQABo0UwQzAdBgNVHQ4EFgQULpJ+1NVTD/y24JzkD695itq9kqMwEgYDVR0T
+      AQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAQYwDQYJKoZIhvcNAQENBQADggIB
+      AHHrviHQW4+zk2vdzezAH9tXHHKe+YJ8JA4FmqWXmiF9VKRTdlWXVVq7SxT6JZKH
+      WHDkOho4w4uoO5YR7PzNWcGdSLlXMuhOeYNMilr1VVFbqkbr96Cq+2hdpY9wp2m0
+      xCRJ1kzhgcnB84ZqtcdzoOr8oihM0BcPUPrpjkfybQtrIH8N0/BXa/8XDvOA80LG
+      dz6TtB1pQC7dBJXOj6CYlv8ODSPe2fMKadvQiTrqXcsoTStA6mAyLEAICHvgP4wl
+      ShMaKwVUyKrxDnR/m307JtT86rbHazTOf5wlSwYIbwjKbEuYNJqCvtBd0GEvEz+q
+      UmS/EEb8+lXP27ndErjU/TRxWB8O1tbXjuWOvK6SuyEG+1LEd2nK3vqmYn7AysPi
+      q1G0CAh9wrK/BsxqtzMCnlO7AnZOWAGMdTSpt8JezQcSATnM0V2xdtrruS0Qi/ai
+      L7K8Jv7WAgSMkkqHZ6gax1PlomF16R9aEijbkYgFhFZoogx/o2LkxxQH1Zi1LNMI
+      4hJ9N51X4jPWglMx0hXqPlimTmvWLlCu1iwHgMu3l+1qdTg572qIiiNlFn48Df38
+      GU5LyiiyPd7/FKai3H4W2T9efnRG0e+qVknzak2bAvVYW7LwqsY7OptklKnLo2OY
+      moFZd6upMc64g1cvxREEHJdcQH0p9GI4UF+eTpB92SCr
+      -----END CERTIFICATE-----
+    name: external
+  observedGeneration: 1
+  operatorLastSuccessfulVersion: 0.46.0-SNAPSHOT
+  registeredNodeIds:
+  - 0
+  - 1
+  - 2
+  - 1000
+  - 2000
+  - 3000

@@ -1,0 +1,39 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta1","kind":"KafkaUser","metadata":{"annotations":{},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"kafka-test-apps-consumer","namespace":"myproject"},"spec":{"authentication":{"type":"tls"},"authorization":{"acls":[{"operations":["Read","Describe"],"resource":{"name":"kafka-test-apps","type":"topic"}},{"operations":["Read"],"resource":{"name":"my-kafka-consumer","type":"group"}}],"type":"simple"}}}
+  creationTimestamp: "2025-02-12T22:00:59Z"
+  generation: 1
+  labels:
+    strimzi.io/cluster: my-cluster
+  name: kafka-test-apps-consumer
+  namespace: myproject
+  resourceVersion: "3507400"
+  uid: 6eef9d30-7441-4cf4-95bb-1e8e63301a5a
+spec:
+  authentication:
+    type: tls
+  authorization:
+    acls:
+    - operations:
+      - Read
+      - Describe
+      resource:
+        name: kafka-test-apps
+        type: topic
+    - operations:
+      - Read
+      resource:
+        name: my-kafka-consumer
+        type: group
+    type: simple
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:01:01.136844800Z"
+    status: "True"
+    type: Ready
+  observedGeneration: 1
+  secret: kafka-test-apps-consumer
+  username: CN=kafka-test-apps-consumer

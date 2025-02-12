@@ -18,6 +18,7 @@ spec:
     listeners:
     - name: plain
       port: 9092
+      tls: false
       type: internal
     - name: tls
       port: 9093

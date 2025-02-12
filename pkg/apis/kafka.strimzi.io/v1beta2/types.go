@@ -502,7 +502,7 @@ type ContainerEnvVarSource struct {
 
 type PodDisruptionBudgetTemplate struct {
     Metadata *MetadataTemplate `json:"metadata,omitempty"`
-    MaxUnavailable int32 `json:"maxUnavailable,omitempty"`
+    MaxUnavailable int32 `json:"maxUnavailable"`
 }
 
 type InternalServiceTemplate struct {
@@ -1418,7 +1418,7 @@ type GenericKafkaListener struct {
     Name string `json:"name,omitempty"`
     Port int32 `json:"port,omitempty"`
     Type KafkaListenerType `json:"type,omitempty"`
-    Tls bool `json:"tls,omitempty"`
+    Tls bool `json:"tls"`
     Authentication *KafkaListenerAuthentication `json:"authentication,omitempty"`
     Configuration *GenericKafkaListenerConfiguration `json:"configuration,omitempty"`
     NetworkPolicyPeers []networkingv1.NetworkPolicyPeer `json:"networkPolicyPeers,omitempty"`

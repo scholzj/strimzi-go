@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.strimzi.api.annotations.ApiVersion;
 import io.strimzi.api.kafka.model.bridge.KafkaBridge;
+import io.strimzi.api.kafka.model.common.template.PodDisruptionBudgetTemplate;
 import io.strimzi.api.kafka.model.connect.KafkaConnect;
 import io.strimzi.api.kafka.model.connector.KafkaConnector;
 import io.strimzi.api.kafka.model.kafka.Kafka;
 import io.strimzi.api.kafka.model.kafka.SingleVolumeStorage;
+import io.strimzi.api.kafka.model.kafka.listener.GenericKafkaListener;
 import io.strimzi.api.kafka.model.mirrormaker2.KafkaMirrorMaker2;
 import io.strimzi.api.kafka.model.nodepool.KafkaNodePool;
 import io.strimzi.api.kafka.model.rebalance.KafkaRebalance;
@@ -147,7 +149,7 @@ public class CodeGenerator {
             }
         } else if (Schema.isJsonScalarType(returnType)) {
             if (returnType.isEnum()) {
-                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), omitEmpty);
+                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), isR);
                 addToStackIfNeeded(returnType);
             } else {
                 generateField(property.getGolangName(), typeName(returnType), property.getName(), omitEmpty);
@@ -327,7 +329,23 @@ public class CodeGenerator {
             Map<String, Property> properties = Property.properties(API_VERSION, type);
 
             for (Property property : properties.values()) {
-                generateField(property, true);
+                if ("tls".equals(property.getName())
+                        && GenericKafkaListener.class.getSimpleName().equals(type.getSimpleName())) {
+                    // The tls field for listener configuration should not be omitted when set to false when serializing the objects.
+                    // So we need some special handling for it and not mark it as omit when empty.
+                    // This does not seem to be detectable in any other way in the Strimzi Java classes, so we just hardcode it here.
+                    LOGGER.info("Special handling for tls field in GenericKafkaListener");
+                    generateField(property, false);
+                } else if ("maxUnavailable".equals(property.getName())
+                        && PodDisruptionBudgetTemplate.class.getSimpleName().equals(type.getSimpleName())) {
+                    // The maxUnavailable field for PodDisruptionBudgetTemplate should not be omitted when set to 0 when serializing the objects.
+                    // So we need some special handling for it and not mark it as omit when empty.
+                    // This does not seem to be detectable in any other way in the Strimzi Java classes, so we just hardcode it here.
+                    LOGGER.info("Special handling for maxUnavailable field in PodDisruptionBudgetTemplate");
+                    generateField(property, false);
+                } else {
+                    generateField(property, true);
+                }
             }
 
             out.append("}").append(NL);

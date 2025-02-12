@@ -1,0 +1,47 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaConnector","metadata":{"annotations":{},"labels":{"strimzi.io/cluster":"my-connect"},"name":"echo-sink-connector","namespace":"myproject"},"spec":{"autoRestart":{"enabled":true},"class":"EchoSink","config":{"level":"${configmaps:myproject/connector-configuration:log.level}","topics":"kafka-test-apps"},"tasksMax":3}}
+  creationTimestamp: "2025-02-12T21:58:42Z"
+  generation: 1
+  labels:
+    strimzi.io/cluster: my-connect
+  name: echo-sink-connector
+  namespace: myproject
+  resourceVersion: "3508468"
+  uid: e0d8f99d-5b2a-41c7-9178-619951485376
+spec:
+  autoRestart:
+    enabled: true
+  class: EchoSink
+  config:
+    level: ${configmaps:myproject/connector-configuration:log.level}
+    topics: kafka-test-apps
+  tasksMax: 3
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:05:36.347563356Z"
+    status: "True"
+    type: Ready
+  connectorStatus:
+    connector:
+      state: RUNNING
+      worker_id: my-connect-connect-0.my-connect-connect.myproject.svc:8083
+    name: echo-sink-connector
+    tasks:
+    - id: 0
+      state: RUNNING
+      worker_id: my-connect-connect-0.my-connect-connect.myproject.svc:8083
+    - id: 1
+      state: RUNNING
+      worker_id: my-connect-connect-0.my-connect-connect.myproject.svc:8083
+    - id: 2
+      state: RUNNING
+      worker_id: my-connect-connect-0.my-connect-connect.myproject.svc:8083
+    type: sink
+  observedGeneration: 1
+  tasksMax: 3
+  topics:
+  - kafka-test-apps
