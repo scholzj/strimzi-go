@@ -13,86 +13,100 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func NewTopic() *kafkav1beta2.KafkaTopic {
-	return &kafkav1beta2.KafkaTopic{
+func NewUser() *kafkav1beta2.KafkaUser {
+	return &kafkav1beta2.KafkaUser{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NAME,
 			Namespace: NAMESPACE,
 		},
-		Spec: &kafkav1beta2.KafkaTopicSpec{
-			Replicas:   3,
-			Partitions: 3,
-			Config:     kafkav1beta2.MapStringObject{"retention.ms": 7200000, "segment.bytes": 1073741824},
+		Spec: &kafkav1beta2.KafkaUserSpec{
+			Authentication: &kafkav1beta2.KafkaUserAuthentication{
+				Type: kafkav1beta2.TLS_KAFKAUSERAUTHENTICATIONTYPE,
+			},
+			Authorization: &kafkav1beta2.KafkaUserAuthorization{
+				Type: kafkav1beta2.SIMPLE_KAFKAUSERAUTHORIZATIONTYPE,
+				Acls: []kafkav1beta2.AclRule{{
+					Operations: []kafkav1beta2.AclOperation{kafkav1beta2.READ_ACLOPERATION, kafkav1beta2.DESCRIBE_ACLOPERATION},
+					Resource:   &kafkav1beta2.AclRuleResource{Name: "my-topic", Type: kafkav1beta2.TOPIC_ACLRULERESOURCETYPE},
+				}},
+			},
 		},
 	}
 }
 
-func UpdatedTopic(oldResource *kafkav1beta2.KafkaTopic) *kafkav1beta2.KafkaTopic {
+func UpdatedUser(oldResource *kafkav1beta2.KafkaUser) *kafkav1beta2.KafkaUser {
 	updatedResource := oldResource.DeepCopy()
 
-	updatedResource.Spec.Replicas = 1
-	updatedResource.Spec.Partitions = 10
-	updatedResource.Spec.Config["segment.bytes"] = 107374182
+	updatedResource.Spec.Authentication = &kafkav1beta2.KafkaUserAuthentication{
+		Type: kafkav1beta2.SCRAM_SHA_512_KAFKAUSERAUTHENTICATIONTYPE,
+	}
+
+	updatedResource.Spec.Authorization = &kafkav1beta2.KafkaUserAuthorization{
+		Type: kafkav1beta2.SIMPLE_KAFKAUSERAUTHORIZATIONTYPE,
+		Acls: []kafkav1beta2.AclRule{{
+			Operations: []kafkav1beta2.AclOperation{kafkav1beta2.WRITE_ACLOPERATION, kafkav1beta2.DESCRIBE_ACLOPERATION},
+			Resource:   &kafkav1beta2.AclRuleResource{Name: "my-other-topic", Type: kafkav1beta2.TOPIC_ACLRULERESOURCETYPE},
+		}},
+	}
 
 	return updatedResource
 }
 
-func AssertTopics(t *testing.T, r1, r2 *kafkav1beta2.KafkaTopic) {
+func AssertUsers(t *testing.T, r1, r2 *kafkav1beta2.KafkaUser) {
 	assert.Equal(t, r1.ObjectMeta.Name, r2.ObjectMeta.Name)
 	assert.Equal(t, r1.ObjectMeta.Namespace, r2.ObjectMeta.Namespace)
-	assert.Equal(t, r1.Spec.Replicas, r2.Spec.Replicas)
-	assert.Equal(t, r1.Spec.Replicas, r2.Spec.Replicas)
-	assert.Equal(t, r1.Spec.Partitions, r2.Spec.Partitions)
-	assert.EqualValues(t, r1.Spec.Config["retention.ms"], r2.Spec.Config["retention.ms"])
-	assert.EqualValues(t, r1.Spec.Config["segment.bytes"], r2.Spec.Config["segment.bytes"])
+	assert.Equal(t, r1.Spec.Authentication.Type, r2.Spec.Authentication.Type)
+	assert.Equal(t, r1.Spec.Authorization.Type, r2.Spec.Authorization.Type)
+	assert.Equal(t, len(r1.Spec.Authorization.Acls), len(r2.Spec.Authorization.Acls))
+	assert.Equal(t, r1.Spec.Authorization.Acls[0], r2.Spec.Authorization.Acls[0])
 }
 
-func TestKafkaTopicCreateUpdateDelete(t *testing.T) {
+func TestKafkaUserCreateUpdateDelete(t *testing.T) {
 	client := Client(t)
 
 	// Delete at the end to avoid errors
-	defer client.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
+	defer client.KafkaV1beta2().KafkaUsers(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
 
 	// Create the resource
-	newResource := NewTopic()
-	_, err := client.KafkaV1beta2().KafkaTopics(NAMESPACE).Create(context.TODO(), newResource, metav1.CreateOptions{})
+	newResource := NewUser()
+	_, err := client.KafkaV1beta2().KafkaUsers(NAMESPACE).Create(context.TODO(), newResource, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to create actualResource: %s", err.Error())
 	}
 
 	// Get the resource
-	actualResource, err := client.KafkaV1beta2().KafkaTopics(NAMESPACE).Get(context.TODO(), NAME, metav1.GetOptions{})
+	actualResource, err := client.KafkaV1beta2().KafkaUsers(NAMESPACE).Get(context.TODO(), NAME, metav1.GetOptions{})
 	if err != nil {
 		t.Fatalf("Failed to get actualResource: %s", err.Error())
 	}
 
 	// Assert the resource
-	AssertTopics(t, newResource, actualResource)
+	AssertUsers(t, newResource, actualResource)
 
 	// Update the resource
-	updatedResource := UpdatedTopic(actualResource)
-	_, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Update(context.TODO(), updatedResource, metav1.UpdateOptions{})
+	updatedResource := UpdatedUser(actualResource)
+	_, err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Update(context.TODO(), updatedResource, metav1.UpdateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to update actualResource: %s", err.Error())
 	}
 
 	// Get the resource
-	actualResource, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Get(context.TODO(), NAME, metav1.GetOptions{})
+	actualResource, err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Get(context.TODO(), NAME, metav1.GetOptions{})
 	if err != nil {
 		t.Fatalf("Failed to get actualResource: %s", err.Error())
 	}
 
 	// Assert the resource
-	AssertTopics(t, updatedResource, actualResource)
+	AssertUsers(t, updatedResource, actualResource)
 
 	// Delete the resource
-	err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
+	err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
 	if err != nil {
 		t.Fatalf("Failed to delete actualResource: %s", err.Error())
 	}
 
 	// Check deletion
-	actualResource, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Get(context.TODO(), NAME, metav1.GetOptions{})
+	actualResource, err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Get(context.TODO(), NAME, metav1.GetOptions{})
 	if err != nil {
 		if !strings.Contains(err.Error(), "not found") {
 			t.Fatalf("Failed to get resource: %s", err.Error())
@@ -102,11 +116,11 @@ func TestKafkaTopicCreateUpdateDelete(t *testing.T) {
 	}
 }
 
-func TestKafkaTopicInformerAndLister(t *testing.T) {
+func TestKafkaUserInformerAndLister(t *testing.T) {
 	client := Client(t)
 
 	// Delete at the end to avoid errors
-	defer client.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
+	defer client.KafkaV1beta2().KafkaUsers(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
 
 	// Setup informer
 	added := 0
@@ -121,7 +135,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 
 	// Create informer and lister
 	factory := strimziinformer.NewSharedInformerFactoryWithOptions(client, time.Hour*1)
-	informer := factory.Kafka().V1beta2().KafkaTopics()
+	informer := factory.Kafka().V1beta2().KafkaUsers()
 	_, err := informer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(new interface{}) {
 			added++
@@ -150,8 +164,8 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	lister := informer.Lister()
 
 	// Create the resource
-	newResource := NewTopic()
-	_, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Create(context.TODO(), newResource, metav1.CreateOptions{})
+	newResource := NewUser()
+	_, err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Create(context.TODO(), newResource, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to create topic: %s", err.Error())
 	}
@@ -160,17 +174,17 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	<-addedSignal
 
 	// Get the resource
-	actualResource, err := lister.KafkaTopics(NAMESPACE).Get(NAME)
+	actualResource, err := lister.KafkaUsers(NAMESPACE).Get(NAME)
 	if err != nil {
 		t.Fatalf("Failed to get topic: %s", err.Error())
 	}
 
 	// Assert the resource
-	AssertTopics(t, newResource, actualResource)
+	AssertUsers(t, newResource, actualResource)
 
 	// Update the resource
-	updatedResource := UpdatedTopic(actualResource)
-	_, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Update(context.TODO(), updatedResource, metav1.UpdateOptions{})
+	updatedResource := UpdatedUser(actualResource)
+	_, err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Update(context.TODO(), updatedResource, metav1.UpdateOptions{})
 	if err != nil {
 		t.Fatalf("Failed to update topic: %s", err.Error())
 	}
@@ -179,16 +193,16 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	<-updatedSignal
 
 	// Get the topic
-	actualResource, err = lister.KafkaTopics(NAMESPACE).Get(NAME)
+	actualResource, err = lister.KafkaUsers(NAMESPACE).Get(NAME)
 	if err != nil {
 		t.Fatalf("Failed to get topic: %s", err.Error())
 	}
 
 	// Assert the resource
-	AssertTopics(t, updatedResource, actualResource)
+	AssertUsers(t, updatedResource, actualResource)
 
 	// Delete the resource
-	err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
+	err = client.KafkaV1beta2().KafkaUsers(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
 	if err != nil {
 		t.Fatalf("Failed to delete topic: %s", err.Error())
 	}
@@ -197,7 +211,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	<-deletedSignal
 
 	// Check deletion
-	actualResource, err = lister.KafkaTopics(NAMESPACE).Get(NAME)
+	actualResource, err = lister.KafkaUsers(NAMESPACE).Get(NAME)
 	if err != nil {
 		if !strings.Contains(err.Error(), "not found") {
 			t.Fatalf("Failed to get resource: %s", err.Error())
