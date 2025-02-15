@@ -98,7 +98,7 @@ func TestKafkaTopicCreateUpdateDelete(t *testing.T) {
 			t.Fatalf("Failed to get resource: %s", err.Error())
 		}
 	} else if actualResource != nil {
-		t.Fatalf("Topic still exists")
+		t.Fatalf("Resource still exists")
 	}
 }
 
@@ -153,7 +153,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	newResource := NewTopic()
 	_, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Create(context.TODO(), newResource, metav1.CreateOptions{})
 	if err != nil {
-		t.Fatalf("Failed to create topic: %s", err.Error())
+		t.Fatalf("Failed to create resource: %s", err.Error())
 	}
 
 	// Wait for the resource to be added in the informer
@@ -162,7 +162,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	// Get the resource
 	actualResource, err := lister.KafkaTopics(NAMESPACE).Get(NAME)
 	if err != nil {
-		t.Fatalf("Failed to get topic: %s", err.Error())
+		t.Fatalf("Failed to get resource: %s", err.Error())
 	}
 
 	// Assert the resource
@@ -172,16 +172,16 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	updatedResource := UpdatedTopic(actualResource)
 	_, err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Update(context.TODO(), updatedResource, metav1.UpdateOptions{})
 	if err != nil {
-		t.Fatalf("Failed to update topic: %s", err.Error())
+		t.Fatalf("Failed to update resource: %s", err.Error())
 	}
 
 	// Wait for resource to be updated in the informer
 	<-updatedSignal
 
-	// Get the topic
+	// Get the resource
 	actualResource, err = lister.KafkaTopics(NAMESPACE).Get(NAME)
 	if err != nil {
-		t.Fatalf("Failed to get topic: %s", err.Error())
+		t.Fatalf("Failed to get resource: %s", err.Error())
 	}
 
 	// Assert the resource
@@ -190,7 +190,7 @@ func TestKafkaTopicInformerAndLister(t *testing.T) {
 	// Delete the resource
 	err = client.KafkaV1beta2().KafkaTopics(NAMESPACE).Delete(context.TODO(), NAME, metav1.DeleteOptions{})
 	if err != nil {
-		t.Fatalf("Failed to delete topic: %s", err.Error())
+		t.Fatalf("Failed to delete resource: %s", err.Error())
 	}
 
 	// Wait for resource to be deleted
