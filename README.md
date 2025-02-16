@@ -9,12 +9,11 @@ The following table shows the supported Strimzi versions
 |----------------|-----------------|
 | `main` branch  | 0.45.0          |
 
-
 ## TODO:
 
-[ ] Add support for `StrimziPodSet` resources
-[ ] Add build automation
-[ ] First release
+* [ ] Add support for `StrimziPodSet` resources
+* [ ] Add build automation
+* [ ] First release
 
 ## Examples
 
