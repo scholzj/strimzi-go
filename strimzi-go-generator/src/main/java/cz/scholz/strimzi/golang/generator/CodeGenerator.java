@@ -149,7 +149,7 @@ public class CodeGenerator {
             }
         } else if (Schema.isJsonScalarType(returnType)) {
             if (returnType.isEnum()) {
-                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), isR);
+                generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), omitEmpty);
                 addToStackIfNeeded(returnType);
             } else {
                 generateField(property.getGolangName(), typeName(returnType), property.getName(), omitEmpty);

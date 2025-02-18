@@ -5,7 +5,7 @@ go 1.23.5
 require (
 	github.com/stretchr/testify v1.9.0
 	k8s.io/api v0.32.1
-	k8s.io/apimachinery v0.32.1
+	k8s.io/apimachinery v0.32.2
 	k8s.io/client-go v0.32.1
 	sigs.k8s.io/yaml v1.4.0
 )
