@@ -8,6 +8,7 @@ The following table shows the supported Strimzi versions
 | Go API Version | Strimzi version |
 |----------------|-----------------|
 | `main` branch  | 0.45.0          |
+| `0.1.0`        | 0.45.0          |
 
 ## TODO:
 
