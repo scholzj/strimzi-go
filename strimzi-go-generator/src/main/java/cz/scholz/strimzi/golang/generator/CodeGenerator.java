@@ -49,7 +49,6 @@ public class CodeGenerator {
 
     private static final List<String> IGNORED_PROPERTIES = List.of("apiVersion", "kind", "metadata");
 
-    //private static final List<Class<?>> CRDS = List.of(KafkaTopic.class);
     private static final List<Class<?>> CRDS = List.of(
             Kafka.class,
             KafkaNodePool.class,
@@ -147,7 +146,7 @@ public class CodeGenerator {
             } else {
                 LOGGER.error("Unsupported Map type {}", returnType);
             }
-        } else if (Schema.isJsonScalarType(returnType)) {
+        } else if (Utils.isJsonScalarType(returnType)) {
             if (returnType.isEnum()) {
                 generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), omitEmpty);
                 addToStackIfNeeded(returnType);
@@ -275,7 +274,7 @@ public class CodeGenerator {
             }
 
             out.append(")").append(NL);
-        } else if (Property.isPolymorphic(type)) {
+        } else if (Utils.isPolymorphic(type)) {
             LOGGER.info("Generating {} poloymorphic type", type.getSimpleName());
 
             // Generates the type constant

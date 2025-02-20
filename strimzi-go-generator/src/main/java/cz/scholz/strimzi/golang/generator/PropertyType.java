@@ -5,7 +5,6 @@
 package cz.scholz.strimzi.golang.generator;
 
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -13,7 +12,6 @@ import java.lang.reflect.WildcardType;
 import java.util.List;
 
 class PropertyType {
-
     private final Class<?> type;
     private final Type gType;
 
@@ -31,9 +29,7 @@ class PropertyType {
     }
 
     public boolean isArray() {
-        //Class<?> propertyType = getType();
-        //return propertyType.isArray() || List.class.equals(propertyType);
-        boolean b = gType instanceof Class<?> && ((Class<?>) gType).equals(List.class)
+        boolean b = gType instanceof Class<?> && gType.equals(List.class)
                 || gType instanceof ParameterizedType && ((ParameterizedType) gType).getRawType().equals(List.class);
         return gType instanceof GenericArrayType
                 || gType instanceof Class<?> && ((Class<?>) gType).isArray()
@@ -41,12 +37,10 @@ class PropertyType {
     }
 
     public int arrayDimension() {
-
         int result = 0;
         Type t = gType;
         while (true) {
-            if (t instanceof Class<?>) {
-                Class<?> c = (Class<?>) t;
+            if (t instanceof Class<?> c) {
                 if (c.isArray()) {
                     t = c.getComponentType();
                     result++;
@@ -57,20 +51,17 @@ class PropertyType {
                 } else {
                     break;
                 }
-            } else if (t instanceof GenericArrayType) {
-                GenericArrayType g = (GenericArrayType) t;
+            } else if (t instanceof GenericArrayType g) {
                 t = g.getGenericComponentType();
                 result++;
-            } else if (t instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) t;
+            } else if (t instanceof ParameterizedType pt) {
                 if (List.class.equals(pt.getRawType())) {
                     t = pt.getActualTypeArguments()[0];
                     result++;
                 } else {
                     break;
                 }
-            } else if (t instanceof WildcardType) {
-                WildcardType wt = (WildcardType) t;
+            } else if (t instanceof WildcardType wt) {
                 t = wt.getUpperBounds()[0];
             } else {
                 break;
@@ -86,8 +77,7 @@ class PropertyType {
         Class<?> result;
         Type t = gType;
         while (true) {
-            if (t instanceof Class<?>) {
-                Class<?> c = (Class<?>) t;
+            if (t instanceof Class<?> c) {
                 if (c.isArray()) {
                     t = c.getComponentType();
                 } else if (List.class.equals(c)) {
@@ -98,11 +88,9 @@ class PropertyType {
                     result = c;
                     break;
                 }
-            } else if (t instanceof GenericArrayType) {
-                GenericArrayType g = (GenericArrayType) t;
+            } else if (t instanceof GenericArrayType g) {
                 t = g.getGenericComponentType();
-            } else if (t instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) t;
+            } else if (t instanceof ParameterizedType pt) {
                 if (List.class.equals(pt.getRawType())) {
                     t = pt.getActualTypeArguments()[0];
                 } else {
@@ -111,7 +99,7 @@ class PropertyType {
                         result = (Class<?>) rt;
                         break;
                     } else if (rt instanceof TypeVariable) {
-                        t = ((TypeVariable) rt).getBounds()[0];
+                        t = ((TypeVariable<?>) rt).getBounds()[0];
                     } else if (rt instanceof WildcardType) {
                         t = ((WildcardType) rt).getUpperBounds()[0];
                     } else {
@@ -120,7 +108,7 @@ class PropertyType {
                     }
                 }
             } else if (t instanceof TypeVariable) {
-                Type type = ((TypeVariable) t).getBounds()[0];
+                Type type = ((TypeVariable<?>) t).getBounds()[0];
                 if (type instanceof Class<?>) {
                     result = (Class<?>) type;
                     break;
@@ -135,23 +123,6 @@ class PropertyType {
             }
         }
         return result;
-    }
-
-    public boolean isEnum() {
-        return this.type.isEnum();
-    }
-
-    public Enum[] getEnumElements() {
-        if (isEnum()) {
-            try {
-                Method valuesMethod = this.getType().getMethod("values");
-                return (Enum[]) valuesMethod.invoke(null);
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return new Enum[0];
-        }
     }
 
     boolean isMapOfTypes(Class<?> keyType, Class<?> valueType) {

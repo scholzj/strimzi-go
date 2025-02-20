@@ -5,22 +5,18 @@
 package cz.scholz.strimzi.golang.generator;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.strimzi.api.annotations.ApiVersion;
 import io.strimzi.crdgenerator.annotations.PresentInVersions;
-import org.apache.logging.log4j.core.impl.LocationAwareLogEventFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -31,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 
 class Property implements AnnotatedElement {
@@ -39,14 +34,12 @@ class Property implements AnnotatedElement {
     private final Class<?> owner;
 
     private final AnnotatedElement a;
-    private final Member m;
     private final PropertyType type;
 
     public Property(Method method) {
         name = propertyName(method);
         owner = method.getDeclaringClass();
         a = method;
-        m = method;
         this.type = new PropertyType(method.getReturnType(), method.getGenericReturnType());
     }
 
@@ -54,7 +47,6 @@ class Property implements AnnotatedElement {
         name = field.getName();
         owner = field.getDeclaringClass();
         a = field;
-        m = field;
         this.type = new PropertyType(field.getType(), field.getGenericType());
     }
 
@@ -70,21 +62,6 @@ class Property implements AnnotatedElement {
         }
 
         return golangName.substring(0,1).toUpperCase(Locale.ROOT) + golangName.substring(1);
-    }
-
-    private static boolean isGetterName(Method method) {
-        String name = method.getName();
-        return name.startsWith("get")
-                && name.length() > 3
-                && isReallyGetterName(method, name)
-                || name.startsWith("is")
-                && name.length() > 2
-                && method.getReturnType().equals(boolean.class);
-    }
-
-    private static boolean isReallyGetterName(Method method, String name) {
-        return !"getClass".equals(name)
-                && !("getDeclaringClass".equals(name) && Enum.class.equals(method.getDeclaringClass()));
     }
 
     private static String propertyName(Method getterMethod) {
@@ -112,7 +89,7 @@ class Property implements AnnotatedElement {
         TreeMap<String, Property> unordered = new TreeMap<>();
         for (Method method : crdClass.getMethods()) {
             Class<?> returnType = method.getReturnType();
-            boolean isGetter = isGetterName(method)
+            boolean isGetter = Utils.isGetterName(method)
                     && method.getParameterCount() == 0
                     && !returnType.equals(void.class);
             boolean isNotInherited = !(hasMethod(CustomResource.class, method) && !method.getName().equals("getSpec") && !method.getName().equals("getStatus"))
@@ -161,16 +138,6 @@ class Property implements AnnotatedElement {
         return annotation != null && annotation.enabled();
     }
 
-    private static boolean hasAnySetter(Method method) {
-        JsonAnySetter annotation = findAnnotation(JsonAnySetter.class, method, method.getDeclaringClass());
-        return annotation != null && annotation.enabled();
-    }
-
-    private static boolean isRequired(Method method) {
-        JsonProperty annotation = findAnnotation(JsonProperty.class, method, method.getDeclaringClass());
-        return annotation != null && annotation.required();
-    }
-
     private static boolean hasJsonIgnore(Method method) {
         JsonIgnore annotation = findAnnotation(JsonIgnore.class, method, method.getDeclaringClass());
         return annotation != null && annotation.value();
@@ -206,20 +173,6 @@ class Property implements AnnotatedElement {
         return null;
     }
 
-    private static boolean isAnySetter(Method method) {
-        return method.getParameterCount() == 2
-                && method.getReturnType().equals(void.class)
-                && method.getParameterTypes()[0].equals(String.class)
-                && method.getParameterTypes()[1].equals(Object.class)
-                && !Modifier.isStatic(method.getModifiers());
-    }
-
-    private static boolean isAnyGetter(Method method) {
-        return method.getParameterCount() == 0
-                && !method.getReturnType().equals(void.class)
-                && !Modifier.isStatic(method.getModifiers());
-    }
-
     static Map<String, Property> sortedProperties(String[] order, TreeMap<String, Property> unordered) {
         Map<String, Property> result;
 
@@ -242,25 +195,6 @@ class Property implements AnnotatedElement {
         return unmodifiableMap(result);
     }
 
-    static boolean hasAnyGetterAndAnySetter(Class<?> crdClass) {
-        boolean anyGetter = false;
-        boolean anySetter = false;
-        for (Method method : crdClass.getMethods()) {
-            if (isAnySetter(method) &&
-                    hasAnySetter(method)) {
-                anySetter = true;
-            }
-            if (isAnyGetter(method) &&
-                    hasAnyGetter(method)) {
-                anyGetter = true;
-            }
-            if (anyGetter && anySetter) {
-                break;
-            }
-        }
-        return anyGetter && anySetter;
-    }
-
     private static boolean hasMethod(Class<?> c, Method m) {
         try {
             if (!c.isAssignableFrom(m.getDeclaringClass()))
@@ -270,23 +204,6 @@ class Property implements AnnotatedElement {
             return true;
         } catch (NoSuchMethodException e) {
             return false;
-        }
-    }
-
-    static boolean isPolymorphic(Class<?> cls) {
-        return cls.isAnnotationPresent(JsonSubTypes.class);
-    }
-
-    static Map<Class<?>, String> subtypeMap(Class<?> crdClass) {
-        JsonSubTypes subtypes = crdClass.getAnnotation(JsonSubTypes.class);
-        if (subtypes != null) {
-            LinkedHashMap<Class<?>, String> result = new LinkedHashMap<>(subtypes.value().length);
-            for (JsonSubTypes.Type type : subtypes.value()) {
-                result.put(type.value(), type.name());
-            }
-            return result;
-        } else {
-            return emptyMap();
         }
     }
 
@@ -316,20 +233,6 @@ class Property implements AnnotatedElement {
         }
     }
 
-    static String discriminator(Class<?> returnType) {
-        if (returnType != null) {
-            JsonTypeInfo annotation = returnType.getAnnotation(JsonTypeInfo.class);
-            if (annotation != null) {
-                return annotation.property();
-            }
-        }
-        return null;
-    }
-
-    boolean isDiscriminator() {
-        return getName().equals(discriminator(m.getDeclaringClass()));
-    }
-
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
         return a.getAnnotation(annotationClass);
@@ -343,10 +246,6 @@ class Property implements AnnotatedElement {
     @Override
     public Annotation[] getDeclaredAnnotations() {
         return a.getDeclaredAnnotations();
-    }
-
-    public Class<?> getDeclaringClass() {
-        return m.getDeclaringClass();
     }
 
     public PropertyType getType() {

@@ -14,7 +14,7 @@ The following table shows the supported Strimzi versions
 
 * [ ] Add support for `StrimziPodSet` resources
 * [ ] Add build automation
-* [ ] First release
+* [ ] Clean-up the generator code
 
 ## Examples
 
