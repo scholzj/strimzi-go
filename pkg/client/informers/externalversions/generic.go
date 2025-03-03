@@ -21,7 +21,8 @@ package externalversions
 import (
 	fmt "fmt"
 
-	v1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
+	v1beta2 "github.com/scholzj/strimzi-go/pkg/apis/core.strimzi.io/v1beta2"
+	kafkastrimziiov1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -52,24 +53,28 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=kafka.strimzi.io, Version=v1beta2
-	case v1beta2.SchemeGroupVersion.WithResource("kafkas"):
+	// Group=core.strimzi.io, Version=v1beta2
+	case v1beta2.SchemeGroupVersion.WithResource("strimzipodsets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1beta2().StrimziPodSets().Informer()}, nil
+
+		// Group=kafka.strimzi.io, Version=v1beta2
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkas"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().Kafkas().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkabridges"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkabridges"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaBridges().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkaconnects"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkaconnects"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaConnects().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkaconnectors"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkaconnectors"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaConnectors().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkamirrormaker2s"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkamirrormaker2s"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaMirrorMaker2s().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkanodepools"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkanodepools"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaNodePools().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkarebalances"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkarebalances"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaRebalances().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkatopics"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkatopics"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaTopics().Informer()}, nil
-	case v1beta2.SchemeGroupVersion.WithResource("kafkausers"):
+	case kafkastrimziiov1beta2.SchemeGroupVersion.WithResource("kafkausers"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Kafka().V1beta2().KafkaUsers().Informer()}, nil
 
 	}

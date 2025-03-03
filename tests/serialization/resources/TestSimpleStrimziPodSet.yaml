@@ -1,0 +1,61 @@
+apiVersion: core.strimzi.io/v1beta2
+kind: StrimziPodSet
+metadata:
+  annotations:
+    strimzi.io/kafka-version: 4.0.0
+    strimzi.io/storage: '{"type":"jbod","volumes":[{"id":0,"type":"persistent-claim","size":"100Gi","deleteClaim":true}]}'
+  creationTimestamp: "2025-03-03T14:32:44Z"
+  generation: 1
+  labels:
+    strimzi.io/cluster: my-cluster
+    strimzi.io/component-type: kafka
+    strimzi.io/kind: Kafka
+    strimzi.io/name: my-cluster-kafka
+    strimzi.io/pool-name: mixed
+  name: my-pod-set
+  namespace: myproject
+  resourceVersion: "853"
+  uid: bdf352ca-8001-4cdc-b7d0-563c6dec05b8
+spec:
+  pods:
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        strimzi.io/cluster: my-cluster
+        strimzi.io/kind: Kafka
+        strimzi.io/name: my-cluster-kafka
+        strimzi.io/pool-name: mixed
+      name: my-pod-set-0
+    spec:
+      containers:
+      - image: nginx:1.14.2
+        name: nginx
+        ports:
+        - containerPort: 80
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        strimzi.io/cluster: my-cluster
+        strimzi.io/kind: Kafka
+        strimzi.io/name: my-cluster-kafka
+        strimzi.io/pool-name: mixed
+      name: my-pod-set-1
+    spec:
+      containers:
+      - image: nginx:1.14.2
+        name: nginx
+        ports:
+        - containerPort: 80
+  selector:
+    matchLabels:
+      strimzi.io/cluster: my-cluster
+      strimzi.io/kind: Kafka
+      strimzi.io/name: my-cluster-kafka
+      strimzi.io/pool-name: mixed
+status:
+  currentPods: 2
+  observedGeneration: 1
+  pods: 2
+  readyPods: 2

@@ -1,6 +1,7 @@
 package serialization
 
 import (
+	corev1beta2 "github.com/scholzj/strimzi-go/pkg/apis/core.strimzi.io/v1beta2"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -10,7 +11,7 @@ import (
 )
 
 type Resource interface {
-	kafkav1beta2.KafkaTopic | kafkav1beta2.Kafka | kafkav1beta2.KafkaUser | kafkav1beta2.KafkaNodePool | kafkav1beta2.KafkaConnect | kafkav1beta2.KafkaBridge | kafkav1beta2.KafkaMirrorMaker2 | kafkav1beta2.KafkaConnector | kafkav1beta2.KafkaRebalance
+	kafkav1beta2.KafkaTopic | kafkav1beta2.Kafka | kafkav1beta2.KafkaUser | kafkav1beta2.KafkaNodePool | kafkav1beta2.KafkaConnect | kafkav1beta2.KafkaBridge | kafkav1beta2.KafkaMirrorMaker2 | kafkav1beta2.KafkaConnector | kafkav1beta2.KafkaRebalance | corev1beta2.StrimziPodSet
 }
 
 func LoadUnload[R Resource](t *testing.T, filename string, resource R) {
@@ -120,5 +121,10 @@ func TestSimpleKafkaUser(t *testing.T) {
 
 func TestComplexKafkaUser(t *testing.T) {
 	var resource kafkav1beta2.KafkaUser
+	LoadUnload(t, "./resources/"+t.Name()+".yaml", resource)
+}
+
+func TestSimpleStrimziPodSet(t *testing.T) {
+	var resource corev1beta2.StrimziPodSet
 	LoadUnload(t, "./resources/"+t.Name()+".yaml", resource)
 }

@@ -24,6 +24,7 @@ import (
 	time "time"
 
 	versioned "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
+	corestrimziio "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions/core.strimzi.io"
 	internalinterfaces "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions/internalinterfaces"
 	kafkastrimziio "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions/kafka.strimzi.io"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -254,7 +255,12 @@ type SharedInformerFactory interface {
 	// client.
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
+	Core() corestrimziio.Interface
 	Kafka() kafkastrimziio.Interface
+}
+
+func (f *sharedInformerFactory) Core() corestrimziio.Interface {
+	return corestrimziio.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Kafka() kafkastrimziio.Interface {

@@ -20,6 +20,8 @@ package fake
 
 import (
 	clientset "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
+	corev1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1beta2"
+	fakecorev1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1beta2/fake"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1beta2"
 	fakekafkav1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1beta2/fake"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -82,6 +84,11 @@ var (
 	_ clientset.Interface = &Clientset{}
 	_ testing.FakeClient  = &Clientset{}
 )
+
+// CoreV1beta2 retrieves the CoreV1beta2Client
+func (c *Clientset) CoreV1beta2() corev1beta2.CoreV1beta2Interface {
+	return &fakecorev1beta2.FakeCoreV1beta2{Fake: &c.Fake}
+}
 
 // KafkaV1beta2 retrieves the KafkaV1beta2Client
 func (c *Clientset) KafkaV1beta2() kafkav1beta2.KafkaV1beta2Interface {

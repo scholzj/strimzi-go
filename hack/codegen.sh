@@ -24,6 +24,10 @@ kube::codegen::gen_helpers \
     --boilerplate ./hack/boilerplate.go.txt \
     ./pkg/apis/kafka.strimzi.io
 
+kube::codegen::gen_helpers \
+    --boilerplate ./hack/boilerplate.go.txt \
+    ./pkg/apis/core.strimzi.io
+
 echo "Generating client code..."
 
 kube::codegen::gen_client \

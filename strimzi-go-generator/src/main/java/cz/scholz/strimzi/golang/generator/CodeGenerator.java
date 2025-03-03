@@ -3,18 +3,9 @@ package cz.scholz.strimzi.golang.generator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.strimzi.api.annotations.ApiVersion;
-import io.strimzi.api.kafka.model.bridge.KafkaBridge;
 import io.strimzi.api.kafka.model.common.template.PodDisruptionBudgetTemplate;
-import io.strimzi.api.kafka.model.connect.KafkaConnect;
-import io.strimzi.api.kafka.model.connector.KafkaConnector;
-import io.strimzi.api.kafka.model.kafka.Kafka;
 import io.strimzi.api.kafka.model.kafka.SingleVolumeStorage;
 import io.strimzi.api.kafka.model.kafka.listener.GenericKafkaListener;
-import io.strimzi.api.kafka.model.mirrormaker2.KafkaMirrorMaker2;
-import io.strimzi.api.kafka.model.nodepool.KafkaNodePool;
-import io.strimzi.api.kafka.model.rebalance.KafkaRebalance;
-import io.strimzi.api.kafka.model.topic.KafkaTopic;
-import io.strimzi.api.kafka.model.user.KafkaUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,48 +32,38 @@ public class CodeGenerator {
 
     private static final String NL = System.lineSeparator();
     private static final String TAB = "    ";
-
-    private static final Path HEADER_BOILERPLATE_PATH = Path.of("../hack/boilerplate.go.txt");
-    private static final String OUTPUT_PATH = "../pkg/apis/kafka.strimzi.io/v1beta2/types.go";
-
-    private static final ApiVersion API_VERSION = ApiVersion.V1BETA2;
-
     private static final List<String> IGNORED_PROPERTIES = List.of("apiVersion", "kind", "metadata");
-
-    private static final List<Class<?>> CRDS = List.of(
-            Kafka.class,
-            KafkaNodePool.class,
-            KafkaConnect.class,
-            KafkaMirrorMaker2.class,
-            KafkaBridge.class,
-            KafkaRebalance.class,
-            KafkaTopic.class,
-            KafkaConnector.class,
-            KafkaUser.class
+    private static final Map<String, String> IMPORTS = Map.of(
+            "corev1", "corev1 \"k8s.io/api/core/v1\"",
+            "networkingv1", "networkingv1 \"k8s.io/api/networking/v1\"",
+            "metav1", "metav1 \"k8s.io/apimachinery/pkg/apis/meta/v1\"",
+            "kafkav1beta2", "kafkav1beta2 \"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2\""
     );
+
+    private final List<Class<?>> crds;
+    private final ApiVersion apiVersion;
+    private final Path headerBoilerPlate;
+    private final List<String> imports;
 
     private final OutputStreamWriter out;
     private final Stack<Class<?>> toBeGenerated = new Stack<>();
     private final Set<Class<?>> alreadyGenerated = new HashSet<>();
 
-    public static void main(String[] args) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        LOGGER.info("Generating Strimzi Golang APIs into {}", OUTPUT_PATH);
+    CodeGenerator(List<Class<?>> crds, List<String> imports, ApiVersion apiVersion, Path headerBoilerPlate, String outputPath) throws FileNotFoundException {
+        this.crds = crds;
+        this.imports = imports;
+        this.apiVersion = apiVersion;
+        this.headerBoilerPlate = headerBoilerPlate;
 
-        CodeGenerator codeGenerator = new CodeGenerator();
-        codeGenerator.generate();
-        codeGenerator.close();
+        this.out = new OutputStreamWriter(new FileOutputStream(outputPath), StandardCharsets.UTF_8);
     }
 
-    private CodeGenerator() throws FileNotFoundException {
-        out = new OutputStreamWriter(new FileOutputStream(OUTPUT_PATH), StandardCharsets.UTF_8);
-    }
-
-    private void generate() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    void generate() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         headerBoilerplate();
         generatePackage();
         generateImports();
 
-        for (Class<?> crd : CRDS) {
+        for (Class<?> crd : crds) {
             generateCrd(crd);
         }
 
@@ -92,6 +73,11 @@ public class CodeGenerator {
             alreadyGenerated.add(propertyType); // Add it to processed to not add it again
             generateType(propertyType);
         }
+    }
+
+    void close() throws IOException {
+        out.flush();
+        out.close();
     }
 
     private void generateCrd(Class<?> crd) throws IOException {
@@ -107,7 +93,7 @@ public class CodeGenerator {
                 .append(TAB).append("metav1.ObjectMeta `json:\"metadata,omitempty\"`").append(NL)
                 .append(TAB).append(NL);
 
-        Map<String, Property> properties = Property.properties(API_VERSION, crd);
+        Map<String, Property> properties = Property.properties(apiVersion, crd);
 
         // Generate the CRD fields
         for (Property property : properties.values()) {
@@ -215,6 +201,9 @@ public class CodeGenerator {
             generateField(property.getGolangName(), arrayMarker + typeName(elementType), property.getName(), omitEmpty);
         } else if (elementType.getName().startsWith("io.fabric8.kubernetes.api.model.")) {
             generateField(property.getGolangName(), arrayMarker + mapFabric8TypeToKubernetes(elementType), property.getName(), omitEmpty);
+        } else if ("pods".equals(property.getName())) {
+            // Special handling for the StrimziPodsSet .spec.pods array
+            generateField(property.getGolangName(), arrayMarker + "kafkav1beta2.MapStringObject", property.getName(), omitEmpty);
         } else {
             generateField(property.getGolangName(), arrayMarker + elementType.getSimpleName(), property.getName(), omitEmpty);
             addToStackIfNeeded(elementType);
@@ -233,7 +222,7 @@ public class CodeGenerator {
             case "io.fabric8.kubernetes.api.model.ConfigMapVolumeSource" -> "corev1.ConfigMapVolumeSource";
             case "io.fabric8.kubernetes.api.model.EmptyDirVolumeSource" -> "corev1.EmptyDirVolumeSource";
             case "io.fabric8.kubernetes.api.model.HostAlias" -> "corev1.HostAlias";
-            case "io.fabric8.kubernetes.api.model.LabelSelector" -> "corev1.LabelSelector";
+            case "io.fabric8.kubernetes.api.model.LabelSelector" -> "metav1.LabelSelector";
             case "io.fabric8.kubernetes.api.model.LocalObjectReference" -> "corev1.LocalObjectReference";
             case "io.fabric8.kubernetes.api.model.PersistentVolumeClaimVolumeSource" -> "corev1.PersistentVolumeClaimVolumeSource";
             case "io.fabric8.kubernetes.api.model.PodDNSConfig" -> "corev1.PodDNSConfig";
@@ -295,7 +284,7 @@ public class CodeGenerator {
             List<Class<?>> subtypes = Property.subtypes(type);
             Map<String, Property> properties = new HashMap<>();
             for (Class<?> subtype : subtypes) {
-                properties.putAll(Property.properties(API_VERSION, subtype));
+                properties.putAll(Property.properties(apiVersion, subtype));
             }
 
             out.append(NL)
@@ -325,7 +314,7 @@ public class CodeGenerator {
             out.append(NL)
                     .append("type ").append(type.getSimpleName()).append(" struct {").append(NL);
 
-            Map<String, Property> properties = Property.properties(API_VERSION, type);
+            Map<String, Property> properties = Property.properties(apiVersion, type);
 
             for (Property property : properties.values()) {
                 if ("tls".equals(property.getName())
@@ -369,29 +358,27 @@ public class CodeGenerator {
                 .append("}").append(NL);
     }
 
-    private void close() throws IOException {
-        out.flush();
-        out.close();
-    }
-
     private void headerBoilerplate() throws IOException {
-        LOGGER.info("Adding boilerplate header from {}", HEADER_BOILERPLATE_PATH);
-        out.append(Files.readString(HEADER_BOILERPLATE_PATH, StandardCharsets.UTF_8))
+        LOGGER.info("Adding boilerplate header from {}", headerBoilerPlate);
+        out.append(Files.readString(headerBoilerPlate, StandardCharsets.UTF_8))
                 .append(NL);
     }
 
     private void generatePackage() throws IOException {
-        LOGGER.info("Setting package to {}", API_VERSION);
-        out.append("package ").append(API_VERSION.toString()).append(NL);
+        LOGGER.info("Setting package to {}", apiVersion);
+        out.append("package ").append(apiVersion.toString()).append(NL);
     }
 
     private void generateImports() throws IOException {
-        LOGGER.info("Generating imports");
-        out.append(NL)
-                .append("import (").append(NL)
-                .append(TAB).append("corev1 \"k8s.io/api/core/v1\"").append(NL)
-                .append(TAB).append("networkingv1 \"k8s.io/api/networking/v1\"").append(NL)
-                .append(TAB).append("metav1 \"k8s.io/apimachinery/pkg/apis/meta/v1\"").append(NL)
-                .append(")").append(NL);
+        if (!imports.isEmpty()) {
+            LOGGER.info("Generating imports");
+            out.append(NL).append("import (").append(NL);
+
+            for (String importName : imports) {
+                out.append(TAB).append(IMPORTS.get(importName)).append(NL);
+            }
+
+            out.append(")").append(NL);
+        }
     }
 }
