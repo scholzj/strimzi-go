@@ -1,4 +1,4 @@
-name: Build Keksposé
+name: Build Strimzi Go API
 on:
   push:
     branches:
