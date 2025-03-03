@@ -32,7 +32,7 @@ jobs:
       # Check uncommitted files
       - name: Check uncommitted files
         run: |
-          GENERATED_FILES=$(git ls-files --other --exclude-standard -- pkg/')
+          GENERATED_FILES=$(git ls-files --other --exclude-standard -- pkg/)
           if [ -n "$GENERATED_FILES" ] ; then
               echo "ERROR: Uncommitted changes in generated resources:"
               echo "$GENERATED_FILES"
