@@ -9,6 +9,7 @@ The following table shows the supported Strimzi versions
 |----------------|-----------------|
 | `main` branch  | 0.45.0          |
 | `0.1.0`        | 0.45.0          |
+| `0.2.0`        | 0.45.0          |
 
 ## Examples
 
