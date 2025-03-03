@@ -44,8 +44,8 @@ jobs:
               exit 1
           fi
       # Prepare test environment
-      - name: Start minikube
-        uses: medyagh/setup-minikube@latest
+      - name: Create Kubernetes Cluster
+        uses: helm/kind-action@v1
       - name: Install CRDs
         run: kubectl create -f https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.45.0/strimzi-crds-0.45.0.yaml
       # Test the project
