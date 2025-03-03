@@ -10,11 +10,6 @@ The following table shows the supported Strimzi versions
 | `main` branch  | 0.45.0          |
 | `0.1.0`        | 0.45.0          |
 
-## TODO:
-
-* [ ] Add build automation
-* [ ] Clean-up the generator code
-
 ## Examples
 
 The [`examples`](./examples) directory contains several examples that show how to use the Strimzi APIs and the generated `ClientSets`.
@@ -22,7 +17,6 @@ The [`examples`](./examples) directory contains several examples that show how t
 ## Updating the APIs
 
 1. Make sure the `doc.go` and `register.go` files are manually created and maintained.
-2. Use the `strimzi-go-generate` to generated the Golang-based `types.go`.
-3. Go to the `hack` directory and run `codegen.sh` to update the generated files
-4. Run `go test ./tests/...` to test the updated files
-5. Add the updated files to the Git repo
+2. Run `make generate` to update all the files
+3. Run `make test` to test the updated files (you need Kubernetes environment with installed Strimzi CRDs)
+4. Add the updated files to the Git repo
