@@ -1489,7 +1489,7 @@ const (
 )
 
 type GenericKafkaListenerConfigurationBroker struct {
-	Broker         int32             `json:"broker,omitempty"`
+	Broker         int32             `json:"broker"`
 	AdvertisedHost string            `json:"advertisedHost,omitempty"`
 	AdvertisedPort int32             `json:"advertisedPort,omitempty"`
 	Host           string            `json:"host,omitempty"`

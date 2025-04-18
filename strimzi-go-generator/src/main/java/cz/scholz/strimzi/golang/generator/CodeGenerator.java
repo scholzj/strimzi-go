@@ -6,6 +6,7 @@ import io.strimzi.api.annotations.ApiVersion;
 import io.strimzi.api.kafka.model.common.template.PodDisruptionBudgetTemplate;
 import io.strimzi.api.kafka.model.kafka.SingleVolumeStorage;
 import io.strimzi.api.kafka.model.kafka.listener.GenericKafkaListener;
+import io.strimzi.api.kafka.model.kafka.listener.GenericKafkaListenerConfigurationBroker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -330,6 +331,13 @@ public class CodeGenerator {
                     // So we need some special handling for it and not mark it as omit when empty.
                     // This does not seem to be detectable in any other way in the Strimzi Java classes, so we just hardcode it here.
                     LOGGER.info("Special handling for maxUnavailable field in PodDisruptionBudgetTemplate");
+                    generateField(property, false);
+                } else if ("broker".equals(property.getName())
+                        && GenericKafkaListenerConfigurationBroker.class.getSimpleName().equals(type.getSimpleName())) {
+                    // The broker field for listener configuration should not be omitted when set to 0 when serializing the objects.
+                    // So we need some special handling for it and not mark it as omit when empty.
+                    // This does not seem to be detectable in any other way in the Strimzi Java classes, so we just hardcode it here.
+                    LOGGER.info("Special handling for broker field in GenericKafkaListenerConfigurationBroker");
                     generateField(property, false);
                 } else {
                     generateField(property, true);
