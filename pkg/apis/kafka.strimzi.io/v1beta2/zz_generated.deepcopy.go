@@ -3973,6 +3973,11 @@ func (in *PodTemplate) DeepCopyInto(out *PodTemplate) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.DnsConfig != nil {
+		in, out := &in.DnsConfig, &out.DnsConfig
+		*out = new(v1.PodDNSConfig)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes
 		*out = make([]AdditionalVolume, len(*in))

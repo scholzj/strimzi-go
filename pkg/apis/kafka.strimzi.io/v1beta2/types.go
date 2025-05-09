@@ -547,6 +547,8 @@ type PodTemplate struct {
 	PriorityClassName             string                            `json:"priorityClassName,omitempty"`
 	SchedulerName                 string                            `json:"schedulerName,omitempty"`
 	HostAliases                   []corev1.HostAlias                `json:"hostAliases,omitempty"`
+	DnsPolicy                     DnsPolicy                         `json:"dnsPolicy,omitempty"`
+	DnsConfig                     *corev1.PodDNSConfig              `json:"dnsConfig,omitempty"`
 	EnableServiceLinks            bool                              `json:"enableServiceLinks,omitempty"`
 	TmpDirSizeLimit               string                            `json:"tmpDirSizeLimit,omitempty"`
 	Volumes                       []AdditionalVolume                `json:"volumes,omitempty"`
@@ -560,6 +562,15 @@ type AdditionalVolume struct {
 	PersistentVolumeClaim *corev1.PersistentVolumeClaimVolumeSource `json:"persistentVolumeClaim,omitempty"`
 	Csi                   *corev1.CSIVolumeSource                   `json:"csi,omitempty"`
 }
+
+type DnsPolicy string
+
+const (
+	CLUSTER_FIRST_DNSPOLICY               DnsPolicy = "ClusterFirst"
+	CLUSTER_FIRST_WITH_HOST_NET_DNSPOLICY DnsPolicy = "ClusterFirstWithHostNet"
+	DEFAULT_DNSPOLICY                     DnsPolicy = "Default"
+	NONE_DNSPOLICY                        DnsPolicy = "None"
+)
 
 type DeploymentTemplate struct {
 	Metadata           *MetadataTemplate  `json:"metadata,omitempty"`
