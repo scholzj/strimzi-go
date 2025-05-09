@@ -10,6 +10,7 @@ The following table shows the supported Strimzi versions
 | `main` branch  | 0.45.0          |
 | `0.1.0`        | 0.45.0          |
 | `0.2.x`        | 0.45.0          |
+| `0.3.x`        | 0.46.0          |
 
 ## Examples
 
@@ -17,7 +18,15 @@ The [`examples`](./examples) directory contains several examples that show how t
 
 ## Updating the APIs
 
-1. Make sure the `doc.go` and `register.go` files are manually created and maintained.
-2. Run `make generate` to update all the files
-3. Run `make test` to test the updated files (you need Kubernetes environment with installed Strimzi CRDs)
-4. Add the updated files to the Git repo
+To add support for new Strimzi version, you should try to follow these steps:
+
+1. Update the Strimzi version in the `pom.xml` file of the `strimzi-go-generator`
+2. Make sure the `doc.go` and `register.go` files are manually created and maintained.
+3. If needed, update the Kubernetes versions in `go.mod` (e.g. `k8s.io/api` and `k8s.io/client-go`).
+   The generator will always generate the code based on the on the latest Kube version so not updating them might cause error.
+4. Run `make generate` to update all the generated files. 
+   This runs both the Java generator to generate the CRD types as well the Kubernetes client generator to generate the Go-lang client code.
+5. Run `make build` to build the Go project files.
+6. Run `make test` to test the updated files (you need Kubernetes environment with installed Strimzi CRDs).
+7. Update the `README.md` file to indicate the new supported Strimzi version.
+8. Add the updated files to the Git repo.
