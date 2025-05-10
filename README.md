@@ -16,6 +16,12 @@ The following table shows the supported Strimzi versions
 
 The [`examples`](./examples) directory contains several examples that show how to use the Strimzi APIs and the generated `ClientSets`.
 
+## Users
+
+If you are using the Strimzi Go API, feel free to open a PR and add your project here so that others can see what you created and use it as an example if needed.
+
+* [Keksposé](https://github.com/scholzj/kekspose): Expose your Strimzi-based Apache Kafka cluster outside your Minikube, Kind, or Docker Desktop clusters
+
 ## Updating the APIs
 
 To add support for new Strimzi version, you should try to follow these steps:
