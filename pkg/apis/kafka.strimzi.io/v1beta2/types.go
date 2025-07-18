@@ -406,10 +406,15 @@ type KafkaTopicSpec struct {
 }
 
 type KafkaRebalanceStatus struct {
-	Conditions         []Condition     `json:"conditions,omitempty"`
-	ObservedGeneration int64           `json:"observedGeneration,omitempty"`
-	SessionId          string          `json:"sessionId,omitempty"`
-	OptimizationResult MapStringObject `json:"optimizationResult,omitempty"`
+	Conditions         []Condition             `json:"conditions,omitempty"`
+	ObservedGeneration int64                   `json:"observedGeneration,omitempty"`
+	SessionId          string                  `json:"sessionId,omitempty"`
+	Progress           *KafkaRebalanceProgress `json:"progress,omitempty"`
+	OptimizationResult MapStringObject         `json:"optimizationResult,omitempty"`
+}
+
+type KafkaRebalanceProgress struct {
+	RebalanceProgressConfigMap string `json:"rebalanceProgressConfigMap,omitempty"`
 }
 
 type KafkaRebalanceSpec struct {
@@ -561,6 +566,7 @@ type AdditionalVolume struct {
 	EmptyDir              *corev1.EmptyDirVolumeSource              `json:"emptyDir,omitempty"`
 	PersistentVolumeClaim *corev1.PersistentVolumeClaimVolumeSource `json:"persistentVolumeClaim,omitempty"`
 	Csi                   *corev1.CSIVolumeSource                   `json:"csi,omitempty"`
+	Image                 *corev1.ImageVolumeSource                 `json:"image,omitempty"`
 }
 
 type DnsPolicy string
@@ -805,12 +811,18 @@ type BuildConfigTemplate struct {
 type MetricsConfigType string
 
 const (
-	JMXPROMETHEUSEXPORTER_METRICSCONFIGTYPE MetricsConfigType = "jmxPrometheusExporter"
+	JMXPROMETHEUSEXPORTER_METRICSCONFIGTYPE  MetricsConfigType = "jmxPrometheusExporter"
+	STRIMZIMETRICSREPORTER_METRICSCONFIGTYPE MetricsConfigType = "strimziMetricsReporter"
 )
 
 type MetricsConfig struct {
 	Type      MetricsConfigType               `json:"type,omitempty"`
 	ValueFrom *ExternalConfigurationReference `json:"valueFrom,omitempty"`
+	Values    *StrimziMetricsReporterValues   `json:"values,omitempty"`
+}
+
+type StrimziMetricsReporterValues struct {
+	AllowList []string `json:"allowList,omitempty"`
 }
 
 type KafkaJmxOptions struct {
@@ -889,6 +901,24 @@ type KafkaConnectSpec struct {
 	Template              *KafkaConnectTemplate        `json:"template,omitempty"`
 	ExternalConfiguration *ExternalConfiguration       `json:"externalConfiguration,omitempty"`
 	Build                 *Build                       `json:"build,omitempty"`
+	Plugins               []MountedPlugin              `json:"plugins,omitempty"`
+}
+
+type MountedPlugin struct {
+	Name      string            `json:"name,omitempty"`
+	Artifacts []MountedArtifact `json:"artifacts,omitempty"`
+}
+
+type MountedArtifactType string
+
+const (
+	IMAGE_MOUNTEDARTIFACTTYPE MountedArtifactType = "image"
+)
+
+type MountedArtifact struct {
+	Reference  string              `json:"reference,omitempty"`
+	Type       MountedArtifactType `json:"type,omitempty"`
+	PullPolicy string              `json:"pullPolicy,omitempty"`
 }
 
 type Build struct {
