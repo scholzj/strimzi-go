@@ -222,6 +222,7 @@ public class CodeGenerator {
             case "io.fabric8.kubernetes.api.model.ConfigMapKeySelector" -> "corev1.ConfigMapKeySelector";
             case "io.fabric8.kubernetes.api.model.ConfigMapVolumeSource" -> "corev1.ConfigMapVolumeSource";
             case "io.fabric8.kubernetes.api.model.EmptyDirVolumeSource" -> "corev1.EmptyDirVolumeSource";
+            case "io.fabric8.kubernetes.api.model.ImageVolumeSource" -> "corev1.ImageVolumeSource";
             case "io.fabric8.kubernetes.api.model.HostAlias" -> "corev1.HostAlias";
             case "io.fabric8.kubernetes.api.model.LabelSelector" -> "metav1.LabelSelector";
             case "io.fabric8.kubernetes.api.model.LocalObjectReference" -> "corev1.LocalObjectReference";

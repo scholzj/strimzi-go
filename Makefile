@@ -5,6 +5,9 @@ all: generate build test
 build:
 	go build -v ./...
 
+clean:
+	go clean -v ./...
+
 test:
 	go test -v ./...
 

@@ -42,7 +42,7 @@ jobs:
       - name: Create Kubernetes Cluster
         uses: helm/kind-action@v1
       - name: Install CRDs
-        run: kubectl create -f https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.46.0/strimzi-crds-0.46.0.yaml
+        run: kubectl create -f https://github.com/strimzi/strimzi-kafka-operator/releases/download/0.47.0/strimzi-crds-0.47.0.yaml
       # Test the project
       - name: Test the project
         run: make test
