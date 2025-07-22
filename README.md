@@ -22,6 +22,7 @@ The [`examples`](./examples) directory contains several examples that show how t
 If you are using the Strimzi Go API, feel free to open a PR and add your project here so that others can see what you created and use it as an example if needed.
 
 * [Keksposé](https://github.com/scholzj/kekspose): Expose your Strimzi-based Apache Kafka cluster outside your Minikube, Kind, or Docker Desktop clusters
+* [Strimzi Shutdown](https://github.com/scholzj/strimzi-shutdown): Simple utility to temporarily stop or restart your Strimzi-based Apache Kafka cluster
 
 ## Updating the APIs
 
