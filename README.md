@@ -1,5 +1,7 @@
 # Strimzi Go APIs
 
+_Note: This is not part of the Strimzi CNCF project!_
+
 This project contains [Strimzi](https://strimzi.io) APIs for integrating with Strimzi from Go programming language.
 It lets you manage the Strimzi resources using the Kubernetes Go Client.
 
