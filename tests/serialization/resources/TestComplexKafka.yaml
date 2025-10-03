@@ -242,7 +242,7 @@ spec:
           labels:
             testLabel: testValue
       pod:
-        enableServiceLinks: true
+        enableServiceLinks: false
         metadata:
           annotations:
             akey1: label1
@@ -282,7 +282,6 @@ spec:
             key1: label1
             key2: label2
       pod:
-        enableServiceLinks: true
         metadata:
           annotations:
             akey1: label1
