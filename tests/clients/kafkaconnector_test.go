@@ -2,10 +2,11 @@ package clients
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimziinformer "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions"
@@ -14,13 +15,14 @@ import (
 )
 
 func NewConnector() *kafkav1beta2.KafkaConnector {
+	tasksMax := int32(3)
 	return &kafkav1beta2.KafkaConnector{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NAME,
 			Namespace: NAMESPACE,
 		},
 		Spec: &kafkav1beta2.KafkaConnectorSpec{
-			TasksMax: 3,
+			TasksMax: &tasksMax,
 			Class:    "org.apache.kafka.connect.file.FileStreamSourceConnector",
 			Config:   map[string]interface{}{"file": "/opt/kafka/LICENSE", "topic": "my-topic"},
 		},
@@ -30,7 +32,8 @@ func NewConnector() *kafkav1beta2.KafkaConnector {
 func UpdatedConnector(oldResource *kafkav1beta2.KafkaConnector) *kafkav1beta2.KafkaConnector {
 	updatedResource := oldResource.DeepCopy()
 
-	updatedResource.Spec.TasksMax = 5
+	tasksMax := int32(5)
+	updatedResource.Spec.TasksMax = &tasksMax
 	updatedResource.Spec.Class = "org.apache.kafka.connect.file.FileStreamSinkConnector"
 	updatedResource.Spec.Config["file"] = "/opt/kafka/README"
 

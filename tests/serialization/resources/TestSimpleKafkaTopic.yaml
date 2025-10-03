@@ -1,7 +1,6 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
-  creationTimestamp: null
   labels:
     strimzi.io/cluster: my-cluster
   name: kafka-test-apps

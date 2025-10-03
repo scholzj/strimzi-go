@@ -2,10 +2,11 @@ package clients
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimziinformer "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions"
@@ -14,14 +15,17 @@ import (
 )
 
 func NewTopic() *kafkav1beta2.KafkaTopic {
+	replicationFactor := int32(3)
+	partitions := int32(3)
+
 	return &kafkav1beta2.KafkaTopic{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NAME,
 			Namespace: NAMESPACE,
 		},
 		Spec: &kafkav1beta2.KafkaTopicSpec{
-			Replicas:   3,
-			Partitions: 3,
+			Replicas:   &replicationFactor,
+			Partitions: &partitions,
 			Config:     kafkav1beta2.MapStringObject{"retention.ms": 7200000, "segment.bytes": 1073741824},
 		},
 	}
@@ -30,8 +34,11 @@ func NewTopic() *kafkav1beta2.KafkaTopic {
 func UpdatedTopic(oldResource *kafkav1beta2.KafkaTopic) *kafkav1beta2.KafkaTopic {
 	updatedResource := oldResource.DeepCopy()
 
-	updatedResource.Spec.Replicas = 1
-	updatedResource.Spec.Partitions = 10
+	replicationFactor := int32(1)
+	partitions := int32(10)
+
+	updatedResource.Spec.Replicas = &replicationFactor
+	updatedResource.Spec.Partitions = &partitions
 	updatedResource.Spec.Config["segment.bytes"] = 107374182
 
 	return updatedResource

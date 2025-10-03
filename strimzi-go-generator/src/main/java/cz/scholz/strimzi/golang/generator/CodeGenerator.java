@@ -137,6 +137,8 @@ public class CodeGenerator {
             if (returnType.isEnum()) {
                 generateField(property.getGolangName(), returnType.getSimpleName(), property.getName(), omitEmpty);
                 addToStackIfNeeded(returnType);
+            } else if (Utils.isBoxedPrimitive(returnType)) {
+                generateField(property.getGolangName(), "*" + typeName(returnType), property.getName(), omitEmpty);
             } else {
                 generateField(property.getGolangName(), typeName(returnType), property.getName(), omitEmpty);
             }

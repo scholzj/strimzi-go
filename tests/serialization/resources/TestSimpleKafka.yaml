@@ -1,7 +1,6 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  creationTimestamp: null
   name: my-cluster
 spec:
   entityOperator:
