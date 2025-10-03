@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta2
+package v1
 
 import (
 	corev1 "k8s.io/api/core/v1"
@@ -259,7 +259,6 @@ type AclRule struct {
 	Type       AclRuleType      `json:"type,omitempty"`
 	Resource   *AclRuleResource `json:"resource,omitempty"`
 	Host       string           `json:"host,omitempty"`
-	Operation  AclOperation     `json:"operation,omitempty"`
 	Operations []AclOperation   `json:"operations,omitempty"`
 }
 
@@ -349,7 +348,6 @@ type KafkaConnectorSpec struct {
 	TasksMax     *int32          `json:"tasksMax,omitempty"`
 	AutoRestart  *AutoRestart    `json:"autoRestart,omitempty"`
 	Config       MapStringObject `json:"config,omitempty"`
-	Pause        *bool           `json:"pause,omitempty"`
 	State        ConnectorState  `json:"state,omitempty"`
 	ListOffsets  *ListOffsets    `json:"listOffsets,omitempty"`
 	AlterOffsets *AlterOffsets   `json:"alterOffsets,omitempty"`
@@ -469,7 +467,6 @@ type KafkaBridgeSpec struct {
 	Logging             *Logging                     `json:"logging,omitempty"`
 	ClientRackInitImage string                       `json:"clientRackInitImage,omitempty"`
 	Rack                *Rack                        `json:"rack,omitempty"`
-	EnableMetrics       bool                         `json:"enableMetrics,omitempty"`
 	MetricsConfig       *MetricsConfig               `json:"metricsConfig,omitempty"`
 	LivenessProbe       *Probe                       `json:"livenessProbe,omitempty"`
 	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
@@ -766,49 +763,26 @@ type Map struct {
 }
 
 type KafkaMirrorMaker2Spec struct {
-	Version               string                         `json:"version,omitempty"`
-	Replicas              int32                          `json:"replicas,omitempty"`
-	Image                 string                         `json:"image,omitempty"`
-	ConnectCluster        string                         `json:"connectCluster,omitempty"`
-	Clusters              []KafkaMirrorMaker2ClusterSpec `json:"clusters,omitempty"`
-	Mirrors               []KafkaMirrorMaker2MirrorSpec  `json:"mirrors,omitempty"`
-	Resources             *corev1.ResourceRequirements   `json:"resources,omitempty"`
-	LivenessProbe         *Probe                         `json:"livenessProbe,omitempty"`
-	ReadinessProbe        *Probe                         `json:"readinessProbe,omitempty"`
-	JvmOptions            *JvmOptions                    `json:"jvmOptions,omitempty"`
-	JmxOptions            *KafkaJmxOptions               `json:"jmxOptions,omitempty"`
-	Logging               *Logging                       `json:"logging,omitempty"`
-	ClientRackInitImage   string                         `json:"clientRackInitImage,omitempty"`
-	Rack                  *Rack                          `json:"rack,omitempty"`
-	MetricsConfig         *MetricsConfig                 `json:"metricsConfig,omitempty"`
-	Tracing               *Tracing                       `json:"tracing,omitempty"`
-	Template              *KafkaConnectTemplate          `json:"template,omitempty"`
-	ExternalConfiguration *ExternalConfiguration         `json:"externalConfiguration,omitempty"`
-}
-
-type ExternalConfiguration struct {
-	Env     []ExternalConfigurationEnv          `json:"env,omitempty"`
-	Volumes []ExternalConfigurationVolumeSource `json:"volumes,omitempty"`
-}
-
-type ExternalConfigurationVolumeSource struct {
-	Name      string                        `json:"name,omitempty"`
-	Secret    *corev1.SecretVolumeSource    `json:"secret,omitempty"`
-	ConfigMap *corev1.ConfigMapVolumeSource `json:"configMap,omitempty"`
-}
-
-type ExternalConfigurationEnv struct {
-	Name      string                             `json:"name,omitempty"`
-	ValueFrom *ExternalConfigurationEnvVarSource `json:"valueFrom,omitempty"`
-}
-
-type ExternalConfigurationEnvVarSource struct {
-	SecretKeyRef    *corev1.SecretKeySelector    `json:"secretKeyRef,omitempty"`
-	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
+	Version             string                         `json:"version,omitempty"`
+	Replicas            int32                          `json:"replicas,omitempty"`
+	Image               string                         `json:"image,omitempty"`
+	ConnectCluster      string                         `json:"connectCluster,omitempty"`
+	Clusters            []KafkaMirrorMaker2ClusterSpec `json:"clusters,omitempty"`
+	Mirrors             []KafkaMirrorMaker2MirrorSpec  `json:"mirrors,omitempty"`
+	Resources           *corev1.ResourceRequirements   `json:"resources,omitempty"`
+	LivenessProbe       *Probe                         `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *Probe                         `json:"readinessProbe,omitempty"`
+	JvmOptions          *JvmOptions                    `json:"jvmOptions,omitempty"`
+	JmxOptions          *KafkaJmxOptions               `json:"jmxOptions,omitempty"`
+	Logging             *Logging                       `json:"logging,omitempty"`
+	ClientRackInitImage string                         `json:"clientRackInitImage,omitempty"`
+	Rack                *Rack                          `json:"rack,omitempty"`
+	MetricsConfig       *MetricsConfig                 `json:"metricsConfig,omitempty"`
+	Tracing             *Tracing                       `json:"tracing,omitempty"`
+	Template            *KafkaConnectTemplate          `json:"template,omitempty"`
 }
 
 type KafkaConnectTemplate struct {
-	Deployment          *DeploymentTemplate          `json:"deployment,omitempty"`
 	PodSet              *ResourceTemplate            `json:"podSet,omitempty"`
 	Pod                 *PodTemplate                 `json:"pod,omitempty"`
 	ApiService          *InternalServiceTemplate     `json:"apiService,omitempty"`
@@ -845,22 +819,19 @@ type KafkaJmxAuthentication struct {
 }
 
 type KafkaMirrorMaker2MirrorSpec struct {
-	SourceCluster          string                          `json:"sourceCluster,omitempty"`
-	TargetCluster          string                          `json:"targetCluster,omitempty"`
-	SourceConnector        *KafkaMirrorMaker2ConnectorSpec `json:"sourceConnector,omitempty"`
-	HeartbeatConnector     *KafkaMirrorMaker2ConnectorSpec `json:"heartbeatConnector,omitempty"`
-	CheckpointConnector    *KafkaMirrorMaker2ConnectorSpec `json:"checkpointConnector,omitempty"`
-	TopicsPattern          string                          `json:"topicsPattern,omitempty"`
-	TopicsBlacklistPattern string                          `json:"topicsBlacklistPattern,omitempty"`
-	TopicsExcludePattern   string                          `json:"topicsExcludePattern,omitempty"`
-	GroupsPattern          string                          `json:"groupsPattern,omitempty"`
-	GroupsBlacklistPattern string                          `json:"groupsBlacklistPattern,omitempty"`
-	GroupsExcludePattern   string                          `json:"groupsExcludePattern,omitempty"`
+	SourceCluster        string                          `json:"sourceCluster,omitempty"`
+	TargetCluster        string                          `json:"targetCluster,omitempty"`
+	SourceConnector      *KafkaMirrorMaker2ConnectorSpec `json:"sourceConnector,omitempty"`
+	HeartbeatConnector   *KafkaMirrorMaker2ConnectorSpec `json:"heartbeatConnector,omitempty"`
+	CheckpointConnector  *KafkaMirrorMaker2ConnectorSpec `json:"checkpointConnector,omitempty"`
+	TopicsPattern        string                          `json:"topicsPattern,omitempty"`
+	TopicsExcludePattern string                          `json:"topicsExcludePattern,omitempty"`
+	GroupsPattern        string                          `json:"groupsPattern,omitempty"`
+	GroupsExcludePattern string                          `json:"groupsExcludePattern,omitempty"`
 }
 
 type KafkaMirrorMaker2ConnectorSpec struct {
 	TasksMax     *int32          `json:"tasksMax,omitempty"`
-	Pause        *bool           `json:"pause,omitempty"`
 	Config       MapStringObject `json:"config,omitempty"`
 	State        ConnectorState  `json:"state,omitempty"`
 	AutoRestart  *AutoRestart    `json:"autoRestart,omitempty"`
@@ -886,27 +857,26 @@ type KafkaConnectStatus struct {
 }
 
 type KafkaConnectSpec struct {
-	Version               string                       `json:"version,omitempty"`
-	Replicas              int32                        `json:"replicas,omitempty"`
-	Image                 string                       `json:"image,omitempty"`
-	BootstrapServers      string                       `json:"bootstrapServers,omitempty"`
-	Tls                   *ClientTls                   `json:"tls,omitempty"`
-	Authentication        *KafkaClientAuthentication   `json:"authentication,omitempty"`
-	Config                MapStringObject              `json:"config,omitempty"`
-	Resources             *corev1.ResourceRequirements `json:"resources,omitempty"`
-	LivenessProbe         *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe        *Probe                       `json:"readinessProbe,omitempty"`
-	JvmOptions            *JvmOptions                  `json:"jvmOptions,omitempty"`
-	JmxOptions            *KafkaJmxOptions             `json:"jmxOptions,omitempty"`
-	Logging               *Logging                     `json:"logging,omitempty"`
-	ClientRackInitImage   string                       `json:"clientRackInitImage,omitempty"`
-	Rack                  *Rack                        `json:"rack,omitempty"`
-	MetricsConfig         *MetricsConfig               `json:"metricsConfig,omitempty"`
-	Tracing               *Tracing                     `json:"tracing,omitempty"`
-	Template              *KafkaConnectTemplate        `json:"template,omitempty"`
-	ExternalConfiguration *ExternalConfiguration       `json:"externalConfiguration,omitempty"`
-	Build                 *Build                       `json:"build,omitempty"`
-	Plugins               []MountedPlugin              `json:"plugins,omitempty"`
+	Version             string                       `json:"version,omitempty"`
+	Replicas            int32                        `json:"replicas,omitempty"`
+	Image               string                       `json:"image,omitempty"`
+	BootstrapServers    string                       `json:"bootstrapServers,omitempty"`
+	Tls                 *ClientTls                   `json:"tls,omitempty"`
+	Authentication      *KafkaClientAuthentication   `json:"authentication,omitempty"`
+	Config              MapStringObject              `json:"config,omitempty"`
+	Resources           *corev1.ResourceRequirements `json:"resources,omitempty"`
+	LivenessProbe       *Probe                       `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
+	JvmOptions          *JvmOptions                  `json:"jvmOptions,omitempty"`
+	JmxOptions          *KafkaJmxOptions             `json:"jmxOptions,omitempty"`
+	Logging             *Logging                     `json:"logging,omitempty"`
+	ClientRackInitImage string                       `json:"clientRackInitImage,omitempty"`
+	Rack                *Rack                        `json:"rack,omitempty"`
+	MetricsConfig       *MetricsConfig               `json:"metricsConfig,omitempty"`
+	Tracing             *Tracing                     `json:"tracing,omitempty"`
+	Template            *KafkaConnectTemplate        `json:"template,omitempty"`
+	Build               *Build                       `json:"build,omitempty"`
+	Plugins             []MountedPlugin              `json:"plugins,omitempty"`
 }
 
 type MountedPlugin struct {
@@ -1019,21 +989,15 @@ const (
 )
 
 type Storage struct {
-	SizeLimit     string                           `json:"sizeLimit,omitempty"`
-	KraftMetadata KRaftMetadataStorage             `json:"kraftMetadata,omitempty"`
-	Size          string                           `json:"size,omitempty"`
-	DeleteClaim   bool                             `json:"deleteClaim,omitempty"`
-	Volumes       []SingleVolumeStorage            `json:"volumes,omitempty"`
-	Selector      map[string]string                `json:"selector,omitempty"`
-	Id            *int32                           `json:"id,omitempty"`
-	Overrides     []PersistentClaimStorageOverride `json:"overrides,omitempty"`
-	Type          StorageType                      `json:"type,omitempty"`
-	Class         string                           `json:"class,omitempty"`
-}
-
-type PersistentClaimStorageOverride struct {
-	Class  string `json:"class,omitempty"`
-	Broker *int32 `json:"broker,omitempty"`
+	SizeLimit     string                `json:"sizeLimit,omitempty"`
+	KraftMetadata KRaftMetadataStorage  `json:"kraftMetadata,omitempty"`
+	Size          string                `json:"size,omitempty"`
+	DeleteClaim   bool                  `json:"deleteClaim,omitempty"`
+	Volumes       []SingleVolumeStorage `json:"volumes,omitempty"`
+	Selector      map[string]string     `json:"selector,omitempty"`
+	Id            *int32                `json:"id,omitempty"`
+	Type          StorageType           `json:"type,omitempty"`
+	Class         string                `json:"class,omitempty"`
 }
 
 type SingleVolumeStorageType string
@@ -1044,15 +1008,14 @@ const (
 )
 
 type SingleVolumeStorage struct {
-	SizeLimit     string                           `json:"sizeLimit,omitempty"`
-	KraftMetadata KRaftMetadataStorage             `json:"kraftMetadata,omitempty"`
-	Size          string                           `json:"size,omitempty"`
-	DeleteClaim   bool                             `json:"deleteClaim,omitempty"`
-	Selector      map[string]string                `json:"selector,omitempty"`
-	Id            *int32                           `json:"id"`
-	Overrides     []PersistentClaimStorageOverride `json:"overrides,omitempty"`
-	Type          SingleVolumeStorageType          `json:"type,omitempty"`
-	Class         string                           `json:"class,omitempty"`
+	SizeLimit     string                  `json:"sizeLimit,omitempty"`
+	KraftMetadata KRaftMetadataStorage    `json:"kraftMetadata,omitempty"`
+	Size          string                  `json:"size,omitempty"`
+	DeleteClaim   bool                    `json:"deleteClaim,omitempty"`
+	Selector      map[string]string       `json:"selector,omitempty"`
+	Id            *int32                  `json:"id"`
+	Type          SingleVolumeStorageType `json:"type,omitempty"`
+	Class         string                  `json:"class,omitempty"`
 }
 
 type KRaftMetadataStorage string
@@ -1066,12 +1029,10 @@ type KafkaStatus struct {
 	ObservedGeneration            int64                     `json:"observedGeneration,omitempty"`
 	Listeners                     []ListenerStatus          `json:"listeners,omitempty"`
 	KafkaNodePools                []UsedNodePoolStatus      `json:"kafkaNodePools,omitempty"`
-	RegisteredNodeIds             []int32                   `json:"registeredNodeIds,omitempty"`
 	ClusterId                     string                    `json:"clusterId,omitempty"`
 	OperatorLastSuccessfulVersion string                    `json:"operatorLastSuccessfulVersion,omitempty"`
 	KafkaVersion                  string                    `json:"kafkaVersion,omitempty"`
 	KafkaMetadataVersion          string                    `json:"kafkaMetadataVersion,omitempty"`
-	KafkaMetadataState            KafkaMetadataState        `json:"kafkaMetadataState,omitempty"`
 	AutoRebalance                 *KafkaAutoRebalanceStatus `json:"autoRebalance,omitempty"`
 }
 
@@ -1101,23 +1062,11 @@ const (
 	REBALANCEONSCALEUP_KAFKAAUTOREBALANCESTATE   KafkaAutoRebalanceState = "RebalanceOnScaleUp"
 )
 
-type KafkaMetadataState string
-
-const (
-	ZOOKEEPER_KAFKAMETADATASTATE          KafkaMetadataState = "ZooKeeper"
-	KRAFTMIGRATION_KAFKAMETADATASTATE     KafkaMetadataState = "KRaftMigration"
-	KRAFTDUALWRITING_KAFKAMETADATASTATE   KafkaMetadataState = "KRaftDualWriting"
-	KRAFTPOSTMIGRATION_KAFKAMETADATASTATE KafkaMetadataState = "KRaftPostMigration"
-	PREKRAFT_KAFKAMETADATASTATE           KafkaMetadataState = "PreKRaft"
-	KRAFT_KAFKAMETADATASTATE              KafkaMetadataState = "KRaft"
-)
-
 type UsedNodePoolStatus struct {
 	Name string `json:"name,omitempty"`
 }
 
 type ListenerStatus struct {
-	Type             string            `json:"type,omitempty"`
 	Name             string            `json:"name,omitempty"`
 	Addresses        []ListenerAddress `json:"addresses,omitempty"`
 	BootstrapServers string            `json:"bootstrapServers,omitempty"`
@@ -1131,12 +1080,10 @@ type ListenerAddress struct {
 
 type KafkaSpec struct {
 	Kafka                  *KafkaClusterSpec     `json:"kafka,omitempty"`
-	Zookeeper              *ZookeeperClusterSpec `json:"zookeeper,omitempty"`
 	EntityOperator         *EntityOperatorSpec   `json:"entityOperator,omitempty"`
 	ClusterCa              *CertificateAuthority `json:"clusterCa,omitempty"`
 	ClientsCa              *CertificateAuthority `json:"clientsCa,omitempty"`
 	CruiseControl          *CruiseControlSpec    `json:"cruiseControl,omitempty"`
-	JmxTrans               *JmxTransSpec         `json:"jmxTrans,omitempty"`
 	KafkaExporter          *KafkaExporterSpec    `json:"kafkaExporter,omitempty"`
 	MaintenanceTimeWindows []string              `json:"maintenanceTimeWindows,omitempty"`
 }
@@ -1159,46 +1106,13 @@ type KafkaExporterSpec struct {
 type KafkaExporterTemplate struct {
 	Deployment          *DeploymentTemplate          `json:"deployment,omitempty"`
 	Pod                 *PodTemplate                 `json:"pod,omitempty"`
-	Service             *ResourceTemplate            `json:"service,omitempty"`
 	Container           *ContainerTemplate           `json:"container,omitempty"`
 	ServiceAccount      *ResourceTemplate            `json:"serviceAccount,omitempty"`
 	PodDisruptionBudget *PodDisruptionBudgetTemplate `json:"podDisruptionBudget,omitempty"`
 }
 
-type JmxTransSpec struct {
-	Image             string                             `json:"image,omitempty"`
-	OutputDefinitions []JmxTransOutputDefinitionTemplate `json:"outputDefinitions,omitempty"`
-	LogLevel          string                             `json:"logLevel,omitempty"`
-	KafkaQueries      []JmxTransQueryTemplate            `json:"kafkaQueries,omitempty"`
-	Resources         *corev1.ResourceRequirements       `json:"resources,omitempty"`
-	Template          *JmxTransTemplate                  `json:"template,omitempty"`
-}
-
-type JmxTransTemplate struct {
-	Deployment     *DeploymentTemplate `json:"deployment,omitempty"`
-	Pod            *PodTemplate        `json:"pod,omitempty"`
-	Container      *ContainerTemplate  `json:"container,omitempty"`
-	ServiceAccount *ResourceTemplate   `json:"serviceAccount,omitempty"`
-}
-
-type JmxTransQueryTemplate struct {
-	TargetMBean string   `json:"targetMBean,omitempty"`
-	Attributes  []string `json:"attributes,omitempty"`
-	Outputs     []string `json:"outputs,omitempty"`
-}
-
-type JmxTransOutputDefinitionTemplate struct {
-	OutputType          string   `json:"outputType,omitempty"`
-	Host                string   `json:"host,omitempty"`
-	Port                *int32   `json:"port,omitempty"`
-	FlushDelayInSeconds *int32   `json:"flushDelayInSeconds,omitempty"`
-	TypeNames           []string `json:"typeNames,omitempty"`
-	Name                string   `json:"name,omitempty"`
-}
-
 type CruiseControlSpec struct {
 	Image          string                            `json:"image,omitempty"`
-	TlsSidecar     *TlsSidecar                       `json:"tlsSidecar,omitempty"`
 	Resources      *corev1.ResourceRequirements      `json:"resources,omitempty"`
 	LivenessProbe  *Probe                            `json:"livenessProbe,omitempty"`
 	ReadinessProbe *Probe                            `json:"readinessProbe,omitempty"`
@@ -1229,8 +1143,6 @@ type CruiseControlApiUsers struct {
 }
 
 type BrokerCapacity struct {
-	Disk            string                   `json:"disk,omitempty"`
-	CpuUtilization  *int32                   `json:"cpuUtilization,omitempty"`
 	Cpu             string                   `json:"cpu,omitempty"`
 	InboundNetwork  string                   `json:"inboundNetwork,omitempty"`
 	OutboundNetwork string                   `json:"outboundNetwork,omitempty"`
@@ -1250,30 +1162,8 @@ type CruiseControlTemplate struct {
 	ApiService             *InternalServiceTemplate     `json:"apiService,omitempty"`
 	PodDisruptionBudget    *PodDisruptionBudgetTemplate `json:"podDisruptionBudget,omitempty"`
 	CruiseControlContainer *ContainerTemplate           `json:"cruiseControlContainer,omitempty"`
-	TlsSidecarContainer    *ContainerTemplate           `json:"tlsSidecarContainer,omitempty"`
 	ServiceAccount         *ResourceTemplate            `json:"serviceAccount,omitempty"`
 }
-
-type TlsSidecar struct {
-	Image          string                       `json:"image,omitempty"`
-	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	LivenessProbe  *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe *Probe                       `json:"readinessProbe,omitempty"`
-	LogLevel       TlsSidecarLogLevel           `json:"logLevel,omitempty"`
-}
-
-type TlsSidecarLogLevel string
-
-const (
-	EMERG_TLSSIDECARLOGLEVEL   TlsSidecarLogLevel = "emerg"
-	ALERT_TLSSIDECARLOGLEVEL   TlsSidecarLogLevel = "alert"
-	CRIT_TLSSIDECARLOGLEVEL    TlsSidecarLogLevel = "crit"
-	ERR_TLSSIDECARLOGLEVEL     TlsSidecarLogLevel = "err"
-	WARNING_TLSSIDECARLOGLEVEL TlsSidecarLogLevel = "warning"
-	NOTICE_TLSSIDECARLOGLEVEL  TlsSidecarLogLevel = "notice"
-	INFO_TLSSIDECARLOGLEVEL    TlsSidecarLogLevel = "info"
-	DEBUG_TLSSIDECARLOGLEVEL   TlsSidecarLogLevel = "debug"
-)
 
 type CertificateAuthority struct {
 	GenerateCertificateAuthority bool                        `json:"generateCertificateAuthority,omitempty"`
@@ -1293,7 +1183,6 @@ const (
 type EntityOperatorSpec struct {
 	TopicOperator *EntityTopicOperatorSpec `json:"topicOperator,omitempty"`
 	UserOperator  *EntityUserOperatorSpec  `json:"userOperator,omitempty"`
-	TlsSidecar    *TlsSidecar              `json:"tlsSidecar,omitempty"`
 	Template      *EntityOperatorTemplate  `json:"template,omitempty"`
 }
 
@@ -1302,7 +1191,6 @@ type EntityOperatorTemplate struct {
 	Pod                      *PodTemplate                 `json:"pod,omitempty"`
 	TopicOperatorContainer   *ContainerTemplate           `json:"topicOperatorContainer,omitempty"`
 	UserOperatorContainer    *ContainerTemplate           `json:"userOperatorContainer,omitempty"`
-	TlsSidecarContainer      *ContainerTemplate           `json:"tlsSidecarContainer,omitempty"`
 	ServiceAccount           *ResourceTemplate            `json:"serviceAccount,omitempty"`
 	PodDisruptionBudget      *PodDisruptionBudgetTemplate `json:"podDisruptionBudget,omitempty"`
 	EntityOperatorRole       *ResourceTemplate            `json:"entityOperatorRole,omitempty"`
@@ -1311,82 +1199,35 @@ type EntityOperatorTemplate struct {
 }
 
 type EntityUserOperatorSpec struct {
-	WatchedNamespace               string                       `json:"watchedNamespace,omitempty"`
-	Image                          string                       `json:"image,omitempty"`
-	ReconciliationIntervalSeconds  *int64                       `json:"reconciliationIntervalSeconds,omitempty"`
-	ReconciliationIntervalMs       *int64                       `json:"reconciliationIntervalMs,omitempty"`
-	ZookeeperSessionTimeoutSeconds *int64                       `json:"zookeeperSessionTimeoutSeconds,omitempty"`
-	SecretPrefix                   string                       `json:"secretPrefix,omitempty"`
-	LivenessProbe                  *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe                 *Probe                       `json:"readinessProbe,omitempty"`
-	Resources                      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	Logging                        *Logging                     `json:"logging,omitempty"`
-	JvmOptions                     *JvmOptions                  `json:"jvmOptions,omitempty"`
+	WatchedNamespace         string                       `json:"watchedNamespace,omitempty"`
+	Image                    string                       `json:"image,omitempty"`
+	ReconciliationIntervalMs *int64                       `json:"reconciliationIntervalMs,omitempty"`
+	SecretPrefix             string                       `json:"secretPrefix,omitempty"`
+	LivenessProbe            *Probe                       `json:"livenessProbe,omitempty"`
+	ReadinessProbe           *Probe                       `json:"readinessProbe,omitempty"`
+	Resources                *corev1.ResourceRequirements `json:"resources,omitempty"`
+	Logging                  *Logging                     `json:"logging,omitempty"`
+	JvmOptions               *JvmOptions                  `json:"jvmOptions,omitempty"`
 }
 
 type EntityTopicOperatorSpec struct {
-	WatchedNamespace               string                       `json:"watchedNamespace,omitempty"`
-	Image                          string                       `json:"image,omitempty"`
-	ReconciliationIntervalSeconds  *int32                       `json:"reconciliationIntervalSeconds,omitempty"`
-	ReconciliationIntervalMs       *int64                       `json:"reconciliationIntervalMs,omitempty"`
-	ZookeeperSessionTimeoutSeconds *int32                       `json:"zookeeperSessionTimeoutSeconds,omitempty"`
-	StartupProbe                   *Probe                       `json:"startupProbe,omitempty"`
-	LivenessProbe                  *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe                 *Probe                       `json:"readinessProbe,omitempty"`
-	Resources                      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	TopicMetadataMaxAttempts       *int32                       `json:"topicMetadataMaxAttempts,omitempty"`
-	Logging                        *Logging                     `json:"logging,omitempty"`
-	JvmOptions                     *JvmOptions                  `json:"jvmOptions,omitempty"`
+	WatchedNamespace         string                       `json:"watchedNamespace,omitempty"`
+	Image                    string                       `json:"image,omitempty"`
+	ReconciliationIntervalMs *int64                       `json:"reconciliationIntervalMs,omitempty"`
+	StartupProbe             *Probe                       `json:"startupProbe,omitempty"`
+	LivenessProbe            *Probe                       `json:"livenessProbe,omitempty"`
+	ReadinessProbe           *Probe                       `json:"readinessProbe,omitempty"`
+	Resources                *corev1.ResourceRequirements `json:"resources,omitempty"`
+	Logging                  *Logging                     `json:"logging,omitempty"`
+	JvmOptions               *JvmOptions                  `json:"jvmOptions,omitempty"`
 }
-
-type ZookeeperClusterSpec struct {
-	Replicas       int32                        `json:"replicas,omitempty"`
-	Image          string                       `json:"image,omitempty"`
-	Storage        *SingleVolumeStorage         `json:"storage,omitempty"`
-	Config         MapStringObject              `json:"config,omitempty"`
-	LivenessProbe  *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe *Probe                       `json:"readinessProbe,omitempty"`
-	JvmOptions     *JvmOptions                  `json:"jvmOptions,omitempty"`
-	JmxOptions     *KafkaJmxOptions             `json:"jmxOptions,omitempty"`
-	Resources      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	MetricsConfig  *MetricsConfig               `json:"metricsConfig,omitempty"`
-	Logging        *Logging                     `json:"logging,omitempty"`
-	Template       *ZookeeperClusterTemplate    `json:"template,omitempty"`
-}
-
-type ZookeeperClusterTemplate struct {
-	Statefulset           *StatefulSetTemplate         `json:"statefulset,omitempty"`
-	PodSet                *ResourceTemplate            `json:"podSet,omitempty"`
-	Pod                   *PodTemplate                 `json:"pod,omitempty"`
-	ClientService         *InternalServiceTemplate     `json:"clientService,omitempty"`
-	NodesService          *InternalServiceTemplate     `json:"nodesService,omitempty"`
-	PersistentVolumeClaim *ResourceTemplate            `json:"persistentVolumeClaim,omitempty"`
-	PodDisruptionBudget   *PodDisruptionBudgetTemplate `json:"podDisruptionBudget,omitempty"`
-	ZookeeperContainer    *ContainerTemplate           `json:"zookeeperContainer,omitempty"`
-	ServiceAccount        *ResourceTemplate            `json:"serviceAccount,omitempty"`
-	JmxSecret             *ResourceTemplate            `json:"jmxSecret,omitempty"`
-}
-
-type StatefulSetTemplate struct {
-	Metadata            *MetadataTemplate   `json:"metadata,omitempty"`
-	PodManagementPolicy PodManagementPolicy `json:"podManagementPolicy,omitempty"`
-}
-
-type PodManagementPolicy string
-
-const (
-	ORDERED_READY_PODMANAGEMENTPOLICY PodManagementPolicy = "OrderedReady"
-	PARALLEL_PODMANAGEMENTPOLICY      PodManagementPolicy = "Parallel"
-)
 
 type KafkaClusterSpec struct {
 	Version             string                       `json:"version,omitempty"`
 	MetadataVersion     string                       `json:"metadataVersion,omitempty"`
-	Replicas            *int32                       `json:"replicas,omitempty"`
 	Image               string                       `json:"image,omitempty"`
 	Listeners           []GenericKafkaListener       `json:"listeners,omitempty"`
 	Config              MapStringObject              `json:"config,omitempty"`
-	Storage             *Storage                     `json:"storage,omitempty"`
 	Authorization       *KafkaAuthorization          `json:"authorization,omitempty"`
 	Rack                *Rack                        `json:"rack,omitempty"`
 	BrokerRackInitImage string                       `json:"brokerRackInitImage,omitempty"`
@@ -1438,7 +1279,6 @@ type RemoteStorageManager struct {
 }
 
 type KafkaClusterTemplate struct {
-	Statefulset              *StatefulSetTemplate         `json:"statefulset,omitempty"`
 	Pod                      *PodTemplate                 `json:"pod,omitempty"`
 	BootstrapService         *InternalServiceTemplate     `json:"bootstrapService,omitempty"`
 	BrokersService           *InternalServiceTemplate     `json:"brokersService,omitempty"`
@@ -1576,7 +1416,6 @@ const (
 
 type KafkaListenerAuthentication struct {
 	JwksMinRefreshPauseSeconds        *int32                          `json:"jwksMinRefreshPauseSeconds,omitempty"`
-	EnableECDSA                       *bool                           `json:"enableECDSA,omitempty"`
 	IntrospectionEndpointUri          string                          `json:"introspectionEndpointUri,omitempty"`
 	ValidIssuerUri                    string                          `json:"validIssuerUri,omitempty"`
 	ValidTokenType                    string                          `json:"validTokenType,omitempty"`
@@ -1606,7 +1445,6 @@ type KafkaListenerAuthentication struct {
 	UserNameClaim                     string                          `json:"userNameClaim,omitempty"`
 	HttpRetryPauseMs                  *int32                          `json:"httpRetryPauseMs,omitempty"`
 	CustomClaimCheck                  string                          `json:"customClaimCheck,omitempty"`
-	Secrets                           []GenericSecretSource           `json:"secrets,omitempty"`
 	FailFast                          bool                            `json:"failFast,omitempty"`
 	GroupsClaim                       string                          `json:"groupsClaim,omitempty"`
 	ReadTimeoutSeconds                *int32                          `json:"readTimeoutSeconds,omitempty"`
