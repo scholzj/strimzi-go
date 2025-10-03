@@ -1,7 +1,6 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaMirrorMaker2
 metadata:
-  creationTimestamp: null
   name: my-mirror-maker-2
 spec:
   clusters:

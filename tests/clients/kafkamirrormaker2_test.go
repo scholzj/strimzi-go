@@ -2,10 +2,11 @@ package clients
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimziinformer "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions"
@@ -14,6 +15,8 @@ import (
 )
 
 func NewMM2() *kafkav1beta2.KafkaMirrorMaker2 {
+	tasksMax := int32(5)
+
 	return &kafkav1beta2.KafkaMirrorMaker2{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NAME,
@@ -40,13 +43,13 @@ func NewMM2() *kafkav1beta2.KafkaMirrorMaker2 {
 				SourceCluster: "cluster-a",
 				TargetCluster: "cluster-b",
 				SourceConnector: &kafkav1beta2.KafkaMirrorMaker2ConnectorSpec{
-					TasksMax: 5,
+					TasksMax: &tasksMax,
 					Config: map[string]interface{}{
 						"sync.topic.acls.enabled": "false",
 					},
 				},
 				CheckpointConnector: &kafkav1beta2.KafkaMirrorMaker2ConnectorSpec{
-					TasksMax: 5,
+					TasksMax: &tasksMax,
 					Config: map[string]interface{}{
 						"sync.group.offsets.enabled": "false",
 					},
@@ -59,13 +62,15 @@ func NewMM2() *kafkav1beta2.KafkaMirrorMaker2 {
 func UpdatedMM2(oldResource *kafkav1beta2.KafkaMirrorMaker2) *kafkav1beta2.KafkaMirrorMaker2 {
 	updatedResource := oldResource.DeepCopy()
 
+	tasksMax := int32(3)
+
 	updatedResource.Spec.Replicas = 3
 	updatedResource.Spec.Version = "4.0.0"
 	updatedResource.Spec.ConnectCluster = "cluster-b"
 	updatedResource.Spec.Mirrors[0].SourceCluster = "cluster-b"
 	updatedResource.Spec.Mirrors[0].TargetCluster = "cluster-a"
-	updatedResource.Spec.Mirrors[0].SourceConnector.TasksMax = 3
-	updatedResource.Spec.Mirrors[0].CheckpointConnector.TasksMax = 3
+	updatedResource.Spec.Mirrors[0].SourceConnector.TasksMax = &tasksMax
+	updatedResource.Spec.Mirrors[0].CheckpointConnector.TasksMax = &tasksMax
 
 	return updatedResource
 }

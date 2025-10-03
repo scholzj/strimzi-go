@@ -3,7 +3,6 @@ kind: KafkaConnect
 metadata:
   annotations:
     strimzi.io/use-connector-resources: "true"
-  creationTimestamp: null
   name: my-connect-cluster
 spec:
   bootstrapServers: my-cluster-kafka-bootstrap:9093

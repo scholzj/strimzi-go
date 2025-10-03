@@ -238,10 +238,10 @@ type MetadataTemplate struct {
 }
 
 type KafkaUserQuotas struct {
-	ProducerByteRate       int32   `json:"producerByteRate,omitempty"`
-	ConsumerByteRate       int32   `json:"consumerByteRate,omitempty"`
-	RequestPercentage      int32   `json:"requestPercentage,omitempty"`
-	ControllerMutationRate float64 `json:"controllerMutationRate,omitempty"`
+	ProducerByteRate       *int32   `json:"producerByteRate,omitempty"`
+	ConsumerByteRate       *int32   `json:"consumerByteRate,omitempty"`
+	RequestPercentage      *int32   `json:"requestPercentage,omitempty"`
+	ControllerMutationRate *float64 `json:"controllerMutationRate,omitempty"`
 }
 
 type KafkaUserAuthorizationType string
@@ -346,10 +346,10 @@ type AutoRestartStatus struct {
 
 type KafkaConnectorSpec struct {
 	Class        string          `json:"class,omitempty"`
-	TasksMax     int32           `json:"tasksMax,omitempty"`
+	TasksMax     *int32          `json:"tasksMax,omitempty"`
 	AutoRestart  *AutoRestart    `json:"autoRestart,omitempty"`
 	Config       MapStringObject `json:"config,omitempty"`
-	Pause        bool            `json:"pause,omitempty"`
+	Pause        *bool           `json:"pause,omitempty"`
 	State        ConnectorState  `json:"state,omitempty"`
 	ListOffsets  *ListOffsets    `json:"listOffsets,omitempty"`
 	AlterOffsets *AlterOffsets   `json:"alterOffsets,omitempty"`
@@ -372,8 +372,8 @@ const (
 )
 
 type AutoRestart struct {
-	Enabled     bool  `json:"enabled,omitempty"`
-	MaxRestarts int32 `json:"maxRestarts,omitempty"`
+	Enabled     bool   `json:"enabled,omitempty"`
+	MaxRestarts *int32 `json:"maxRestarts,omitempty"`
 }
 
 type KafkaTopicStatus struct {
@@ -385,7 +385,7 @@ type KafkaTopicStatus struct {
 }
 
 type ReplicasChangeStatus struct {
-	TargetReplicas int32               `json:"targetReplicas,omitempty"`
+	TargetReplicas *int32              `json:"targetReplicas,omitempty"`
 	State          ReplicasChangeState `json:"state,omitempty"`
 	Message        string              `json:"message,omitempty"`
 	SessionId      string              `json:"sessionId,omitempty"`
@@ -400,8 +400,8 @@ const (
 
 type KafkaTopicSpec struct {
 	TopicName  string          `json:"topicName,omitempty"`
-	Partitions int32           `json:"partitions,omitempty"`
-	Replicas   int32           `json:"replicas,omitempty"`
+	Partitions *int32          `json:"partitions,omitempty"`
+	Replicas   *int32          `json:"replicas,omitempty"`
 	Config     MapStringObject `json:"config,omitempty"`
 }
 
@@ -433,7 +433,7 @@ type KafkaRebalanceSpec struct {
 }
 
 type BrokerAndVolumeIds struct {
-	BrokerId  int32   `json:"brokerId,omitempty"`
+	BrokerId  *int32  `json:"brokerId,omitempty"`
 	VolumeIds []int32 `json:"volumeIds,omitempty"`
 }
 
@@ -554,7 +554,7 @@ type PodTemplate struct {
 	HostAliases                   []corev1.HostAlias                `json:"hostAliases,omitempty"`
 	DnsPolicy                     DnsPolicy                         `json:"dnsPolicy,omitempty"`
 	DnsConfig                     *corev1.PodDNSConfig              `json:"dnsConfig,omitempty"`
-	EnableServiceLinks            bool                              `json:"enableServiceLinks,omitempty"`
+	EnableServiceLinks            *bool                             `json:"enableServiceLinks,omitempty"`
 	TmpDirSizeLimit               string                            `json:"tmpDirSizeLimit,omitempty"`
 	Volumes                       []AdditionalVolume                `json:"volumes,omitempty"`
 }
@@ -591,11 +591,11 @@ const (
 )
 
 type Probe struct {
-	InitialDelaySeconds int32 `json:"initialDelaySeconds,omitempty"`
-	TimeoutSeconds      int32 `json:"timeoutSeconds,omitempty"`
-	PeriodSeconds       int32 `json:"periodSeconds,omitempty"`
-	SuccessThreshold    int32 `json:"successThreshold,omitempty"`
-	FailureThreshold    int32 `json:"failureThreshold,omitempty"`
+	InitialDelaySeconds int32  `json:"initialDelaySeconds,omitempty"`
+	TimeoutSeconds      int32  `json:"timeoutSeconds,omitempty"`
+	PeriodSeconds       *int32 `json:"periodSeconds,omitempty"`
+	SuccessThreshold    *int32 `json:"successThreshold,omitempty"`
+	FailureThreshold    *int32 `json:"failureThreshold,omitempty"`
 }
 
 type Rack struct {
@@ -682,16 +682,16 @@ type KafkaClientAuthentication struct {
 	Audience                       string                        `json:"audience,omitempty"`
 	ClientAssertion                *GenericSecretSource          `json:"clientAssertion,omitempty"`
 	ClientId                       string                        `json:"clientId,omitempty"`
-	ConnectTimeoutSeconds          int32                         `json:"connectTimeoutSeconds,omitempty"`
+	ConnectTimeoutSeconds          *int32                        `json:"connectTimeoutSeconds,omitempty"`
 	MaxTokenExpirySeconds          int32                         `json:"maxTokenExpirySeconds,omitempty"`
-	HttpRetryPauseMs               int32                         `json:"httpRetryPauseMs,omitempty"`
+	HttpRetryPauseMs               *int32                        `json:"httpRetryPauseMs,omitempty"`
 	AccessToken                    *GenericSecretSource          `json:"accessToken,omitempty"`
-	ReadTimeoutSeconds             int32                         `json:"readTimeoutSeconds,omitempty"`
+	ReadTimeoutSeconds             *int32                        `json:"readTimeoutSeconds,omitempty"`
 	EnableMetrics                  bool                          `json:"enableMetrics,omitempty"`
 	TokenEndpointUri               string                        `json:"tokenEndpointUri,omitempty"`
 	PasswordSecret                 *PasswordSecretSource         `json:"passwordSecret,omitempty"`
 	IncludeAcceptHeader            bool                          `json:"includeAcceptHeader,omitempty"`
-	HttpRetries                    int32                         `json:"httpRetries,omitempty"`
+	HttpRetries                    *int32                        `json:"httpRetries,omitempty"`
 	Username                       string                        `json:"username,omitempty"`
 	RefreshToken                   *GenericSecretSource          `json:"refreshToken,omitempty"`
 }
@@ -854,8 +854,8 @@ type KafkaMirrorMaker2MirrorSpec struct {
 }
 
 type KafkaMirrorMaker2ConnectorSpec struct {
-	TasksMax     int32           `json:"tasksMax,omitempty"`
-	Pause        bool            `json:"pause,omitempty"`
+	TasksMax     *int32          `json:"tasksMax,omitempty"`
+	Pause        *bool           `json:"pause,omitempty"`
 	Config       MapStringObject `json:"config,omitempty"`
 	State        ConnectorState  `json:"state,omitempty"`
 	AutoRestart  *AutoRestart    `json:"autoRestart,omitempty"`
@@ -946,7 +946,7 @@ type Artifact struct {
 	Artifact   string       `json:"artifact,omitempty"`
 	Sha512sum  string       `json:"sha512sum,omitempty"`
 	FileName   string       `json:"fileName,omitempty"`
-	Insecure   bool         `json:"insecure,omitempty"`
+	Insecure   *bool        `json:"insecure,omitempty"`
 	Type       ArtifactType `json:"type,omitempty"`
 	Repository string       `json:"repository,omitempty"`
 	Version    string       `json:"version,omitempty"`
@@ -1020,7 +1020,7 @@ type Storage struct {
 	DeleteClaim   bool                             `json:"deleteClaim,omitempty"`
 	Volumes       []SingleVolumeStorage            `json:"volumes,omitempty"`
 	Selector      map[string]string                `json:"selector,omitempty"`
-	Id            int32                            `json:"id,omitempty"`
+	Id            *int32                           `json:"id,omitempty"`
 	Overrides     []PersistentClaimStorageOverride `json:"overrides,omitempty"`
 	Type          StorageType                      `json:"type,omitempty"`
 	Class         string                           `json:"class,omitempty"`
@@ -1028,7 +1028,7 @@ type Storage struct {
 
 type PersistentClaimStorageOverride struct {
 	Class  string `json:"class,omitempty"`
-	Broker int32  `json:"broker,omitempty"`
+	Broker *int32 `json:"broker,omitempty"`
 }
 
 type SingleVolumeStorageType string
@@ -1044,7 +1044,7 @@ type SingleVolumeStorage struct {
 	Size          string                           `json:"size,omitempty"`
 	DeleteClaim   bool                             `json:"deleteClaim,omitempty"`
 	Selector      map[string]string                `json:"selector,omitempty"`
-	Id            int32                            `json:"id"`
+	Id            *int32                           `json:"id"`
 	Overrides     []PersistentClaimStorageOverride `json:"overrides,omitempty"`
 	Type          SingleVolumeStorageType          `json:"type,omitempty"`
 	Class         string                           `json:"class,omitempty"`
@@ -1121,7 +1121,7 @@ type ListenerStatus struct {
 
 type ListenerAddress struct {
 	Host string `json:"host,omitempty"`
-	Port int32  `json:"port,omitempty"`
+	Port *int32 `json:"port,omitempty"`
 }
 
 type KafkaSpec struct {
@@ -1184,8 +1184,8 @@ type JmxTransQueryTemplate struct {
 type JmxTransOutputDefinitionTemplate struct {
 	OutputType          string   `json:"outputType,omitempty"`
 	Host                string   `json:"host,omitempty"`
-	Port                int32    `json:"port,omitempty"`
-	FlushDelayInSeconds int32    `json:"flushDelayInSeconds,omitempty"`
+	Port                *int32   `json:"port,omitempty"`
+	FlushDelayInSeconds *int32   `json:"flushDelayInSeconds,omitempty"`
 	TypeNames           []string `json:"typeNames,omitempty"`
 	Name                string   `json:"name,omitempty"`
 }
@@ -1224,7 +1224,7 @@ type CruiseControlApiUsers struct {
 
 type BrokerCapacity struct {
 	Disk            string                   `json:"disk,omitempty"`
-	CpuUtilization  int32                    `json:"cpuUtilization,omitempty"`
+	CpuUtilization  *int32                   `json:"cpuUtilization,omitempty"`
 	Cpu             string                   `json:"cpu,omitempty"`
 	InboundNetwork  string                   `json:"inboundNetwork,omitempty"`
 	OutboundNetwork string                   `json:"outboundNetwork,omitempty"`
@@ -1306,9 +1306,9 @@ type EntityOperatorTemplate struct {
 type EntityUserOperatorSpec struct {
 	WatchedNamespace               string                       `json:"watchedNamespace,omitempty"`
 	Image                          string                       `json:"image,omitempty"`
-	ReconciliationIntervalSeconds  int64                        `json:"reconciliationIntervalSeconds,omitempty"`
-	ReconciliationIntervalMs       int64                        `json:"reconciliationIntervalMs,omitempty"`
-	ZookeeperSessionTimeoutSeconds int64                        `json:"zookeeperSessionTimeoutSeconds,omitempty"`
+	ReconciliationIntervalSeconds  *int64                       `json:"reconciliationIntervalSeconds,omitempty"`
+	ReconciliationIntervalMs       *int64                       `json:"reconciliationIntervalMs,omitempty"`
+	ZookeeperSessionTimeoutSeconds *int64                       `json:"zookeeperSessionTimeoutSeconds,omitempty"`
 	SecretPrefix                   string                       `json:"secretPrefix,omitempty"`
 	LivenessProbe                  *Probe                       `json:"livenessProbe,omitempty"`
 	ReadinessProbe                 *Probe                       `json:"readinessProbe,omitempty"`
@@ -1320,14 +1320,14 @@ type EntityUserOperatorSpec struct {
 type EntityTopicOperatorSpec struct {
 	WatchedNamespace               string                       `json:"watchedNamespace,omitempty"`
 	Image                          string                       `json:"image,omitempty"`
-	ReconciliationIntervalSeconds  int32                        `json:"reconciliationIntervalSeconds,omitempty"`
-	ReconciliationIntervalMs       int64                        `json:"reconciliationIntervalMs,omitempty"`
-	ZookeeperSessionTimeoutSeconds int32                        `json:"zookeeperSessionTimeoutSeconds,omitempty"`
+	ReconciliationIntervalSeconds  *int32                       `json:"reconciliationIntervalSeconds,omitempty"`
+	ReconciliationIntervalMs       *int64                       `json:"reconciliationIntervalMs,omitempty"`
+	ZookeeperSessionTimeoutSeconds *int32                       `json:"zookeeperSessionTimeoutSeconds,omitempty"`
 	StartupProbe                   *Probe                       `json:"startupProbe,omitempty"`
 	LivenessProbe                  *Probe                       `json:"livenessProbe,omitempty"`
 	ReadinessProbe                 *Probe                       `json:"readinessProbe,omitempty"`
 	Resources                      *corev1.ResourceRequirements `json:"resources,omitempty"`
-	TopicMetadataMaxAttempts       int32                        `json:"topicMetadataMaxAttempts,omitempty"`
+	TopicMetadataMaxAttempts       *int32                       `json:"topicMetadataMaxAttempts,omitempty"`
 	Logging                        *Logging                     `json:"logging,omitempty"`
 	JvmOptions                     *JvmOptions                  `json:"jvmOptions,omitempty"`
 }
@@ -1375,7 +1375,7 @@ const (
 type KafkaClusterSpec struct {
 	Version             string                       `json:"version,omitempty"`
 	MetadataVersion     string                       `json:"metadataVersion,omitempty"`
-	Replicas            int32                        `json:"replicas,omitempty"`
+	Replicas            *int32                       `json:"replicas,omitempty"`
 	Image               string                       `json:"image,omitempty"`
 	Listeners           []GenericKafkaListener       `json:"listeners,omitempty"`
 	Config              MapStringObject              `json:"config,omitempty"`
@@ -1403,13 +1403,13 @@ const (
 )
 
 type QuotasPlugin struct {
-	ProducerByteRate           int64            `json:"producerByteRate,omitempty"`
-	ConsumerByteRate           int64            `json:"consumerByteRate,omitempty"`
-	RequestPercentage          int32            `json:"requestPercentage,omitempty"`
-	MinAvailableRatioPerVolume float64          `json:"minAvailableRatioPerVolume,omitempty"`
-	MinAvailableBytesPerVolume int64            `json:"minAvailableBytesPerVolume,omitempty"`
+	ProducerByteRate           *int64           `json:"producerByteRate,omitempty"`
+	ConsumerByteRate           *int64           `json:"consumerByteRate,omitempty"`
+	RequestPercentage          *int32           `json:"requestPercentage,omitempty"`
+	MinAvailableRatioPerVolume *float64         `json:"minAvailableRatioPerVolume,omitempty"`
+	MinAvailableBytesPerVolume *int64           `json:"minAvailableBytesPerVolume,omitempty"`
 	Type                       QuotasPluginType `json:"type,omitempty"`
-	ControllerMutationRate     float64          `json:"controllerMutationRate,omitempty"`
+	ControllerMutationRate     *float64         `json:"controllerMutationRate,omitempty"`
 	ExcludedPrincipals         []string         `json:"excludedPrincipals,omitempty"`
 }
 
@@ -1462,30 +1462,30 @@ const (
 )
 
 type KafkaAuthorization struct {
-	GrantsRefreshPeriodSeconds     int32                  `json:"grantsRefreshPeriodSeconds,omitempty"`
+	GrantsRefreshPeriodSeconds     *int32                 `json:"grantsRefreshPeriodSeconds,omitempty"`
 	AllowOnError                   bool                   `json:"allowOnError,omitempty"`
 	ClientId                       string                 `json:"clientId,omitempty"`
 	SuperUsers                     []string               `json:"superUsers,omitempty"`
-	GrantsMaxIdleTimeSeconds       int32                  `json:"grantsMaxIdleTimeSeconds,omitempty"`
+	GrantsMaxIdleTimeSeconds       *int32                 `json:"grantsMaxIdleTimeSeconds,omitempty"`
 	InitialCacheCapacity           int32                  `json:"initialCacheCapacity,omitempty"`
 	AuthorizerClass                string                 `json:"authorizerClass,omitempty"`
-	ConnectTimeoutSeconds          int32                  `json:"connectTimeoutSeconds,omitempty"`
+	ConnectTimeoutSeconds          *int32                 `json:"connectTimeoutSeconds,omitempty"`
 	ExpireAfterMs                  int64                  `json:"expireAfterMs,omitempty"`
 	Type                           KafkaAuthorizationType `json:"type,omitempty"`
 	SupportsAdminApi               bool                   `json:"supportsAdminApi,omitempty"`
 	DelegateToKafkaAcls            bool                   `json:"delegateToKafkaAcls,omitempty"`
-	GrantsRefreshPoolSize          int32                  `json:"grantsRefreshPoolSize,omitempty"`
+	GrantsRefreshPoolSize          *int32                 `json:"grantsRefreshPoolSize,omitempty"`
 	Url                            string                 `json:"url,omitempty"`
 	MaximumCacheSize               int32                  `json:"maximumCacheSize,omitempty"`
-	ReadTimeoutSeconds             int32                  `json:"readTimeoutSeconds,omitempty"`
+	ReadTimeoutSeconds             *int32                 `json:"readTimeoutSeconds,omitempty"`
 	TlsTrustedCertificates         []CertSecretSource     `json:"tlsTrustedCertificates,omitempty"`
 	EnableMetrics                  bool                   `json:"enableMetrics,omitempty"`
 	GrantsAlwaysLatest             bool                   `json:"grantsAlwaysLatest,omitempty"`
-	GrantsGcPeriodSeconds          int32                  `json:"grantsGcPeriodSeconds,omitempty"`
+	GrantsGcPeriodSeconds          *int32                 `json:"grantsGcPeriodSeconds,omitempty"`
 	TokenEndpointUri               string                 `json:"tokenEndpointUri,omitempty"`
 	DisableTlsHostnameVerification bool                   `json:"disableTlsHostnameVerification,omitempty"`
 	IncludeAcceptHeader            bool                   `json:"includeAcceptHeader,omitempty"`
-	HttpRetries                    int32                  `json:"httpRetries,omitempty"`
+	HttpRetries                    *int32                 `json:"httpRetries,omitempty"`
 }
 
 type GenericKafkaListener struct {
@@ -1507,16 +1507,16 @@ type GenericKafkaListenerConfiguration struct {
 	Brokers                       []GenericKafkaListenerConfigurationBroker   `json:"brokers,omitempty"`
 	IpFamilyPolicy                IpFamilyPolicy                              `json:"ipFamilyPolicy,omitempty"`
 	IpFamilies                    []IpFamily                                  `json:"ipFamilies,omitempty"`
-	CreateBootstrapService        bool                                        `json:"createBootstrapService,omitempty"`
+	CreateBootstrapService        *bool                                       `json:"createBootstrapService,omitempty"`
 	Finalizers                    []string                                    `json:"finalizers,omitempty"`
-	UseServiceDnsDomain           bool                                        `json:"useServiceDnsDomain,omitempty"`
-	MaxConnections                int32                                       `json:"maxConnections,omitempty"`
-	MaxConnectionCreationRate     int32                                       `json:"maxConnectionCreationRate,omitempty"`
+	UseServiceDnsDomain           *bool                                       `json:"useServiceDnsDomain,omitempty"`
+	MaxConnections                *int32                                      `json:"maxConnections,omitempty"`
+	MaxConnectionCreationRate     *int32                                      `json:"maxConnectionCreationRate,omitempty"`
 	PreferredNodePortAddressType  NodeAddressType                             `json:"preferredNodePortAddressType,omitempty"`
-	PublishNotReadyAddresses      bool                                        `json:"publishNotReadyAddresses,omitempty"`
+	PublishNotReadyAddresses      *bool                                       `json:"publishNotReadyAddresses,omitempty"`
 	HostTemplate                  string                                      `json:"hostTemplate,omitempty"`
 	AdvertisedHostTemplate        string                                      `json:"advertisedHostTemplate,omitempty"`
-	AllocateLoadBalancerNodePorts bool                                        `json:"allocateLoadBalancerNodePorts,omitempty"`
+	AllocateLoadBalancerNodePorts *bool                                       `json:"allocateLoadBalancerNodePorts,omitempty"`
 }
 
 type NodeAddressType string
@@ -1530,11 +1530,11 @@ const (
 )
 
 type GenericKafkaListenerConfigurationBroker struct {
-	Broker         int32             `json:"broker"`
+	Broker         *int32            `json:"broker"`
 	AdvertisedHost string            `json:"advertisedHost,omitempty"`
-	AdvertisedPort int32             `json:"advertisedPort,omitempty"`
+	AdvertisedPort *int32            `json:"advertisedPort,omitempty"`
 	Host           string            `json:"host,omitempty"`
-	NodePort       int32             `json:"nodePort,omitempty"`
+	NodePort       *int32            `json:"nodePort,omitempty"`
 	LoadBalancerIP string            `json:"loadBalancerIP,omitempty"`
 	Annotations    map[string]string `json:"annotations,omitempty"`
 	Labels         map[string]string `json:"labels,omitempty"`
@@ -1544,7 +1544,7 @@ type GenericKafkaListenerConfigurationBroker struct {
 type GenericKafkaListenerConfigurationBootstrap struct {
 	AlternativeNames []string          `json:"alternativeNames,omitempty"`
 	Host             string            `json:"host,omitempty"`
-	NodePort         int32             `json:"nodePort,omitempty"`
+	NodePort         *int32            `json:"nodePort,omitempty"`
 	LoadBalancerIP   string            `json:"loadBalancerIP,omitempty"`
 	Annotations      map[string]string `json:"annotations,omitempty"`
 	Labels           map[string]string `json:"labels,omitempty"`
@@ -1568,8 +1568,8 @@ const (
 )
 
 type KafkaListenerAuthentication struct {
-	JwksMinRefreshPauseSeconds        int32                           `json:"jwksMinRefreshPauseSeconds,omitempty"`
-	EnableECDSA                       bool                            `json:"enableECDSA,omitempty"`
+	JwksMinRefreshPauseSeconds        *int32                          `json:"jwksMinRefreshPauseSeconds,omitempty"`
+	EnableECDSA                       *bool                           `json:"enableECDSA,omitempty"`
 	IntrospectionEndpointUri          string                          `json:"introspectionEndpointUri,omitempty"`
 	ValidIssuerUri                    string                          `json:"validIssuerUri,omitempty"`
 	ValidTokenType                    string                          `json:"validTokenType,omitempty"`
@@ -1589,24 +1589,24 @@ type KafkaListenerAuthentication struct {
 	JwksEndpointUri                   string                          `json:"jwksEndpointUri,omitempty"`
 	ClientSecret                      *GenericSecretSource            `json:"clientSecret,omitempty"`
 	ClientAudience                    string                          `json:"clientAudience,omitempty"`
-	JwksExpirySeconds                 int32                           `json:"jwksExpirySeconds,omitempty"`
-	JwksRefreshSeconds                int32                           `json:"jwksRefreshSeconds,omitempty"`
+	JwksExpirySeconds                 *int32                          `json:"jwksExpirySeconds,omitempty"`
+	JwksRefreshSeconds                *int32                          `json:"jwksRefreshSeconds,omitempty"`
 	EnableOauthBearer                 bool                            `json:"enableOauthBearer,omitempty"`
 	ClientId                          string                          `json:"clientId,omitempty"`
 	GroupsClaimDelimiter              string                          `json:"groupsClaimDelimiter,omitempty"`
-	ConnectTimeoutSeconds             int32                           `json:"connectTimeoutSeconds,omitempty"`
+	ConnectTimeoutSeconds             *int32                          `json:"connectTimeoutSeconds,omitempty"`
 	UserNameClaim                     string                          `json:"userNameClaim,omitempty"`
-	HttpRetryPauseMs                  int32                           `json:"httpRetryPauseMs,omitempty"`
+	HttpRetryPauseMs                  *int32                          `json:"httpRetryPauseMs,omitempty"`
 	CustomClaimCheck                  string                          `json:"customClaimCheck,omitempty"`
 	Secrets                           []GenericSecretSource           `json:"secrets,omitempty"`
 	FailFast                          bool                            `json:"failFast,omitempty"`
 	GroupsClaim                       string                          `json:"groupsClaim,omitempty"`
-	ReadTimeoutSeconds                int32                           `json:"readTimeoutSeconds,omitempty"`
+	ReadTimeoutSeconds                *int32                          `json:"readTimeoutSeconds,omitempty"`
 	EnableMetrics                     bool                            `json:"enableMetrics,omitempty"`
-	MaxSecondsWithoutReauthentication int32                           `json:"maxSecondsWithoutReauthentication,omitempty"`
+	MaxSecondsWithoutReauthentication *int32                          `json:"maxSecondsWithoutReauthentication,omitempty"`
 	TokenEndpointUri                  string                          `json:"tokenEndpointUri,omitempty"`
 	IncludeAcceptHeader               bool                            `json:"includeAcceptHeader,omitempty"`
-	HttpRetries                       int32                           `json:"httpRetries,omitempty"`
+	HttpRetries                       *int32                          `json:"httpRetries,omitempty"`
 	EnablePlain                       bool                            `json:"enablePlain,omitempty"`
 	CheckAccessTokenType              bool                            `json:"checkAccessTokenType,omitempty"`
 	ClientScope                       string                          `json:"clientScope,omitempty"`

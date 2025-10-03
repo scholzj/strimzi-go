@@ -2,10 +2,11 @@ package clients
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	strimziinformer "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions"
@@ -14,6 +15,8 @@ import (
 )
 
 func NewNodePool() *kafkav1beta2.KafkaNodePool {
+	volumeId := int32(0)
+
 	return &kafkav1beta2.KafkaNodePool{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      NAME,
@@ -25,7 +28,7 @@ func NewNodePool() *kafkav1beta2.KafkaNodePool {
 			Storage: &kafkav1beta2.Storage{
 				Type: kafkav1beta2.JBOD_STORAGETYPE,
 				Volumes: []kafkav1beta2.SingleVolumeStorage{{
-					Id:   0,
+					Id:   &volumeId,
 					Type: kafkav1beta2.PERSISTENT_CLAIM_SINGLEVOLUMESTORAGETYPE,
 					Size: "100Gi",
 				}},

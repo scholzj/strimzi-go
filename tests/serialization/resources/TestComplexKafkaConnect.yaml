@@ -102,7 +102,7 @@ spec:
       securityContext:
         readOnlyRootFilesystem: false
     buildPod:
-      enableServiceLinks: true
+      enableServiceLinks: false
       metadata:
         annotations:
           key1: label1
