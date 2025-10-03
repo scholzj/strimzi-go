@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"path/filepath"
+
 	strimziclient "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-	"log"
-	"path/filepath"
 )
 
 func main() {

@@ -470,6 +470,7 @@ type KafkaBridgeSpec struct {
 	ClientRackInitImage string                       `json:"clientRackInitImage,omitempty"`
 	Rack                *Rack                        `json:"rack,omitempty"`
 	EnableMetrics       bool                         `json:"enableMetrics,omitempty"`
+	MetricsConfig       *MetricsConfig               `json:"metricsConfig,omitempty"`
 	LivenessProbe       *Probe                       `json:"livenessProbe,omitempty"`
 	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
 	Template            *KafkaBridgeTemplate         `json:"template,omitempty"`
@@ -598,6 +599,27 @@ type Probe struct {
 	FailureThreshold    *int32 `json:"failureThreshold,omitempty"`
 }
 
+type MetricsConfigType string
+
+const (
+	JMXPROMETHEUSEXPORTER_METRICSCONFIGTYPE  MetricsConfigType = "jmxPrometheusExporter"
+	STRIMZIMETRICSREPORTER_METRICSCONFIGTYPE MetricsConfigType = "strimziMetricsReporter"
+)
+
+type MetricsConfig struct {
+	Type      MetricsConfigType               `json:"type,omitempty"`
+	ValueFrom *ExternalConfigurationReference `json:"valueFrom,omitempty"`
+	Values    *StrimziMetricsReporterValues   `json:"values,omitempty"`
+}
+
+type StrimziMetricsReporterValues struct {
+	AllowList []string `json:"allowList,omitempty"`
+}
+
+type ExternalConfigurationReference struct {
+	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
+}
+
 type Rack struct {
 	TopologyKey string `json:"topologyKey,omitempty"`
 }
@@ -613,10 +635,6 @@ type Logging struct {
 	Type      LoggingType                     `json:"type,omitempty"`
 	Loggers   map[string]string               `json:"loggers,omitempty"`
 	ValueFrom *ExternalConfigurationReference `json:"valueFrom,omitempty"`
-}
-
-type ExternalConfigurationReference struct {
-	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
 }
 
 type JvmOptions struct {
@@ -665,6 +683,7 @@ const (
 	SCRAM_SHA_512_KAFKACLIENTAUTHENTICATIONTYPE KafkaClientAuthenticationType = "scram-sha-512"
 	PLAIN_KAFKACLIENTAUTHENTICATIONTYPE         KafkaClientAuthenticationType = "plain"
 	OAUTH_KAFKACLIENTAUTHENTICATIONTYPE         KafkaClientAuthenticationType = "oauth"
+	CUSTOM_KAFKACLIENTAUTHENTICATIONTYPE        KafkaClientAuthenticationType = "custom"
 )
 
 type KafkaClientAuthentication struct {
@@ -672,6 +691,7 @@ type KafkaClientAuthentication struct {
 	Type                           KafkaClientAuthenticationType `json:"type,omitempty"`
 	AccessTokenIsJwt               bool                          `json:"accessTokenIsJwt,omitempty"`
 	TlsTrustedCertificates         []CertSecretSource            `json:"tlsTrustedCertificates,omitempty"`
+	Sasl                           bool                          `json:"sasl,omitempty"`
 	SaslExtensions                 map[string]string             `json:"saslExtensions,omitempty"`
 	DisableTlsHostnameVerification bool                          `json:"disableTlsHostnameVerification,omitempty"`
 	Scope                          string                        `json:"scope,omitempty"`
@@ -692,6 +712,8 @@ type KafkaClientAuthentication struct {
 	PasswordSecret                 *PasswordSecretSource         `json:"passwordSecret,omitempty"`
 	IncludeAcceptHeader            bool                          `json:"includeAcceptHeader,omitempty"`
 	HttpRetries                    *int32                        `json:"httpRetries,omitempty"`
+	GrantType                      string                        `json:"grantType,omitempty"`
+	Config                         MapStringObject               `json:"config,omitempty"`
 	Username                       string                        `json:"username,omitempty"`
 	RefreshToken                   *GenericSecretSource          `json:"refreshToken,omitempty"`
 }
@@ -806,23 +828,6 @@ type KafkaConnectTemplate struct {
 type BuildConfigTemplate struct {
 	Metadata   *MetadataTemplate `json:"metadata,omitempty"`
 	PullSecret string            `json:"pullSecret,omitempty"`
-}
-
-type MetricsConfigType string
-
-const (
-	JMXPROMETHEUSEXPORTER_METRICSCONFIGTYPE  MetricsConfigType = "jmxPrometheusExporter"
-	STRIMZIMETRICSREPORTER_METRICSCONFIGTYPE MetricsConfigType = "strimziMetricsReporter"
-)
-
-type MetricsConfig struct {
-	Type      MetricsConfigType               `json:"type,omitempty"`
-	ValueFrom *ExternalConfigurationReference `json:"valueFrom,omitempty"`
-	Values    *StrimziMetricsReporterValues   `json:"values,omitempty"`
-}
-
-type StrimziMetricsReporterValues struct {
-	AllowList []string `json:"allowList,omitempty"`
 }
 
 type KafkaJmxOptions struct {
@@ -1152,11 +1157,12 @@ type KafkaExporterSpec struct {
 }
 
 type KafkaExporterTemplate struct {
-	Deployment     *DeploymentTemplate `json:"deployment,omitempty"`
-	Pod            *PodTemplate        `json:"pod,omitempty"`
-	Service        *ResourceTemplate   `json:"service,omitempty"`
-	Container      *ContainerTemplate  `json:"container,omitempty"`
-	ServiceAccount *ResourceTemplate   `json:"serviceAccount,omitempty"`
+	Deployment          *DeploymentTemplate          `json:"deployment,omitempty"`
+	Pod                 *PodTemplate                 `json:"pod,omitempty"`
+	Service             *ResourceTemplate            `json:"service,omitempty"`
+	Container           *ContainerTemplate           `json:"container,omitempty"`
+	ServiceAccount      *ResourceTemplate            `json:"serviceAccount,omitempty"`
+	PodDisruptionBudget *PodDisruptionBudgetTemplate `json:"podDisruptionBudget,omitempty"`
 }
 
 type JmxTransSpec struct {
@@ -1292,15 +1298,16 @@ type EntityOperatorSpec struct {
 }
 
 type EntityOperatorTemplate struct {
-	Deployment               *DeploymentTemplate `json:"deployment,omitempty"`
-	Pod                      *PodTemplate        `json:"pod,omitempty"`
-	TopicOperatorContainer   *ContainerTemplate  `json:"topicOperatorContainer,omitempty"`
-	UserOperatorContainer    *ContainerTemplate  `json:"userOperatorContainer,omitempty"`
-	TlsSidecarContainer      *ContainerTemplate  `json:"tlsSidecarContainer,omitempty"`
-	ServiceAccount           *ResourceTemplate   `json:"serviceAccount,omitempty"`
-	EntityOperatorRole       *ResourceTemplate   `json:"entityOperatorRole,omitempty"`
-	TopicOperatorRoleBinding *ResourceTemplate   `json:"topicOperatorRoleBinding,omitempty"`
-	UserOperatorRoleBinding  *ResourceTemplate   `json:"userOperatorRoleBinding,omitempty"`
+	Deployment               *DeploymentTemplate          `json:"deployment,omitempty"`
+	Pod                      *PodTemplate                 `json:"pod,omitempty"`
+	TopicOperatorContainer   *ContainerTemplate           `json:"topicOperatorContainer,omitempty"`
+	UserOperatorContainer    *ContainerTemplate           `json:"userOperatorContainer,omitempty"`
+	TlsSidecarContainer      *ContainerTemplate           `json:"tlsSidecarContainer,omitempty"`
+	ServiceAccount           *ResourceTemplate            `json:"serviceAccount,omitempty"`
+	PodDisruptionBudget      *PodDisruptionBudgetTemplate `json:"podDisruptionBudget,omitempty"`
+	EntityOperatorRole       *ResourceTemplate            `json:"entityOperatorRole,omitempty"`
+	TopicOperatorRoleBinding *ResourceTemplate            `json:"topicOperatorRoleBinding,omitempty"`
+	UserOperatorRoleBinding  *ResourceTemplate            `json:"userOperatorRoleBinding,omitempty"`
 }
 
 type EntityUserOperatorSpec struct {
@@ -1593,6 +1600,7 @@ type KafkaListenerAuthentication struct {
 	JwksRefreshSeconds                *int32                          `json:"jwksRefreshSeconds,omitempty"`
 	EnableOauthBearer                 bool                            `json:"enableOauthBearer,omitempty"`
 	ClientId                          string                          `json:"clientId,omitempty"`
+	ClientGrantType                   string                          `json:"clientGrantType,omitempty"`
 	GroupsClaimDelimiter              string                          `json:"groupsClaimDelimiter,omitempty"`
 	ConnectTimeoutSeconds             *int32                          `json:"connectTimeoutSeconds,omitempty"`
 	UserNameClaim                     string                          `json:"userNameClaim,omitempty"`
