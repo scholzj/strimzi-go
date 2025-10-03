@@ -19,7 +19,9 @@ limitations under the License.
 package scheme
 
 import (
+	corev1 "github.com/scholzj/strimzi-go/pkg/apis/core.strimzi.io/v1"
 	corev1beta2 "github.com/scholzj/strimzi-go/pkg/apis/core.strimzi.io/v1beta2"
+	kafkav1 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -32,7 +34,9 @@ var Scheme = runtime.NewScheme()
 var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
+	corev1.AddToScheme,
 	corev1beta2.AddToScheme,
+	kafkav1.AddToScheme,
 	kafkav1beta2.AddToScheme,
 }
 
