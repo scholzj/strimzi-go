@@ -14,6 +14,7 @@ The following table shows the supported Strimzi versions
 | `0.2.x`        | 0.45.0          |
 | `0.3.x`        | 0.46.0          |
 | `0.4.x`        | 0.47.x          |
+| `0.5.x`        | 0.48.x          |
 
 ## Examples
 
@@ -25,6 +26,7 @@ If you are using the Strimzi Go API, feel free to open a PR and add your project
 
 * [Keksposé](https://github.com/scholzj/kekspose): Expose your Strimzi-based Apache Kafka cluster outside your Minikube, Kind, or Docker Desktop clusters
 * [Strimzi Shutdown](https://github.com/scholzj/strimzi-shutdown): Simple utility to temporarily stop or restart your Strimzi-based Apache Kafka cluster
+* [Strimzi Backup](https://github.com/scholzj/strimzi-backup): Backup or restore Strimzi-managed Apache Kafka clusters
 
 ## Updating the APIs
 

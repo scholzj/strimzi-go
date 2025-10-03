@@ -742,6 +742,11 @@ func (in *EntityOperatorTemplate) DeepCopyInto(out *EntityOperatorTemplate) {
 		*out = new(ResourceTemplate)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.PodDisruptionBudget != nil {
+		in, out := &in.PodDisruptionBudget, &out.PodDisruptionBudget
+		*out = new(PodDisruptionBudgetTemplate)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.EntityOperatorRole != nil {
 		in, out := &in.EntityOperatorRole, &out.EntityOperatorRole
 		*out = new(ResourceTemplate)
@@ -1807,6 +1812,11 @@ func (in *KafkaBridgeSpec) DeepCopyInto(out *KafkaBridgeSpec) {
 		*out = new(Rack)
 		**out = **in
 	}
+	if in.MetricsConfig != nil {
+		in, out := &in.MetricsConfig, &out.MetricsConfig
+		*out = new(MetricsConfig)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(Probe)
@@ -1977,6 +1987,7 @@ func (in *KafkaClientAuthentication) DeepCopyInto(out *KafkaClientAuthentication
 		*out = new(int32)
 		**out = **in
 	}
+	in.Config.DeepCopyInto(&out.Config)
 	if in.RefreshToken != nil {
 		in, out := &in.RefreshToken, &out.RefreshToken
 		*out = new(GenericSecretSource)
@@ -2685,6 +2696,11 @@ func (in *KafkaExporterTemplate) DeepCopyInto(out *KafkaExporterTemplate) {
 	if in.ServiceAccount != nil {
 		in, out := &in.ServiceAccount, &out.ServiceAccount
 		*out = new(ResourceTemplate)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.PodDisruptionBudget != nil {
+		in, out := &in.PodDisruptionBudget, &out.PodDisruptionBudget
+		*out = new(PodDisruptionBudgetTemplate)
 		(*in).DeepCopyInto(*out)
 	}
 	return
