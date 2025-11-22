@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
+	kafkav1 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1"
 	strimziclient "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -38,49 +38,49 @@ func main() {
 		panic(err)
 	}
 
-	nodepool := &kafkav1beta2.KafkaNodePool{
+	nodepool := &kafkav1.KafkaNodePool{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   "mixed",
 			Labels: map[string]string{"strimzi.io/cluster": "my-cluster"},
 		},
-		Spec: &kafkav1beta2.KafkaNodePoolSpec{
+		Spec: &kafkav1.KafkaNodePoolSpec{
 			Replicas: 3,
-			Roles:    []kafkav1beta2.ProcessRoles{kafkav1beta2.BROKER_PROCESSROLES, kafkav1beta2.CONTROLLER_PROCESSROLES},
-			Storage: &kafkav1beta2.Storage{
-				Type: kafkav1beta2.EPHEMERAL_STORAGETYPE,
+			Roles:    []kafkav1.ProcessRoles{kafkav1.BROKER_PROCESSROLES, kafkav1.CONTROLLER_PROCESSROLES},
+			Storage: &kafkav1.Storage{
+				Type: kafkav1.EPHEMERAL_STORAGETYPE,
 			},
 		},
 	}
 
 	log.Print("Creating the KafkaNodePool resource")
-	nodepool, err = client.KafkaV1beta2().KafkaNodePools(*namespace).Create(context.TODO(), nodepool, metav1.CreateOptions{})
+	nodepool, err = client.KafkaV1().KafkaNodePools(*namespace).Create(context.TODO(), nodepool, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
 	}
 
-	kafka := &kafkav1beta2.Kafka{
+	kafka := &kafkav1.Kafka{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        "my-cluster",
 			Annotations: map[string]string{"strimzi.io/kraft": "enabled", "strimzi.io/node-pools": "enabled"},
 		},
-		Spec: &kafkav1beta2.KafkaSpec{
-			Kafka: &kafkav1beta2.KafkaClusterSpec{
-				Listeners: []kafkav1beta2.GenericKafkaListener{{
+		Spec: &kafkav1.KafkaSpec{
+			Kafka: &kafkav1.KafkaClusterSpec{
+				Listeners: []kafkav1.GenericKafkaListener{{
 					Name: "internal",
-					Type: kafkav1beta2.INTERNAL_KAFKALISTENERTYPE,
+					Type: kafkav1.INTERNAL_KAFKALISTENERTYPE,
 					Tls:  false,
 					Port: 9092,
 				}},
 			},
-			EntityOperator: &kafkav1beta2.EntityOperatorSpec{
-				TopicOperator: &kafkav1beta2.EntityTopicOperatorSpec{},
-				UserOperator:  &kafkav1beta2.EntityUserOperatorSpec{},
+			EntityOperator: &kafkav1.EntityOperatorSpec{
+				TopicOperator: &kafkav1.EntityTopicOperatorSpec{},
+				UserOperator:  &kafkav1.EntityUserOperatorSpec{},
 			},
 		},
 	}
 
 	log.Print("Creating the Kafka resource")
-	kafka, err = client.KafkaV1beta2().Kafkas(*namespace).Create(context.TODO(), kafka, metav1.CreateOptions{})
+	kafka, err = client.KafkaV1().Kafkas(*namespace).Create(context.TODO(), kafka, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -98,7 +98,7 @@ func waitUntilReady(client *strimziclient.Clientset, namespace *string) bool {
 	watchContext, watchContextCancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer watchContextCancel()
 
-	watcher, err := client.KafkaV1beta2().Kafkas(*namespace).Watch(watchContext, metav1.ListOptions{FieldSelector: fields.OneTermEqualSelector(metav1.ObjectNameField, "my-cluster").String()})
+	watcher, err := client.KafkaV1().Kafkas(*namespace).Watch(watchContext, metav1.ListOptions{FieldSelector: fields.OneTermEqualSelector(metav1.ObjectNameField, "my-cluster").String()})
 	if err != nil {
 		panic(err)
 	}
@@ -119,7 +119,7 @@ func waitUntilReady(client *strimziclient.Clientset, namespace *string) bool {
 }
 
 func isReady(event watch.Event) bool {
-	k := event.Object.(*kafkav1beta2.Kafka)
+	k := event.Object.(*kafkav1.Kafka)
 	if k.Status != nil && k.Status.Conditions != nil && len(k.Status.Conditions) > 0 {
 		for _, condition := range k.Status.Conditions {
 			if condition.Type == "Ready" && condition.Status == "True" {

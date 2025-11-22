@@ -35,13 +35,13 @@ func main() {
 	}
 
 	log.Print("Deleting the KafkaNodePool resource")
-	err = client.KafkaV1beta2().KafkaNodePools(*namespace).Delete(context.TODO(), "mixed", metav1.DeleteOptions{})
+	err = client.KafkaV1().KafkaNodePools(*namespace).Delete(context.TODO(), "mixed", metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	}
 
 	log.Print("Deleting the Kafka resource")
-	err = client.KafkaV1beta2().Kafkas(*namespace).Delete(context.TODO(), "my-cluster", metav1.DeleteOptions{})
+	err = client.KafkaV1().Kafkas(*namespace).Delete(context.TODO(), "my-cluster", metav1.DeleteOptions{})
 	if err != nil {
 		panic(err)
 	}
