@@ -10,7 +10,7 @@ clean:
 	go clean -testcache
 
 test:
-	go test -p 1 -v ./...
+	go test -v ./...
 
 generate:
 	cd ./strimzi-go-generator; mvn -e -V -B compile exec:java -Dexec.mainClass="cz.scholz.strimzi.golang.generator.Main"

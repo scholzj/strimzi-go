@@ -1,15 +1,16 @@
 package clients
 
 import (
+	"path/filepath"
+	"testing"
+
 	strimzi "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-	"path/filepath"
-	"testing"
 )
 
 const NAMESPACE = "default"
-const NAME = "my-test-resource"
+const NAME = "my-v1beta2-test-resource"
 
 func Client(t *testing.T) *strimzi.Clientset {
 	var kubeconfig string
