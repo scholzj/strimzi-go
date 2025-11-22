@@ -2,10 +2,11 @@ package clients
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	corev1beta2 "github.com/scholzj/strimzi-go/pkg/apis/core.strimzi.io/v1beta2"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"

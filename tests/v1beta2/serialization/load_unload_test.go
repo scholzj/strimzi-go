@@ -1,13 +1,14 @@
 package serialization
 
 import (
+	"os"
+	"path/filepath"
+	"testing"
+
 	corev1beta2 "github.com/scholzj/strimzi-go/pkg/apis/core.strimzi.io/v1beta2"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path/filepath"
 	"sigs.k8s.io/yaml"
-	"testing"
 )
 
 type Resource interface {
