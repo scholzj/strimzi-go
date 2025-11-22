@@ -22,7 +22,7 @@ limitations under the License.
 package v1
 
 import (
-	v1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
+	kafkastrimziiov1 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -122,7 +122,7 @@ func (in *StrimziPodSetSpec) DeepCopyInto(out *StrimziPodSetSpec) {
 	}
 	if in.Pods != nil {
 		in, out := &in.Pods, &out.Pods
-		*out = make([]v1beta2.MapStringObject, len(*in))
+		*out = make([]kafkastrimziiov1.MapStringObject, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}

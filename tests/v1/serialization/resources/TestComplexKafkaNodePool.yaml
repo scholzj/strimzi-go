@@ -1,0 +1,48 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaNodePool","metadata":{"annotations":{"strimzi.io/next-node-ids":"[0-99]","strimzi.io/remove-node-ids":"[99-0]"},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"controllers","namespace":"myproject"},"spec":{"jvmOptions":{"-Xms":"1024m","-Xmx":"1024m"},"replicas":3,"resources":{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"500m","memory":"2Gi"}},"roles":["controller"],"storage":{"type":"jbod","volumes":[{"deleteClaim":true,"id":0,"size":"100Gi","type":"persistent-claim"}]}}}
+    strimzi.io/next-node-ids: '[0-99]'
+    strimzi.io/remove-node-ids: '[99-0]'
+  creationTimestamp: "2025-02-12T12:23:00Z"
+  generation: 1
+  labels:
+    strimzi.io/cluster: my-cluster
+  name: controllers
+  namespace: myproject
+  resourceVersion: "3382717"
+  uid: b325dee4-6a2e-4180-8729-c88c52503815
+spec:
+  jvmOptions:
+    -Xms: 1024m
+    -Xmx: 1024m
+  replicas: 3
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+  roles:
+  - controller
+  storage:
+    type: jbod
+    volumes:
+    - deleteClaim: true
+      id: 0
+      size: 100Gi
+      type: persistent-claim
+status:
+  clusterId: 3YOWGNJ8RFed6n2a93ZDuA
+  labelSelector: strimzi.io/cluster=my-cluster,strimzi.io/name=my-cluster-kafka,strimzi.io/kind=Kafka,strimzi.io/pool-name=controllers
+  nodeIds:
+  - 0
+  - 1
+  - 2
+  observedGeneration: 1
+  replicas: 3
+  roles:
+  - controller

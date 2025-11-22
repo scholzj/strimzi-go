@@ -63,7 +63,7 @@ public class Main {
         codeGenerator.generate();
         codeGenerator.close();
 
-        codeGenerator = new CodeGenerator(CORE_CRDS, List.of("kafkav1beta2", "metav1"), ApiVersion.V1, HEADER_BOILERPLATE_PATH, CORE_V1_OUTPUT_PATH);
+        codeGenerator = new CodeGenerator(CORE_CRDS, List.of("kafkav1", "metav1"), ApiVersion.V1, HEADER_BOILERPLATE_PATH, CORE_V1_OUTPUT_PATH);
         codeGenerator.generate();
         codeGenerator.close();
     }

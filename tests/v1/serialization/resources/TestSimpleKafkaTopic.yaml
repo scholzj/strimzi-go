@@ -1,0 +1,12 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: my-cluster
+  name: kafka-test-apps
+spec:
+  config:
+    retention.ms: 7200000
+    segment.bytes: 1073741824
+  partitions: 3
+  replicas: 3

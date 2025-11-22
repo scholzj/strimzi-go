@@ -1,0 +1,73 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaBridge
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaBridge","metadata":{"annotations":{},"labels":{"app":"my-bridge"},"name":"my-bridge","namespace":"myproject"},"spec":{"adminClient":{"config":{"ssl.enabled.protocols":"TLSv1.2","ssl.protocol":"TLSv1.2"}},"authentication":{"certificateAndKey":{"certificate":"user.crt","key":"user.key","secretName":"my-bridge"},"type":"tls"},"bootstrapServers":"my-cluster-kafka-bootstrap:9093","consumer":{"config":{"ssl.enabled.protocols":"TLSv1.2","ssl.protocol":"TLSv1.2"}},"enableMetrics":true,"http":{"port":8080},"producer":{"config":{"ssl.enabled.protocols":"TLSv1.2","ssl.protocol":"TLSv1.2"}},"replicas":1,"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}},"template":{"apiService":{"metadata":{"annotations":{"discovery.3scale.net/description-path":"/openapi","discovery.3scale.net/path":"/","discovery.3scale.net/port":"8080","discovery.3scale.net/scheme":"http"},"labels":{"discovery.3scale.net":"true"}}}},"tls":{"trustedCertificates":[{"pattern":"*.crt","secretName":"my-cluster-cluster-ca-cert"}]}}}
+  creationTimestamp: "2025-02-12T22:15:31Z"
+  generation: 1
+  labels:
+    app: my-bridge
+  name: my-bridge
+  namespace: myproject
+  resourceVersion: "3511150"
+  uid: 7e5b4580-ddd1-453a-89b8-e0e10c4f58bc
+spec:
+  adminClient:
+    config:
+      ssl.enabled.protocols: TLSv1.2
+      ssl.protocol: TLSv1.2
+  authentication:
+    certificateAndKey:
+      certificate: user.crt
+      key: user.key
+      secretName: my-bridge
+    type: tls
+  bootstrapServers: my-cluster-kafka-bootstrap:9093
+  consumer:
+    config:
+      ssl.enabled.protocols: TLSv1.2
+      ssl.protocol: TLSv1.2
+  http:
+    port: 8080
+  metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        key: metrics-config.yml
+        name: bridge-metrics
+  producer:
+    config:
+      ssl.enabled.protocols: TLSv1.2
+      ssl.protocol: TLSv1.2
+  replicas: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  template:
+    apiService:
+      metadata:
+        annotations:
+          discovery.3scale.net/description-path: /openapi
+          discovery.3scale.net/path: /
+          discovery.3scale.net/port: "8080"
+          discovery.3scale.net/scheme: http
+        labels:
+          discovery.3scale.net: "true"
+  tls:
+    trustedCertificates:
+    - pattern: '*.crt'
+      secretName: my-cluster-cluster-ca-cert
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:16:25.823786386Z"
+    status: "True"
+    type: Ready
+  labelSelector: strimzi.io/cluster=my-bridge,strimzi.io/name=my-bridge-bridge,strimzi.io/kind=KafkaBridge
+  observedGeneration: 1
+  replicas: 1
+  url: http://my-bridge-bridge-service.myproject.svc:8080

@@ -1,0 +1,169 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnect
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaConnect","metadata":{"annotations":{"strimzi.io/use-connector-resources":"true"},"labels":{"app":"my-connect"},"name":"my-connect","namespace":"myproject"},"spec":{"authentication":{"certificateAndKey":{"certificate":"user.crt","key":"user.key","secretName":"my-connect"},"type":"tls"},"bootstrapServers":"my-cluster-kafka-bootstrap:9093","build":{"output":{"additionalKanikoOptions":["--log-format=json"],"image":"quay.io/scholzj/kafka-connect-build:latest","pushSecret":"kafkaconnectbuild-pull-secret","type":"docker"},"plugins":[{"artifacts":[{"sha512sum":"3f30d48079578f9f2d0a097ed9a7088773b135dff3dc8e70d87f8422c073adc1181cb41d823c1d1472b0447a337e4877e535daa34ca8ef21d608f8ee6f5e4a9c","type":"jar","url":"https://github.com/scholzj/echo-sink/releases/download/1.6.0/echo-sink-1.6.0.jar"},{"type":"jar","url":"https://raw.githubusercontent.com/scholzj/echo-sink/master/LICENSE"}],"name":"echo-sink-connector"},{"artifacts":[{"artifact":"camel-timer-source-kafka-connector","group":"org.apache.camel.kafkaconnector","type":"maven","version":"4.8.0"}],"name":"camel-timer-connector"}],"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"500m","memory":"128Mi"}}},"config":{"config.providers":"file,secrets,configmaps,env","config.providers.configmaps.class":"io.strimzi.kafka.KubernetesConfigMapConfigProvider","config.providers.env.class":"org.apache.kafka.common.config.provider.EnvVarConfigProvider","config.providers.file.class":"org.apache.kafka.common.config.provider.FileConfigProvider","config.providers.secrets.class":"io.strimzi.kafka.KubernetesSecretConfigProvider","key.converter":"org.apache.kafka.connect.storage.StringConverter","key.converter.schemas.enable":false,"ssl.enabled.protocols":"TLSv1.2","ssl.protocol":"TLSv1.2","value.converter":"org.apache.kafka.connect.storage.StringConverter","value.converter.schemas.enable":false},"livenessProbe":{"initialDelaySeconds":60,"timeoutSeconds":5},"logging":{"loggers":{"log4j.logger.cz.scholz.kafka.connect.echosink":"INFO","log4j.logger.org.apache.kafka.connect.runtime.rest.RestServer":"WARN","log4j.rootLogger":"INFO"},"type":"inline"},"metricsConfig":{"type":"jmxPrometheusExporter","valueFrom":{"configMapKeyRef":{"key":"connect-metrics.yaml","name":"connect-metrics"}}},"rack":{"topologyKey":"kubernetes.io/hostname"},"readinessProbe":{"initialDelaySeconds":60,"timeoutSeconds":5},"replicas":1,"resources":{"limits":{"cpu":"1000m","memory":"2Gi"},"requests":{"cpu":"500m","memory":"1Gi"}},"template":{"apiService":{"metadata":{"annotations":{"key1":"label1","key2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"buildContainer":{"securityContext":{"readOnlyRootFilesystem":false}},"buildPod":{"enableServiceLinks":false,"metadata":{"annotations":{"key1":"label1","key2":"label2"},"labels":{"key1":"label1","key2":"label2"}}},"connectContainer":{"env":[{"name":"TEST_ENV_VAR","value":"Just a simple test"},{"name":"TIMER_MESSAGE_TEXT","valueFrom":{"configMapKeyRef":{"key":"timer.message","name":"connector-configuration"}}}]},"pod":{"enableServiceLinks":false,"metadata":{"annotations":{"key1":"label1","key2":"label2"},"labels":{"key1":"label1","key2":"label2"}}}},"tls":{"trustedCertificates":[{"pattern":"*.crt","secretName":"my-cluster-cluster-ca-cert"}]}}}
+    strimzi.io/use-connector-resources: "true"
+  creationTimestamp: "2025-02-12T21:58:42Z"
+  generation: 1
+  labels:
+    app: my-connect
+  name: my-connect
+  namespace: myproject
+  resourceVersion: "3508251"
+  uid: 6cb1b784-8219-4c5b-ae89-48635a5b2dbb
+spec:
+  authentication:
+    certificateAndKey:
+      certificate: user.crt
+      key: user.key
+      secretName: my-connect
+    type: tls
+  bootstrapServers: my-cluster-kafka-bootstrap:9093
+  build:
+    output:
+      additionalBuildOptions:
+      - --log-format=json
+      image: quay.io/scholzj/kafka-connect-build:latest
+      pushSecret: kafkaconnectbuild-pull-secret
+      type: docker
+    plugins:
+    - artifacts:
+      - sha512sum: 3f30d48079578f9f2d0a097ed9a7088773b135dff3dc8e70d87f8422c073adc1181cb41d823c1d1472b0447a337e4877e535daa34ca8ef21d608f8ee6f5e4a9c
+        type: jar
+        url: https://github.com/scholzj/echo-sink/releases/download/1.6.0/echo-sink-1.6.0.jar
+      - type: jar
+        url: https://raw.githubusercontent.com/scholzj/echo-sink/master/LICENSE
+      name: echo-sink-connector
+    - artifacts:
+      - artifact: camel-timer-source-kafka-connector
+        group: org.apache.camel.kafkaconnector
+        type: maven
+        version: 4.8.0
+      name: camel-timer-connector
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 128Mi
+  config:
+    config.providers: file,secrets,configmaps,env
+    config.providers.configmaps.class: io.strimzi.kafka.KubernetesConfigMapConfigProvider
+    config.providers.env.class: org.apache.kafka.common.config.provider.EnvVarConfigProvider
+    config.providers.file.class: org.apache.kafka.common.config.provider.FileConfigProvider
+    config.providers.secrets.class: io.strimzi.kafka.KubernetesSecretConfigProvider
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    key.converter.schemas.enable: false
+    ssl.enabled.protocols: TLSv1.2
+    ssl.protocol: TLSv1.2
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: false
+  configStorageTopic: my-connect-configs
+  groupId: my-connect-group
+  livenessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 5
+  logging:
+    loggers:
+      log4j.logger.cz.scholz.kafka.connect.echosink: INFO
+      log4j.logger.org.apache.kafka.connect.runtime.rest.RestServer: WARN
+      log4j.rootLogger: INFO
+    type: inline
+  metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        key: connect-metrics.yaml
+        name: connect-metrics
+  offsetStorageTopic: my-connect-offsets
+  rack:
+    topologyKey: kubernetes.io/hostname
+  readinessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 5
+  replicas: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  statusStorageTopic: my-connect-status
+  template:
+    apiService:
+      metadata:
+        annotations:
+          key1: label1
+          key2: label2
+        labels:
+          key1: label1
+          key2: label2
+    buildContainer:
+      securityContext:
+        readOnlyRootFilesystem: false
+    buildPod:
+      enableServiceLinks: false
+      metadata:
+        annotations:
+          key1: label1
+          key2: label2
+        labels:
+          key1: label1
+          key2: label2
+    connectContainer:
+      env:
+      - name: TEST_ENV_VAR
+        value: Just a simple test
+      - name: TIMER_MESSAGE_TEXT
+        valueFrom:
+          configMapKeyRef:
+            key: timer.message
+            name: connector-configuration
+    pod:
+      enableServiceLinks: true
+      metadata:
+        annotations:
+          key1: label1
+          key2: label2
+        labels:
+          key1: label1
+          key2: label2
+  tls:
+    trustedCertificates:
+    - pattern: '*.crt'
+      secretName: my-cluster-cluster-ca-cert
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:04:36.558035443Z"
+    status: "True"
+    type: Ready
+  connectorPlugins:
+  - class: cz.scholz.kafka.connect.echosink.EchoSinkConnector
+    type: sink
+    version: 1.6.0
+  - class: org.apache.camel.kafkaconnector.CamelSinkConnector
+    type: sink
+    version: 4.8.0
+  - class: org.apache.camel.kafkaconnector.CamelSourceConnector
+    type: source
+    version: 4.8.0
+  - class: org.apache.camel.kafkaconnector.timersource.CamelTimersourceSourceConnector
+    type: source
+    version: 4.8.0
+  - class: org.apache.kafka.connect.mirror.MirrorCheckpointConnector
+    type: source
+    version: 3.9.0
+  - class: org.apache.kafka.connect.mirror.MirrorHeartbeatConnector
+    type: source
+    version: 3.9.0
+  - class: org.apache.kafka.connect.mirror.MirrorSourceConnector
+    type: source
+    version: 3.9.0
+  labelSelector: strimzi.io/cluster=my-connect,strimzi.io/name=my-connect-connect,strimzi.io/kind=KafkaConnect
+  observedGeneration: 1
+  replicas: 1
+  url: http://my-connect-connect-api.myproject.svc:8083

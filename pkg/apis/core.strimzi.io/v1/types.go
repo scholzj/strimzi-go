@@ -17,7 +17,7 @@ limitations under the License.
 package v1
 
 import (
-	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2"
+	kafkav1 "github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -58,6 +58,6 @@ type Condition struct {
 }
 
 type StrimziPodSetSpec struct {
-	Selector *metav1.LabelSelector          `json:"selector,omitempty"`
-	Pods     []kafkav1beta2.MapStringObject `json:"pods,omitempty"`
+	Selector *metav1.LabelSelector     `json:"selector,omitempty"`
+	Pods     []kafkav1.MapStringObject `json:"pods,omitempty"`
 }

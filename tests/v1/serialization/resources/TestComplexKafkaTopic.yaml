@@ -1,0 +1,31 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta1","kind":"KafkaTopic","metadata":{"annotations":{},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"kafka-test-apps","namespace":"myproject"},"spec":{"config":{"retention.bytes":1073741824,"retention.ms":86400000,"segment.bytes":1073741824},"partitions":3,"replicas":3}}
+  creationTimestamp: "2025-02-12T22:01:00Z"
+  finalizers:
+  - strimzi.io/topic-operator
+  generation: 1
+  labels:
+    strimzi.io/cluster: my-cluster
+  name: kafka-test-apps
+  namespace: myproject
+  resourceVersion: "3507391"
+  uid: 663d0acd-b7bc-47f4-a3ca-7530f86ea2cc
+spec:
+  config:
+    retention.bytes: 1073741824
+    retention.ms: 86400000
+    segment.bytes: 1073741824
+  partitions: 3
+  replicas: 3
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:01:00.787148049Z"
+    status: "True"
+    type: Ready
+  observedGeneration: 1
+  topicId: 6iLxQScOSDGEol2W6xjYqw
+  topicName: kafka-test-apps

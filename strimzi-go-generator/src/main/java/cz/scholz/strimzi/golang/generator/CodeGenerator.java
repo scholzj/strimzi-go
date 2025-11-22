@@ -38,7 +38,8 @@ public class CodeGenerator {
             "corev1", "corev1 \"k8s.io/api/core/v1\"",
             "networkingv1", "networkingv1 \"k8s.io/api/networking/v1\"",
             "metav1", "metav1 \"k8s.io/apimachinery/pkg/apis/meta/v1\"",
-            "kafkav1beta2", "kafkav1beta2 \"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2\""
+            "kafkav1beta2", "kafkav1beta2 \"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2\"",
+            "kafkav1", "kafkav1 \"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1\""
     );
 
     private final List<Class<?>> crds;
@@ -206,7 +207,7 @@ public class CodeGenerator {
             generateField(property.getGolangName(), arrayMarker + mapFabric8TypeToKubernetes(elementType), property.getName(), omitEmpty);
         } else if ("pods".equals(property.getName())) {
             // Special handling for the StrimziPodsSet .spec.pods array
-            generateField(property.getGolangName(), arrayMarker + "kafkav1beta2.MapStringObject", property.getName(), omitEmpty);
+            generateField(property.getGolangName(), arrayMarker + "kafka" + apiVersion.toString().toLowerCase() + ".MapStringObject", property.getName(), omitEmpty);
         } else {
             generateField(property.getGolangName(), arrayMarker + elementType.getSimpleName(), property.getName(), omitEmpty);
             addToStackIfNeeded(elementType);
