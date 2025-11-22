@@ -57,7 +57,7 @@ public class Main {
         codeGenerator.close();
 
         // Generate v1 versions
-        LOGGER.info("Generating Strimzi Golang v1 APIs into {}", KAFKA_V1BETA2_OUTPUT_PATH);
+        LOGGER.info("Generating Strimzi Golang v1 APIs into {}", KAFKA_V1_OUTPUT_PATH);
 
         codeGenerator = new CodeGenerator(KAFKA_CRDS, List.of("corev1", "networkingv1", "metav1"), ApiVersion.V1, HEADER_BOILERPLATE_PATH, KAFKA_V1_OUTPUT_PATH);
         codeGenerator.generate();
