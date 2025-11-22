@@ -22,7 +22,9 @@ import (
 	fmt "fmt"
 	http "net/http"
 
+	corev1 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1"
 	corev1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1beta2"
+	kafkav1 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1"
 	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1beta2"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -31,20 +33,34 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
+	CoreV1() corev1.CoreV1Interface
 	CoreV1beta2() corev1beta2.CoreV1beta2Interface
+	KafkaV1() kafkav1.KafkaV1Interface
 	KafkaV1beta2() kafkav1beta2.KafkaV1beta2Interface
 }
 
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
+	coreV1       *corev1.CoreV1Client
 	coreV1beta2  *corev1beta2.CoreV1beta2Client
+	kafkaV1      *kafkav1.KafkaV1Client
 	kafkaV1beta2 *kafkav1beta2.KafkaV1beta2Client
+}
+
+// CoreV1 retrieves the CoreV1Client
+func (c *Clientset) CoreV1() corev1.CoreV1Interface {
+	return c.coreV1
 }
 
 // CoreV1beta2 retrieves the CoreV1beta2Client
 func (c *Clientset) CoreV1beta2() corev1beta2.CoreV1beta2Interface {
 	return c.coreV1beta2
+}
+
+// KafkaV1 retrieves the KafkaV1Client
+func (c *Clientset) KafkaV1() kafkav1.KafkaV1Interface {
+	return c.kafkaV1
 }
 
 // KafkaV1beta2 retrieves the KafkaV1beta2Client
@@ -96,7 +112,15 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 
 	var cs Clientset
 	var err error
+	cs.coreV1, err = corev1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 	cs.coreV1beta2, err = corev1beta2.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
+	cs.kafkaV1, err = kafkav1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +149,9 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
+	cs.coreV1 = corev1.New(c)
 	cs.coreV1beta2 = corev1beta2.New(c)
+	cs.kafkaV1 = kafkav1.New(c)
 	cs.kafkaV1beta2 = kafkav1beta2.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

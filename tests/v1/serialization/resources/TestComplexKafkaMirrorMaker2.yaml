@@ -1,0 +1,83 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaMirrorMaker2
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaMirrorMaker2","metadata":{"annotations":{},"name":"my-mirror-maker-2","namespace":"myproject"},"spec":{"clusters":[{"alias":"cluster-a","authentication":{"certificateAndKey":{"certificate":"user.crt","key":"user.key","secretName":"source-user"},"type":"tls"},"bootstrapServers":"my-cluster-kafka-bootstrap:9093","tls":{"trustedCertificates":[{"certificate":"ca.crt","secretName":"my-cluster-cluster-ca-cert"}]}},{"alias":"cluster-b","authentication":{"certificateAndKey":{"certificate":"user.crt","key":"user.key","secretName":"target-user"},"type":"tls"},"bootstrapServers":"my-cluster2-kafka-bootstrap:9093","config":{"config.storage.replication.factor":-1,"offset.storage.replication.factor":-1,"status.storage.replication.factor":-1},"tls":{"trustedCertificates":[{"certificate":"ca.crt","secretName":"my-cluster2-cluster-ca-cert"}]}}],"connectCluster":"cluster-b","metricsConfig":{"type":"jmxPrometheusExporter","valueFrom":{"configMapKeyRef":{"key":"metrics-config.yml","name":"mirror-maker-2-metrics"}}},"mirrors":[{"checkpointConnector":{"autoRestart":{"enabled":true},"config":{"checkpoints.topic.replication.factor":-1,"refresh.groups.interval.seconds":60,"replication.policy.class":"org.apache.kafka.connect.mirror.IdentityReplicationPolicy","sync.group.offsets.enabled":"true"},"tasksMax":5},"groupsPattern":".*","sourceCluster":"cluster-a","sourceConnector":{"autoRestart":{"enabled":true},"config":{"offset-syncs.topic.replication.factor":-1,"refresh.topics.interval.seconds":60,"replication.factor":-1,"replication.policy.class":"org.apache.kafka.connect.mirror.IdentityReplicationPolicy","sync.topic.acls.enabled":"false"},"tasksMax":5},"targetCluster":"cluster-b","topicsPattern":".*"}],"replicas":1}}
+  creationTimestamp: "2025-02-12T22:24:54Z"
+  generation: 1
+  name: my-mirror-maker-2
+  namespace: myproject
+  resourceVersion: "3513447"
+  uid: 46a48c41-d6aa-49e0-a62e-821bea9233c9
+spec:
+  metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        key: metrics-config.yml
+        name: mirror-maker-2-metrics
+  mirrors:
+  - checkpointConnector:
+      autoRestart:
+        enabled: true
+      config:
+        checkpoints.topic.replication.factor: -1
+        refresh.groups.interval.seconds: 60
+        replication.policy.class: org.apache.kafka.connect.mirror.IdentityReplicationPolicy
+        sync.group.offsets.enabled: "true"
+      tasksMax: 5
+    groupsPattern: .*
+    source:
+      alias: cluster-a
+      authentication:
+        certificateAndKey:
+          certificate: user.crt
+          key: user.key
+          secretName: source-user
+        type: tls
+      bootstrapServers: my-cluster-kafka-bootstrap:9093
+      tls:
+        trustedCertificates:
+        - certificate: ca.crt
+          secretName: my-cluster-cluster-ca-cert
+    sourceConnector:
+      autoRestart:
+        enabled: true
+      config:
+        offset-syncs.topic.replication.factor: -1
+        refresh.topics.interval.seconds: 60
+        replication.factor: -1
+        replication.policy.class: org.apache.kafka.connect.mirror.IdentityReplicationPolicy
+        sync.topic.acls.enabled: "false"
+      tasksMax: 5
+    topicsPattern: .*
+  replicas: 1
+  target:
+    alias: cluster-b
+    authentication:
+      certificateAndKey:
+        certificate: user.crt
+        key: user.key
+        secretName: target-user
+      type: tls
+    bootstrapServers: my-cluster2-kafka-bootstrap:9093
+    config:
+      config.storage.replication.factor: -1
+      offset.storage.replication.factor: -1
+      status.storage.replication.factor: -1
+    tls:
+      trustedCertificates:
+      - certificate: ca.crt
+        secretName: my-cluster2-cluster-ca-cert
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:25:01.172423615Z"
+    message: Secret source-user not found in namespace myproject
+    reason: InvalidConfigurationException
+    status: "True"
+    type: NotReady
+  labelSelector: strimzi.io/cluster=my-mirror-maker-2,strimzi.io/name=my-mirror-maker-2-mirrormaker2,strimzi.io/kind=KafkaMirrorMaker2
+  observedGeneration: 1
+  replicas: 1
+  url: http://my-mirror-maker-2-mirrormaker2-api.myproject.svc:8083

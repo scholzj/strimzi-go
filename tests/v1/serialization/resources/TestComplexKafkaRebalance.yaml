@@ -1,0 +1,48 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaRebalance
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaRebalance","metadata":{"annotations":{"strimzi.io/rebalance-auto-approval":"true"},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"my-rebalance","namespace":"myproject"},"spec":{"goals":["LeaderReplicaDistributionGoal","LeaderBytesInDistributionGoal","DiskUsageDistributionGoal","CpuUsageDistributionGoal","ReplicaDistributionGoal","NetworkInboundUsageDistributionGoal","NetworkOutboundUsageDistributionGoal"],"skipHardGoalCheck":true}}
+    strimzi.io/rebalance-auto-approval: "true"
+  creationTimestamp: "2025-02-12T22:23:10Z"
+  generation: 1
+  labels:
+    strimzi.io/cluster: my-cluster
+  name: my-rebalance
+  namespace: myproject
+  resourceVersion: "3512608"
+  uid: d86e7253-6722-48c7-a4f5-85c6122a45ea
+spec:
+  goals:
+  - LeaderReplicaDistributionGoal
+  - LeaderBytesInDistributionGoal
+  - DiskUsageDistributionGoal
+  - CpuUsageDistributionGoal
+  - ReplicaDistributionGoal
+  - NetworkInboundUsageDistributionGoal
+  - NetworkOutboundUsageDistributionGoal
+  skipHardGoalCheck: true
+status:
+  conditions:
+  - lastTransitionTime: "2025-02-12T22:23:11.245246053Z"
+    status: "True"
+    type: Rebalancing
+  observedGeneration: 1
+  optimizationResult:
+    afterBeforeLoadConfigMap: my-rebalance
+    dataToMoveMB: 0
+    excludedBrokersForLeadership: []
+    excludedBrokersForReplicaMove: []
+    excludedTopics: []
+    intraBrokerDataToMoveMB: 0
+    monitoredPartitionsPercentage: 100
+    numIntraBrokerReplicaMovements: 0
+    numLeaderMovements: 6
+    numReplicaMovements: 0
+    onDemandBalancednessScoreAfter: 72.4837888976598
+    onDemandBalancednessScoreBefore: 58.45431688751052
+    provisionRecommendation: ""
+    provisionStatus: RIGHT_SIZED
+    recentWindows: 1
+  sessionId: d3aefb65-9fb3-4eea-aa9f-4a75d4f14d89

@@ -1,0 +1,22 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnect
+metadata:
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+  name: my-connect-cluster
+spec:
+  bootstrapServers: my-cluster-kafka-bootstrap:9093
+  config:
+    config.storage.replication.factor: -1
+    offset.storage.replication.factor: -1
+    status.storage.replication.factor: -1
+  configStorageTopic: my-connect-configs
+  groupId: my-connect-group
+  offsetStorageTopic: my-connect-offsets
+  replicas: 1
+  statusStorageTopic: my-connect-status
+  tls:
+    trustedCertificates:
+    - pattern: '*.crt'
+      secretName: my-cluster-cluster-ca-cert
+  version: 3.9.0

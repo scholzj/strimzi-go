@@ -15,6 +15,7 @@ The following table shows the supported Strimzi versions
 | `0.3.x`        | 0.46.0          |
 | `0.4.x`        | 0.47.x          |
 | `0.5.x`        | 0.48.x          |
+| `0.6.x`        | 0.49.x          |
 
 ## Examples
 
