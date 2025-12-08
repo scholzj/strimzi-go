@@ -22,7 +22,7 @@
 
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
 
-        <strimzi-api.version>0.49.0</strimzi-api.version>
+        <strimzi-api.version>0.49.1</strimzi-api.version>
         <log4j2.version>2.20.0</log4j2.version>
     </properties>
 
