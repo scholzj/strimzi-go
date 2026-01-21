@@ -288,9 +288,9 @@ const (
 )
 
 type AclRuleResource struct {
+	Type        AclRuleResourceType    `json:"type,omitempty"`
 	Name        string                 `json:"name,omitempty"`
 	PatternType AclResourcePatternType `json:"patternType,omitempty"`
-	Type        AclRuleResourceType    `json:"type,omitempty"`
 }
 
 type AclResourcePatternType string
@@ -556,6 +556,7 @@ type PodTemplate struct {
 	EnableServiceLinks            *bool                             `json:"enableServiceLinks,omitempty"`
 	TmpDirSizeLimit               string                            `json:"tmpDirSizeLimit,omitempty"`
 	Volumes                       []AdditionalVolume                `json:"volumes,omitempty"`
+	HostUsers                     *bool                             `json:"hostUsers,omitempty"`
 }
 
 type AdditionalVolume struct {
@@ -917,8 +918,8 @@ const (
 )
 
 type MountedArtifact struct {
-	Reference  string              `json:"reference,omitempty"`
 	Type       MountedArtifactType `json:"type,omitempty"`
+	Reference  string              `json:"reference,omitempty"`
 	PullPolicy string              `json:"pullPolicy,omitempty"`
 }
 

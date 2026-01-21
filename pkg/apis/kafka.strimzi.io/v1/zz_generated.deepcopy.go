@@ -4029,6 +4029,11 @@ func (in *PodTemplate) DeepCopyInto(out *PodTemplate) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.HostUsers != nil {
+		in, out := &in.HostUsers, &out.HostUsers
+		*out = new(bool)
+		**out = **in
+	}
 	return
 }
 

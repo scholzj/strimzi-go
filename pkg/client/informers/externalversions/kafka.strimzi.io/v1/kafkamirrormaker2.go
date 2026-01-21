@@ -57,7 +57,7 @@ func NewKafkaMirrorMaker2Informer(client versioned.Interface, namespace string, 
 // one. This reduces memory footprint and number of connections to the server.
 func NewFilteredKafkaMirrorMaker2Informer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
+		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
@@ -82,7 +82,7 @@ func NewFilteredKafkaMirrorMaker2Informer(client versioned.Interface, namespace 
 				}
 				return client.KafkaV1().KafkaMirrorMaker2s(namespace).Watch(ctx, options)
 			},
-		},
+		}, client),
 		&apiskafkastrimziiov1.KafkaMirrorMaker2{},
 		resyncPeriod,
 		indexers,
