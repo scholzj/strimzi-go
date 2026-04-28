@@ -473,6 +473,7 @@ type KafkaBridgeSpec struct {
 	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
 	Template            *KafkaBridgeTemplate         `json:"template,omitempty"`
 	Tracing             *Tracing                     `json:"tracing,omitempty"`
+	Config              MapStringObject              `json:"config,omitempty"`
 }
 
 type TracingType string
@@ -630,8 +631,17 @@ type ExternalConfigurationReference struct {
 	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
 }
 
+type RackType string
+
+const (
+	TOPOLOGY_LABEL_RACKTYPE       RackType = "topology-label"
+	ENVIRONMENT_VARIABLE_RACKTYPE RackType = "environment-variable"
+)
+
 type Rack struct {
-	TopologyKey string `json:"topologyKey,omitempty"`
+	Type        RackType `json:"type,omitempty"`
+	EnvVarName  string   `json:"envVarName,omitempty"`
+	TopologyKey string   `json:"topologyKey,omitempty"`
 }
 
 type LoggingType string
@@ -677,12 +687,24 @@ type KafkaBridgeAdminClientSpec struct {
 
 type KafkaBridgeHttpConfig struct {
 	Port int32                `json:"port,omitempty"`
+	Tls  *KafkaBridgeHttpTls  `json:"tls,omitempty"`
 	Cors *KafkaBridgeHttpCors `json:"cors,omitempty"`
 }
 
 type KafkaBridgeHttpCors struct {
 	AllowedOrigins []string `json:"allowedOrigins,omitempty"`
 	AllowedMethods []string `json:"allowedMethods,omitempty"`
+}
+
+type KafkaBridgeHttpTls struct {
+	CertificateAndKey *CertAndKeySecretSource `json:"certificateAndKey,omitempty"`
+	Config            MapStringObject         `json:"config,omitempty"`
+}
+
+type CertAndKeySecretSource struct {
+	SecretName  string `json:"secretName,omitempty"`
+	Certificate string `json:"certificate,omitempty"`
+	Key         string `json:"key,omitempty"`
 }
 
 type KafkaClientAuthenticationType string
@@ -731,12 +753,6 @@ type KafkaClientAuthentication struct {
 type PasswordSecretSource struct {
 	SecretName string `json:"secretName,omitempty"`
 	Password   string `json:"password,omitempty"`
-}
-
-type CertAndKeySecretSource struct {
-	SecretName  string `json:"secretName,omitempty"`
-	Certificate string `json:"certificate,omitempty"`
-	Key         string `json:"key,omitempty"`
 }
 
 type GenericSecretSource struct {
@@ -1392,6 +1408,7 @@ type GenericKafkaListenerConfiguration struct {
 	PublishNotReadyAddresses      *bool                                       `json:"publishNotReadyAddresses,omitempty"`
 	HostTemplate                  string                                      `json:"hostTemplate,omitempty"`
 	AdvertisedHostTemplate        string                                      `json:"advertisedHostTemplate,omitempty"`
+	AdvertisedPortTemplate        string                                      `json:"advertisedPortTemplate,omitempty"`
 	AllocateLoadBalancerNodePorts *bool                                       `json:"allocateLoadBalancerNodePorts,omitempty"`
 }
 

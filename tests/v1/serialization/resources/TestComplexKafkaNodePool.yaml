@@ -3,7 +3,7 @@ kind: KafkaNodePool
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaNodePool","metadata":{"annotations":{"strimzi.io/next-node-ids":"[0-99]","strimzi.io/remove-node-ids":"[99-0]"},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"controllers","namespace":"myproject"},"spec":{"jvmOptions":{"-Xms":"1024m","-Xmx":"1024m"},"replicas":3,"resources":{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"500m","memory":"2Gi"}},"roles":["controller"],"storage":{"type":"jbod","volumes":[{"deleteClaim":true,"id":0,"size":"100Gi","type":"persistent-claim"}]}}}
+      {"apiVersion":"kafka.strimzi.io/v1","kind":"KafkaNodePool","metadata":{"annotations":{"strimzi.io/next-node-ids":"[0-99]","strimzi.io/remove-node-ids":"[99-0]"},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"controllers","namespace":"myproject"},"spec":{"jvmOptions":{"-Xms":"1024m","-Xmx":"1024m"},"replicas":3,"resources":{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"500m","memory":"2Gi"}},"roles":["controller"],"storage":{"type":"jbod","volumes":[{"deleteClaim":true,"id":0,"size":"100Gi","type":"persistent-claim"}]}}}
     strimzi.io/next-node-ids: '[0-99]'
     strimzi.io/remove-node-ids: '[99-0]'
   creationTimestamp: "2025-02-12T12:23:00Z"

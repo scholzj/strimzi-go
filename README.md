@@ -7,17 +7,18 @@ It lets you manage the Strimzi resources using the Kubernetes Go Client.
 
 The following table shows the supported Strimzi versions
 
-| Go API Version | Strimzi version |
-|----------------|-----------------|
-| `main` branch  | 0.45.0          |
-| `0.1.0`        | 0.45.0          |
-| `0.2.x`        | 0.45.0          |
-| `0.3.x`        | 0.46.0          |
-| `0.4.x`        | 0.47.x          |
-| `0.5.x`        | 0.48.x          |
-| `0.6.x`        | 0.49.x          |
-| `0.7.x`        | 0.50.x          |
-| `0.8.x`        | 0.51.x          |
+| Go API Version | Strimzi version       |
+|----------------|-----------------------|
+| `main` branch  | 0.45.0                |
+| `0.1.0`        | 0.45.0                |
+| `0.2.x`        | 0.45.0                |
+| `0.3.x`        | 0.46.0                |
+| `0.4.x`        | 0.47.x                |
+| `0.5.x`        | 0.48.x                |
+| `0.6.x`        | 0.49.x                |
+| `0.7.x`        | 0.50.x                |
+| `0.8.x`        | 0.51.x                |
+| `0.9.x`        | 1.0.x (`v1` API only) |
 
 ## Examples
 

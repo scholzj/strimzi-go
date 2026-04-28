@@ -22,12 +22,8 @@ import (
 	clientset "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned"
 	corev1 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1"
 	fakecorev1 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1/fake"
-	corev1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1beta2"
-	fakecorev1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/core.strimzi.io/v1beta2/fake"
 	kafkav1 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1"
 	fakekafkav1 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1/fake"
-	kafkav1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1beta2"
-	fakekafkav1beta2 "github.com/scholzj/strimzi-go/pkg/client/clientset/versioned/typed/kafka.strimzi.io/v1beta2/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -40,10 +36,6 @@ import (
 // It's backed by a very simple object tracker that processes creates, updates and deletions as-is,
 // without applying any field management, validations and/or defaults. It shouldn't be considered a replacement
 // for a real clientset and is mostly useful in simple unit tests.
-//
-// Deprecated: NewClientset replaces this with support for field management, which significantly improves
-// server side apply testing. NewClientset is only available when apply configurations are generated (e.g.
-// via --with-applyconfig).
 func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 	o := testing.NewObjectTracker(scheme, codecs.UniversalDecoder())
 	for _, obj := range objects {
@@ -89,7 +81,7 @@ func (c *Clientset) Tracker() testing.ObjectTracker {
 	return c.tracker
 }
 
-// IsWatchListSemanticsSupported informs the reflector that this client
+// IsWatchListSemanticsUnSupported informs the reflector that this client
 // doesn't support WatchList semantics.
 //
 // This is a synthetic method whose sole purpose is to satisfy the optional
@@ -110,17 +102,7 @@ func (c *Clientset) CoreV1() corev1.CoreV1Interface {
 	return &fakecorev1.FakeCoreV1{Fake: &c.Fake}
 }
 
-// CoreV1beta2 retrieves the CoreV1beta2Client
-func (c *Clientset) CoreV1beta2() corev1beta2.CoreV1beta2Interface {
-	return &fakecorev1beta2.FakeCoreV1beta2{Fake: &c.Fake}
-}
-
 // KafkaV1 retrieves the KafkaV1Client
 func (c *Clientset) KafkaV1() kafkav1.KafkaV1Interface {
 	return &fakekafkav1.FakeKafkaV1{Fake: &c.Fake}
-}
-
-// KafkaV1beta2 retrieves the KafkaV1beta2Client
-func (c *Clientset) KafkaV1beta2() kafkav1beta2.KafkaV1beta2Interface {
-	return &fakekafkav1beta2.FakeKafkaV1beta2{Fake: &c.Fake}
 }

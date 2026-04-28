@@ -3,7 +3,7 @@ kind: KafkaConnector
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaConnector","metadata":{"annotations":{},"labels":{"strimzi.io/cluster":"my-connect"},"name":"echo-sink-connector","namespace":"myproject"},"spec":{"autoRestart":{"enabled":true},"class":"EchoSink","config":{"level":"${configmaps:myproject/connector-configuration:log.level}","topics":"kafka-test-apps"},"tasksMax":3}}
+      {"apiVersion":"kafka.strimzi.io/v1","kind":"KafkaConnector","metadata":{"annotations":{},"labels":{"strimzi.io/cluster":"my-connect"},"name":"echo-sink-connector","namespace":"myproject"},"spec":{"autoRestart":{"enabled":true},"class":"EchoSink","config":{"level":"${configmaps:myproject/connector-configuration:log.level}","topics":"kafka-test-apps"},"tasksMax":3}}
   creationTimestamp: "2025-02-12T21:58:42Z"
   generation: 1
   labels:
