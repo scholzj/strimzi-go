@@ -3,7 +3,7 @@ kind: KafkaRebalance
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"kafka.strimzi.io/v1beta2","kind":"KafkaRebalance","metadata":{"annotations":{"strimzi.io/rebalance-auto-approval":"true"},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"my-rebalance","namespace":"myproject"},"spec":{"goals":["LeaderReplicaDistributionGoal","LeaderBytesInDistributionGoal","DiskUsageDistributionGoal","CpuUsageDistributionGoal","ReplicaDistributionGoal","NetworkInboundUsageDistributionGoal","NetworkOutboundUsageDistributionGoal"],"skipHardGoalCheck":true}}
+      {"apiVersion":"kafka.strimzi.io/v1","kind":"KafkaRebalance","metadata":{"annotations":{"strimzi.io/rebalance-auto-approval":"true"},"labels":{"strimzi.io/cluster":"my-cluster"},"name":"my-rebalance","namespace":"myproject"},"spec":{"goals":["LeaderReplicaDistributionGoal","LeaderBytesInDistributionGoal","DiskUsageDistributionGoal","CpuUsageDistributionGoal","ReplicaDistributionGoal","NetworkInboundUsageDistributionGoal","NetworkOutboundUsageDistributionGoal"],"skipHardGoalCheck":true}}
     strimzi.io/rebalance-auto-approval: "true"
   creationTimestamp: "2025-02-12T22:23:10Z"
   generation: 1

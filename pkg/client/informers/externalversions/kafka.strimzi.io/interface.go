@@ -21,15 +21,12 @@ package kafka
 import (
 	internalinterfaces "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions/internalinterfaces"
 	v1 "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions/kafka.strimzi.io/v1"
-	v1beta2 "github.com/scholzj/strimzi-go/pkg/client/informers/externalversions/kafka.strimzi.io/v1beta2"
 )
 
 // Interface provides access to each of this group's versions.
 type Interface interface {
 	// V1 provides access to shared informers for resources in V1.
 	V1() v1.Interface
-	// V1beta2 provides access to shared informers for resources in V1beta2.
-	V1beta2() v1beta2.Interface
 }
 
 type group struct {
@@ -46,9 +43,4 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // V1 returns a new v1.Interface.
 func (g *group) V1() v1.Interface {
 	return v1.New(g.factory, g.namespace, g.tweakListOptions)
-}
-
-// V1beta2 returns a new v1beta2.Interface.
-func (g *group) V1beta2() v1beta2.Interface {
-	return v1beta2.New(g.factory, g.namespace, g.tweakListOptions)
 }
