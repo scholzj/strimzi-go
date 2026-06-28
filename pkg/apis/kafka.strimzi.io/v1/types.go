@@ -20,6 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	gatewayapiv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -316,8 +317,10 @@ const (
 )
 
 type KafkaUserAuthentication struct {
-	Type     KafkaUserAuthenticationType `json:"type,omitempty"`
-	Password *Password                   `json:"password,omitempty"`
+	RenewalDays  *int32                      `json:"renewalDays,omitempty"`
+	Password     *Password                   `json:"password,omitempty"`
+	Type         KafkaUserAuthenticationType `json:"type,omitempty"`
+	ValidityDays *int32                      `json:"validityDays,omitempty"`
 }
 
 type Password struct {
@@ -479,7 +482,6 @@ type KafkaBridgeSpec struct {
 type TracingType string
 
 const (
-	JAEGER_TRACINGTYPE        TracingType = "jaeger"
 	OPENTELEMETRY_TRACINGTYPE TracingType = "opentelemetry"
 )
 
@@ -714,40 +716,16 @@ const (
 	SCRAM_SHA_256_KAFKACLIENTAUTHENTICATIONTYPE KafkaClientAuthenticationType = "scram-sha-256"
 	SCRAM_SHA_512_KAFKACLIENTAUTHENTICATIONTYPE KafkaClientAuthenticationType = "scram-sha-512"
 	PLAIN_KAFKACLIENTAUTHENTICATIONTYPE         KafkaClientAuthenticationType = "plain"
-	OAUTH_KAFKACLIENTAUTHENTICATIONTYPE         KafkaClientAuthenticationType = "oauth"
 	CUSTOM_KAFKACLIENTAUTHENTICATIONTYPE        KafkaClientAuthenticationType = "custom"
 )
 
 type KafkaClientAuthentication struct {
-	ClientAssertionLocation        string                        `json:"clientAssertionLocation,omitempty"`
-	Type                           KafkaClientAuthenticationType `json:"type,omitempty"`
-	AccessTokenIsJwt               bool                          `json:"accessTokenIsJwt,omitempty"`
-	TlsTrustedCertificates         []CertSecretSource            `json:"tlsTrustedCertificates,omitempty"`
-	Sasl                           bool                          `json:"sasl,omitempty"`
-	SaslExtensions                 map[string]string             `json:"saslExtensions,omitempty"`
-	DisableTlsHostnameVerification bool                          `json:"disableTlsHostnameVerification,omitempty"`
-	Scope                          string                        `json:"scope,omitempty"`
-	ClientAssertionType            string                        `json:"clientAssertionType,omitempty"`
-	ClientSecret                   *GenericSecretSource          `json:"clientSecret,omitempty"`
-	AccessTokenLocation            string                        `json:"accessTokenLocation,omitempty"`
-	CertificateAndKey              *CertAndKeySecretSource       `json:"certificateAndKey,omitempty"`
-	Audience                       string                        `json:"audience,omitempty"`
-	ClientAssertion                *GenericSecretSource          `json:"clientAssertion,omitempty"`
-	ClientId                       string                        `json:"clientId,omitempty"`
-	ConnectTimeoutSeconds          *int32                        `json:"connectTimeoutSeconds,omitempty"`
-	MaxTokenExpirySeconds          int32                         `json:"maxTokenExpirySeconds,omitempty"`
-	HttpRetryPauseMs               *int32                        `json:"httpRetryPauseMs,omitempty"`
-	AccessToken                    *GenericSecretSource          `json:"accessToken,omitempty"`
-	ReadTimeoutSeconds             *int32                        `json:"readTimeoutSeconds,omitempty"`
-	EnableMetrics                  bool                          `json:"enableMetrics,omitempty"`
-	TokenEndpointUri               string                        `json:"tokenEndpointUri,omitempty"`
-	PasswordSecret                 *PasswordSecretSource         `json:"passwordSecret,omitempty"`
-	IncludeAcceptHeader            bool                          `json:"includeAcceptHeader,omitempty"`
-	HttpRetries                    *int32                        `json:"httpRetries,omitempty"`
-	GrantType                      string                        `json:"grantType,omitempty"`
-	Config                         MapStringObject               `json:"config,omitempty"`
-	Username                       string                        `json:"username,omitempty"`
-	RefreshToken                   *GenericSecretSource          `json:"refreshToken,omitempty"`
+	CertificateAndKey *CertAndKeySecretSource       `json:"certificateAndKey,omitempty"`
+	Sasl              bool                          `json:"sasl,omitempty"`
+	Type              KafkaClientAuthenticationType `json:"type,omitempty"`
+	Config            MapStringObject               `json:"config,omitempty"`
+	Username          string                        `json:"username,omitempty"`
+	PasswordSecret    *PasswordSecretSource         `json:"passwordSecret,omitempty"`
 }
 
 type PasswordSecretSource struct {
@@ -755,19 +733,14 @@ type PasswordSecretSource struct {
 	Password   string `json:"password,omitempty"`
 }
 
-type GenericSecretSource struct {
-	Key        string `json:"key,omitempty"`
-	SecretName string `json:"secretName,omitempty"`
+type ClientTls struct {
+	TrustedCertificates []CertSecretSource `json:"trustedCertificates,omitempty"`
 }
 
 type CertSecretSource struct {
 	SecretName  string `json:"secretName,omitempty"`
 	Certificate string `json:"certificate,omitempty"`
 	Pattern     string `json:"pattern,omitempty"`
-}
-
-type ClientTls struct {
-	TrustedCertificates []CertSecretSource `json:"trustedCertificates,omitempty"`
 }
 
 type KafkaMirrorMaker2Status struct {
@@ -961,16 +934,27 @@ const (
 )
 
 type Artifact struct {
-	Artifact   string       `json:"artifact,omitempty"`
-	Sha512sum  string       `json:"sha512sum,omitempty"`
-	FileName   string       `json:"fileName,omitempty"`
-	Insecure   *bool        `json:"insecure,omitempty"`
-	Type       ArtifactType `json:"type,omitempty"`
-	Repository string       `json:"repository,omitempty"`
-	Version    string       `json:"version,omitempty"`
-	Url        string       `json:"url,omitempty"`
-	Group      string       `json:"group,omitempty"`
+	Artifact     string                    `json:"artifact,omitempty"`
+	Sha512sum    string                    `json:"sha512sum,omitempty"`
+	FileName     string                    `json:"fileName,omitempty"`
+	IncludeScope MavenArtifactIncludeScope `json:"includeScope,omitempty"`
+	Insecure     *bool                     `json:"insecure,omitempty"`
+	Type         ArtifactType              `json:"type,omitempty"`
+	Repository   string                    `json:"repository,omitempty"`
+	Version      string                    `json:"version,omitempty"`
+	Url          string                    `json:"url,omitempty"`
+	Group        string                    `json:"group,omitempty"`
 }
+
+type MavenArtifactIncludeScope string
+
+const (
+	COMPILE_MAVENARTIFACTINCLUDESCOPE  MavenArtifactIncludeScope = "compile"
+	PROVIDED_MAVENARTIFACTINCLUDESCOPE MavenArtifactIncludeScope = "provided"
+	RUNTIME_MAVENARTIFACTINCLUDESCOPE  MavenArtifactIncludeScope = "runtime"
+	TEST_MAVENARTIFACTINCLUDESCOPE     MavenArtifactIncludeScope = "test"
+	SYSTEM_MAVENARTIFACTINCLUDESCOPE   MavenArtifactIncludeScope = "system"
+)
 
 type OutputType string
 
@@ -1347,37 +1331,15 @@ type KafkaClusterTemplate struct {
 type KafkaAuthorizationType string
 
 const (
-	SIMPLE_KAFKAAUTHORIZATIONTYPE   KafkaAuthorizationType = "simple"
-	OPA_KAFKAAUTHORIZATIONTYPE      KafkaAuthorizationType = "opa"
-	KEYCLOAK_KAFKAAUTHORIZATIONTYPE KafkaAuthorizationType = "keycloak"
-	CUSTOM_KAFKAAUTHORIZATIONTYPE   KafkaAuthorizationType = "custom"
+	SIMPLE_KAFKAAUTHORIZATIONTYPE KafkaAuthorizationType = "simple"
+	CUSTOM_KAFKAAUTHORIZATIONTYPE KafkaAuthorizationType = "custom"
 )
 
 type KafkaAuthorization struct {
-	GrantsRefreshPeriodSeconds     *int32                 `json:"grantsRefreshPeriodSeconds,omitempty"`
-	AllowOnError                   bool                   `json:"allowOnError,omitempty"`
-	ClientId                       string                 `json:"clientId,omitempty"`
-	SuperUsers                     []string               `json:"superUsers,omitempty"`
-	GrantsMaxIdleTimeSeconds       *int32                 `json:"grantsMaxIdleTimeSeconds,omitempty"`
-	InitialCacheCapacity           int32                  `json:"initialCacheCapacity,omitempty"`
-	AuthorizerClass                string                 `json:"authorizerClass,omitempty"`
-	ConnectTimeoutSeconds          *int32                 `json:"connectTimeoutSeconds,omitempty"`
-	ExpireAfterMs                  int64                  `json:"expireAfterMs,omitempty"`
-	Type                           KafkaAuthorizationType `json:"type,omitempty"`
-	SupportsAdminApi               bool                   `json:"supportsAdminApi,omitempty"`
-	DelegateToKafkaAcls            bool                   `json:"delegateToKafkaAcls,omitempty"`
-	GrantsRefreshPoolSize          *int32                 `json:"grantsRefreshPoolSize,omitempty"`
-	Url                            string                 `json:"url,omitempty"`
-	MaximumCacheSize               int32                  `json:"maximumCacheSize,omitempty"`
-	ReadTimeoutSeconds             *int32                 `json:"readTimeoutSeconds,omitempty"`
-	TlsTrustedCertificates         []CertSecretSource     `json:"tlsTrustedCertificates,omitempty"`
-	EnableMetrics                  bool                   `json:"enableMetrics,omitempty"`
-	GrantsAlwaysLatest             bool                   `json:"grantsAlwaysLatest,omitempty"`
-	GrantsGcPeriodSeconds          *int32                 `json:"grantsGcPeriodSeconds,omitempty"`
-	TokenEndpointUri               string                 `json:"tokenEndpointUri,omitempty"`
-	DisableTlsHostnameVerification bool                   `json:"disableTlsHostnameVerification,omitempty"`
-	IncludeAcceptHeader            bool                   `json:"includeAcceptHeader,omitempty"`
-	HttpRetries                    *int32                 `json:"httpRetries,omitempty"`
+	Type             KafkaAuthorizationType `json:"type,omitempty"`
+	SuperUsers       []string               `json:"superUsers,omitempty"`
+	SupportsAdminApi bool                   `json:"supportsAdminApi,omitempty"`
+	AuthorizerClass  string                 `json:"authorizerClass,omitempty"`
 }
 
 type GenericKafkaListener struct {
@@ -1406,10 +1368,13 @@ type GenericKafkaListenerConfiguration struct {
 	MaxConnectionCreationRate     *int32                                      `json:"maxConnectionCreationRate,omitempty"`
 	PreferredNodePortAddressType  NodeAddressType                             `json:"preferredNodePortAddressType,omitempty"`
 	PublishNotReadyAddresses      *bool                                       `json:"publishNotReadyAddresses,omitempty"`
+	PerBrokerAnnotationsTemplate  map[string]string                           `json:"perBrokerAnnotationsTemplate,omitempty"`
+	PerBrokerLabelsTemplate       map[string]string                           `json:"perBrokerLabelsTemplate,omitempty"`
 	HostTemplate                  string                                      `json:"hostTemplate,omitempty"`
 	AdvertisedHostTemplate        string                                      `json:"advertisedHostTemplate,omitempty"`
 	AdvertisedPortTemplate        string                                      `json:"advertisedPortTemplate,omitempty"`
 	AllocateLoadBalancerNodePorts *bool                                       `json:"allocateLoadBalancerNodePorts,omitempty"`
+	ParentRefs                    []gatewayapiv1.ParentReference              `json:"parentRefs,omitempty"`
 }
 
 type NodeAddressType string
@@ -1456,53 +1421,13 @@ type KafkaListenerAuthenticationType string
 const (
 	TLS_KAFKALISTENERAUTHENTICATIONTYPE           KafkaListenerAuthenticationType = "tls"
 	SCRAM_SHA_512_KAFKALISTENERAUTHENTICATIONTYPE KafkaListenerAuthenticationType = "scram-sha-512"
-	OAUTH_KAFKALISTENERAUTHENTICATIONTYPE         KafkaListenerAuthenticationType = "oauth"
 	CUSTOM_KAFKALISTENERAUTHENTICATIONTYPE        KafkaListenerAuthenticationType = "custom"
 )
 
 type KafkaListenerAuthentication struct {
-	JwksMinRefreshPauseSeconds        *int32                          `json:"jwksMinRefreshPauseSeconds,omitempty"`
-	IntrospectionEndpointUri          string                          `json:"introspectionEndpointUri,omitempty"`
-	ValidIssuerUri                    string                          `json:"validIssuerUri,omitempty"`
-	ValidTokenType                    string                          `json:"validTokenType,omitempty"`
-	ListenerConfig                    MapStringObject                 `json:"listenerConfig,omitempty"`
-	Type                              KafkaListenerAuthenticationType `json:"type,omitempty"`
-	UserNamePrefix                    string                          `json:"userNamePrefix,omitempty"`
-	FallbackUserNamePrefix            string                          `json:"fallbackUserNamePrefix,omitempty"`
-	UserInfoEndpointUri               string                          `json:"userInfoEndpointUri,omitempty"`
-	AccessTokenIsJwt                  bool                            `json:"accessTokenIsJwt,omitempty"`
-	FallbackUserNameClaim             string                          `json:"fallbackUserNameClaim,omitempty"`
-	TlsTrustedCertificates            []CertSecretSource              `json:"tlsTrustedCertificates,omitempty"`
-	Sasl                              bool                            `json:"sasl,omitempty"`
-	CheckIssuer                       bool                            `json:"checkIssuer,omitempty"`
-	DisableTlsHostnameVerification    bool                            `json:"disableTlsHostnameVerification,omitempty"`
-	JwksIgnoreKeyUse                  bool                            `json:"jwksIgnoreKeyUse,omitempty"`
-	ServerBearerTokenLocation         string                          `json:"serverBearerTokenLocation,omitempty"`
-	JwksEndpointUri                   string                          `json:"jwksEndpointUri,omitempty"`
-	ClientSecret                      *GenericSecretSource            `json:"clientSecret,omitempty"`
-	ClientAudience                    string                          `json:"clientAudience,omitempty"`
-	JwksExpirySeconds                 *int32                          `json:"jwksExpirySeconds,omitempty"`
-	JwksRefreshSeconds                *int32                          `json:"jwksRefreshSeconds,omitempty"`
-	EnableOauthBearer                 bool                            `json:"enableOauthBearer,omitempty"`
-	ClientId                          string                          `json:"clientId,omitempty"`
-	ClientGrantType                   string                          `json:"clientGrantType,omitempty"`
-	GroupsClaimDelimiter              string                          `json:"groupsClaimDelimiter,omitempty"`
-	ConnectTimeoutSeconds             *int32                          `json:"connectTimeoutSeconds,omitempty"`
-	UserNameClaim                     string                          `json:"userNameClaim,omitempty"`
-	HttpRetryPauseMs                  *int32                          `json:"httpRetryPauseMs,omitempty"`
-	CustomClaimCheck                  string                          `json:"customClaimCheck,omitempty"`
-	FailFast                          bool                            `json:"failFast,omitempty"`
-	GroupsClaim                       string                          `json:"groupsClaim,omitempty"`
-	ReadTimeoutSeconds                *int32                          `json:"readTimeoutSeconds,omitempty"`
-	EnableMetrics                     bool                            `json:"enableMetrics,omitempty"`
-	MaxSecondsWithoutReauthentication *int32                          `json:"maxSecondsWithoutReauthentication,omitempty"`
-	TokenEndpointUri                  string                          `json:"tokenEndpointUri,omitempty"`
-	IncludeAcceptHeader               bool                            `json:"includeAcceptHeader,omitempty"`
-	HttpRetries                       *int32                          `json:"httpRetries,omitempty"`
-	EnablePlain                       bool                            `json:"enablePlain,omitempty"`
-	CheckAccessTokenType              bool                            `json:"checkAccessTokenType,omitempty"`
-	ClientScope                       string                          `json:"clientScope,omitempty"`
-	CheckAudience                     bool                            `json:"checkAudience,omitempty"`
+	Type           KafkaListenerAuthenticationType `json:"type,omitempty"`
+	ListenerConfig MapStringObject                 `json:"listenerConfig,omitempty"`
+	Sasl           bool                            `json:"sasl,omitempty"`
 }
 
 type KafkaListenerType string
@@ -1510,6 +1435,7 @@ type KafkaListenerType string
 const (
 	INTERNAL_KAFKALISTENERTYPE     KafkaListenerType = "internal"
 	ROUTE_KAFKALISTENERTYPE        KafkaListenerType = "route"
+	TLSROUTE_KAFKALISTENERTYPE     KafkaListenerType = "tlsroute"
 	LOADBALANCER_KAFKALISTENERTYPE KafkaListenerType = "loadbalancer"
 	NODEPORT_KAFKALISTENERTYPE     KafkaListenerType = "nodeport"
 	INGRESS_KAFKALISTENERTYPE      KafkaListenerType = "ingress"

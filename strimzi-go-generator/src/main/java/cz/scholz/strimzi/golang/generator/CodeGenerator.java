@@ -38,6 +38,7 @@ public class CodeGenerator {
             "corev1", "corev1 \"k8s.io/api/core/v1\"",
             "networkingv1", "networkingv1 \"k8s.io/api/networking/v1\"",
             "metav1", "metav1 \"k8s.io/apimachinery/pkg/apis/meta/v1\"",
+            "gatewayapiv1", "gatewayapiv1 \"sigs.k8s.io/gateway-api/apis/v1\"",
             "kafkav1beta2", "kafkav1beta2 \"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1beta2\"",
             "kafkav1", "kafkav1 \"github.com/scholzj/strimzi-go/pkg/apis/kafka.strimzi.io/v1\""
     );
@@ -241,6 +242,7 @@ public class CodeGenerator {
             case "io.fabric8.kubernetes.api.model.TopologySpreadConstraint" -> "corev1.TopologySpreadConstraint";
             case "io.fabric8.kubernetes.api.model.VolumeMount" -> "corev1.VolumeMount";
             case "io.fabric8.kubernetes.api.model.networking.v1.NetworkPolicyPeer" -> "networkingv1.NetworkPolicyPeer";
+            case "io.fabric8.kubernetes.api.model.gatewayapi.v1.ParentReference" -> "gatewayapiv1.ParentReference";
             default -> {
                 LOGGER.error("Unmapped Fabric8 class {}", type.getName());
                 yield "";
