@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.CustomResource;
-import io.strimzi.api.annotations.ApiVersion;
+import io.strimzi.crdgenerator.ApiVersion;
 import io.strimzi.crdgenerator.annotations.PresentInVersions;
 
 import java.lang.annotation.Annotation;

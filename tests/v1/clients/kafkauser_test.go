@@ -27,7 +27,7 @@ func NewUser() *kafkav1.KafkaUser {
 			Authorization: &kafkav1.KafkaUserAuthorization{
 				Type: kafkav1.SIMPLE_KAFKAUSERAUTHORIZATIONTYPE,
 				Acls: []kafkav1.AclRule{{
-					Operations: []kafkav1.AclOperation{kafkav1.READ_ACLOPERATION, kafkav1.DESCRIBE_ACLOPERATION},
+					Operations: []kafkav1.StrimziAclOperation{kafkav1.READ_STRIMZIACLOPERATION, kafkav1.DESCRIBE_STRIMZIACLOPERATION},
 					Resource:   &kafkav1.AclRuleResource{Name: "my-topic", Type: kafkav1.TOPIC_ACLRULERESOURCETYPE},
 				}},
 			},
@@ -45,7 +45,7 @@ func UpdatedUser(oldResource *kafkav1.KafkaUser) *kafkav1.KafkaUser {
 	updatedResource.Spec.Authorization = &kafkav1.KafkaUserAuthorization{
 		Type: kafkav1.SIMPLE_KAFKAUSERAUTHORIZATIONTYPE,
 		Acls: []kafkav1.AclRule{{
-			Operations: []kafkav1.AclOperation{kafkav1.WRITE_ACLOPERATION, kafkav1.DESCRIBE_ACLOPERATION},
+			Operations: []kafkav1.StrimziAclOperation{kafkav1.WRITE_STRIMZIACLOPERATION, kafkav1.DESCRIBE_STRIMZIACLOPERATION},
 			Resource:   &kafkav1.AclRuleResource{Name: "my-other-topic", Type: kafkav1.TOPIC_ACLRULERESOURCETYPE},
 		}},
 	}
