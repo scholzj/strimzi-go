@@ -257,26 +257,26 @@ type KafkaUserAuthorization struct {
 }
 
 type AclRule struct {
-	Type       AclRuleType      `json:"type,omitempty"`
-	Resource   *AclRuleResource `json:"resource,omitempty"`
-	Host       string           `json:"host,omitempty"`
-	Operations []AclOperation   `json:"operations,omitempty"`
+	Type       AclRuleType           `json:"type,omitempty"`
+	Resource   *AclRuleResource      `json:"resource,omitempty"`
+	Host       string                `json:"host,omitempty"`
+	Operations []StrimziAclOperation `json:"operations,omitempty"`
 }
 
-type AclOperation string
+type StrimziAclOperation string
 
 const (
-	READ_ACLOPERATION            AclOperation = "Read"
-	WRITE_ACLOPERATION           AclOperation = "Write"
-	CREATE_ACLOPERATION          AclOperation = "Create"
-	DELETE_ACLOPERATION          AclOperation = "Delete"
-	ALTER_ACLOPERATION           AclOperation = "Alter"
-	DESCRIBE_ACLOPERATION        AclOperation = "Describe"
-	CLUSTERACTION_ACLOPERATION   AclOperation = "ClusterAction"
-	ALTERCONFIGS_ACLOPERATION    AclOperation = "AlterConfigs"
-	DESCRIBECONFIGS_ACLOPERATION AclOperation = "DescribeConfigs"
-	IDEMPOTENTWRITE_ACLOPERATION AclOperation = "IdempotentWrite"
-	ALL_ACLOPERATION             AclOperation = "All"
+	READ_STRIMZIACLOPERATION            StrimziAclOperation = "Read"
+	WRITE_STRIMZIACLOPERATION           StrimziAclOperation = "Write"
+	CREATE_STRIMZIACLOPERATION          StrimziAclOperation = "Create"
+	DELETE_STRIMZIACLOPERATION          StrimziAclOperation = "Delete"
+	ALTER_STRIMZIACLOPERATION           StrimziAclOperation = "Alter"
+	DESCRIBE_STRIMZIACLOPERATION        StrimziAclOperation = "Describe"
+	CLUSTERACTION_STRIMZIACLOPERATION   StrimziAclOperation = "ClusterAction"
+	ALTERCONFIGS_STRIMZIACLOPERATION    StrimziAclOperation = "AlterConfigs"
+	DESCRIBECONFIGS_STRIMZIACLOPERATION StrimziAclOperation = "DescribeConfigs"
+	IDEMPOTENTWRITE_STRIMZIACLOPERATION StrimziAclOperation = "IdempotentWrite"
+	ALL_STRIMZIACLOPERATION             StrimziAclOperation = "All"
 )
 
 type AclRuleResourceType string
@@ -472,8 +472,8 @@ type KafkaBridgeSpec struct {
 	ClientRackInitImage string                       `json:"clientRackInitImage,omitempty"`
 	Rack                *Rack                        `json:"rack,omitempty"`
 	MetricsConfig       *MetricsConfig               `json:"metricsConfig,omitempty"`
-	LivenessProbe       *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
+	LivenessProbe       *StrimziProbe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *StrimziProbe                `json:"readinessProbe,omitempty"`
 	Template            *KafkaBridgeTemplate         `json:"template,omitempty"`
 	Tracing             *Tracing                     `json:"tracing,omitempty"`
 	Config              MapStringObject              `json:"config,omitempty"`
@@ -593,18 +593,18 @@ const (
 )
 
 type DeploymentTemplate struct {
-	Metadata           *MetadataTemplate  `json:"metadata,omitempty"`
-	DeploymentStrategy DeploymentStrategy `json:"deploymentStrategy,omitempty"`
+	Metadata           *MetadataTemplate         `json:"metadata,omitempty"`
+	DeploymentStrategy StrimziDeploymentStrategy `json:"deploymentStrategy,omitempty"`
 }
 
-type DeploymentStrategy string
+type StrimziDeploymentStrategy string
 
 const (
-	ROLLING_UPDATE_DEPLOYMENTSTRATEGY DeploymentStrategy = "RollingUpdate"
-	RECREATE_DEPLOYMENTSTRATEGY       DeploymentStrategy = "Recreate"
+	ROLLING_UPDATE_STRIMZIDEPLOYMENTSTRATEGY StrimziDeploymentStrategy = "RollingUpdate"
+	RECREATE_STRIMZIDEPLOYMENTSTRATEGY       StrimziDeploymentStrategy = "Recreate"
 )
 
-type Probe struct {
+type StrimziProbe struct {
 	InitialDelaySeconds int32  `json:"initialDelaySeconds,omitempty"`
 	TimeoutSeconds      int32  `json:"timeoutSeconds,omitempty"`
 	PeriodSeconds       *int32 `json:"periodSeconds,omitempty"`
@@ -771,8 +771,8 @@ type KafkaMirrorMaker2Spec struct {
 	Target              *KafkaMirrorMaker2TargetClusterSpec `json:"target,omitempty"`
 	Mirrors             []KafkaMirrorMaker2MirrorSpec       `json:"mirrors,omitempty"`
 	Resources           *corev1.ResourceRequirements        `json:"resources,omitempty"`
-	LivenessProbe       *Probe                              `json:"livenessProbe,omitempty"`
-	ReadinessProbe      *Probe                              `json:"readinessProbe,omitempty"`
+	LivenessProbe       *StrimziProbe                       `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *StrimziProbe                       `json:"readinessProbe,omitempty"`
 	JvmOptions          *JvmOptions                         `json:"jvmOptions,omitempty"`
 	JmxOptions          *KafkaJmxOptions                    `json:"jmxOptions,omitempty"`
 	Logging             *Logging                            `json:"logging,omitempty"`
@@ -785,7 +785,7 @@ type KafkaMirrorMaker2Spec struct {
 
 type KafkaConnectTemplate struct {
 	PodSet              *ResourceTemplate            `json:"podSet,omitempty"`
-	Pod                 *PodTemplate                 `json:"pod,omitempty"`
+	Pod                 *StatefulPodTemplate         `json:"pod,omitempty"`
 	ApiService          *InternalServiceTemplate     `json:"apiService,omitempty"`
 	HeadlessService     *InternalServiceTemplate     `json:"headlessService,omitempty"`
 	ConnectContainer    *ContainerTemplate           `json:"connectContainer,omitempty"`
@@ -803,6 +803,33 @@ type KafkaConnectTemplate struct {
 type BuildConfigTemplate struct {
 	Metadata   *MetadataTemplate `json:"metadata,omitempty"`
 	PullSecret string            `json:"pullSecret,omitempty"`
+}
+
+type StatefulPodTemplate struct {
+	Metadata                      *MetadataTemplate                 `json:"metadata,omitempty"`
+	ImagePullSecrets              []corev1.LocalObjectReference     `json:"imagePullSecrets,omitempty"`
+	SecurityContext               *corev1.PodSecurityContext        `json:"securityContext,omitempty"`
+	TerminationGracePeriodSeconds int32                             `json:"terminationGracePeriodSeconds,omitempty"`
+	Affinity                      *corev1.Affinity                  `json:"affinity,omitempty"`
+	Tolerations                   []corev1.Toleration               `json:"tolerations,omitempty"`
+	TopologySpreadConstraints     []corev1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty"`
+	PriorityClassName             string                            `json:"priorityClassName,omitempty"`
+	SchedulerName                 string                            `json:"schedulerName,omitempty"`
+	HostAliases                   []corev1.HostAlias                `json:"hostAliases,omitempty"`
+	DnsPolicy                     DnsPolicy                         `json:"dnsPolicy,omitempty"`
+	DnsConfig                     *corev1.PodDNSConfig              `json:"dnsConfig,omitempty"`
+	EnableServiceLinks            *bool                             `json:"enableServiceLinks,omitempty"`
+	TmpDirSizeLimit               string                            `json:"tmpDirSizeLimit,omitempty"`
+	Volumes                       []AdditionalVolume                `json:"volumes,omitempty"`
+	TemplatedVolumes              []AdditionalTemplatedVolume       `json:"templatedVolumes,omitempty"`
+	HostUsers                     *bool                             `json:"hostUsers,omitempty"`
+}
+
+type AdditionalTemplatedVolume struct {
+	Name                  string                                    `json:"name,omitempty"`
+	Secret                *corev1.SecretVolumeSource                `json:"secret,omitempty"`
+	ConfigMap             *corev1.ConfigMapVolumeSource             `json:"configMap,omitempty"`
+	PersistentVolumeClaim *corev1.PersistentVolumeClaimVolumeSource `json:"persistentVolumeClaim,omitempty"`
 }
 
 type KafkaJmxOptions struct {
@@ -881,8 +908,8 @@ type KafkaConnectSpec struct {
 	Authentication      *KafkaClientAuthentication   `json:"authentication,omitempty"`
 	Config              MapStringObject              `json:"config,omitempty"`
 	Resources           *corev1.ResourceRequirements `json:"resources,omitempty"`
-	LivenessProbe       *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
+	LivenessProbe       *StrimziProbe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *StrimziProbe                `json:"readinessProbe,omitempty"`
 	JvmOptions          *JvmOptions                  `json:"jvmOptions,omitempty"`
 	JmxOptions          *KafkaJmxOptions             `json:"jmxOptions,omitempty"`
 	Logging             *Logging                     `json:"logging,omitempty"`
@@ -937,6 +964,7 @@ type Artifact struct {
 	Artifact     string                    `json:"artifact,omitempty"`
 	Sha512sum    string                    `json:"sha512sum,omitempty"`
 	FileName     string                    `json:"fileName,omitempty"`
+	Mirrors      []MavenMirror             `json:"mirrors,omitempty"`
 	IncludeScope MavenArtifactIncludeScope `json:"includeScope,omitempty"`
 	Insecure     *bool                     `json:"insecure,omitempty"`
 	Type         ArtifactType              `json:"type,omitempty"`
@@ -955,6 +983,10 @@ const (
 	TEST_MAVENARTIFACTINCLUDESCOPE     MavenArtifactIncludeScope = "test"
 	SYSTEM_MAVENARTIFACTINCLUDESCOPE   MavenArtifactIncludeScope = "system"
 )
+
+type MavenMirror struct {
+	Url string `json:"url,omitempty"`
+}
 
 type OutputType string
 
@@ -998,14 +1030,14 @@ type KafkaNodePoolSpec struct {
 }
 
 type KafkaNodePoolTemplate struct {
-	PodSet                *ResourceTemplate  `json:"podSet,omitempty"`
-	Pod                   *PodTemplate       `json:"pod,omitempty"`
-	PerPodService         *ResourceTemplate  `json:"perPodService,omitempty"`
-	PerPodRoute           *ResourceTemplate  `json:"perPodRoute,omitempty"`
-	PerPodIngress         *ResourceTemplate  `json:"perPodIngress,omitempty"`
-	PersistentVolumeClaim *ResourceTemplate  `json:"persistentVolumeClaim,omitempty"`
-	KafkaContainer        *ContainerTemplate `json:"kafkaContainer,omitempty"`
-	InitContainer         *ContainerTemplate `json:"initContainer,omitempty"`
+	PodSet                *ResourceTemplate    `json:"podSet,omitempty"`
+	Pod                   *StatefulPodTemplate `json:"pod,omitempty"`
+	PerPodService         *ResourceTemplate    `json:"perPodService,omitempty"`
+	PerPodRoute           *ResourceTemplate    `json:"perPodRoute,omitempty"`
+	PerPodIngress         *ResourceTemplate    `json:"perPodIngress,omitempty"`
+	PersistentVolumeClaim *ResourceTemplate    `json:"persistentVolumeClaim,omitempty"`
+	KafkaContainer        *ContainerTemplate   `json:"kafkaContainer,omitempty"`
+	InitContainer         *ContainerTemplate   `json:"initContainer,omitempty"`
 }
 
 type StorageType string
@@ -1064,6 +1096,10 @@ type KafkaStatus struct {
 	KafkaVersion                  string                    `json:"kafkaVersion,omitempty"`
 	KafkaMetadataVersion          string                    `json:"kafkaMetadataVersion,omitempty"`
 	AutoRebalance                 *KafkaAutoRebalanceStatus `json:"autoRebalance,omitempty"`
+	ClusterSecurity               *Object                   `json:"clusterSecurity,omitempty"`
+}
+
+type Object struct {
 }
 
 type KafkaAutoRebalanceStatus struct {
@@ -1126,8 +1162,8 @@ type KafkaExporterSpec struct {
 	TopicExcludeRegex   string                       `json:"topicExcludeRegex,omitempty"`
 	Resources           *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Logging             string                       `json:"logging,omitempty"`
-	LivenessProbe       *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe      *Probe                       `json:"readinessProbe,omitempty"`
+	LivenessProbe       *StrimziProbe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *StrimziProbe                `json:"readinessProbe,omitempty"`
 	EnableSaramaLogging bool                         `json:"enableSaramaLogging,omitempty"`
 	ShowAllOffsets      bool                         `json:"showAllOffsets,omitempty"`
 	Template            *KafkaExporterTemplate       `json:"template,omitempty"`
@@ -1144,8 +1180,8 @@ type KafkaExporterTemplate struct {
 type CruiseControlSpec struct {
 	Image          string                            `json:"image,omitempty"`
 	Resources      *corev1.ResourceRequirements      `json:"resources,omitempty"`
-	LivenessProbe  *Probe                            `json:"livenessProbe,omitempty"`
-	ReadinessProbe *Probe                            `json:"readinessProbe,omitempty"`
+	LivenessProbe  *StrimziProbe                     `json:"livenessProbe,omitempty"`
+	ReadinessProbe *StrimziProbe                     `json:"readinessProbe,omitempty"`
 	JvmOptions     *JvmOptions                       `json:"jvmOptions,omitempty"`
 	Logging        *Logging                          `json:"logging,omitempty"`
 	Template       *CruiseControlTemplate            `json:"template,omitempty"`
@@ -1233,8 +1269,8 @@ type EntityUserOperatorSpec struct {
 	Image                    string                       `json:"image,omitempty"`
 	ReconciliationIntervalMs *int64                       `json:"reconciliationIntervalMs,omitempty"`
 	SecretPrefix             string                       `json:"secretPrefix,omitempty"`
-	LivenessProbe            *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe           *Probe                       `json:"readinessProbe,omitempty"`
+	LivenessProbe            *StrimziProbe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe           *StrimziProbe                `json:"readinessProbe,omitempty"`
 	Resources                *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Logging                  *Logging                     `json:"logging,omitempty"`
 	JvmOptions               *JvmOptions                  `json:"jvmOptions,omitempty"`
@@ -1244,9 +1280,9 @@ type EntityTopicOperatorSpec struct {
 	WatchedNamespace         string                       `json:"watchedNamespace,omitempty"`
 	Image                    string                       `json:"image,omitempty"`
 	ReconciliationIntervalMs *int64                       `json:"reconciliationIntervalMs,omitempty"`
-	StartupProbe             *Probe                       `json:"startupProbe,omitempty"`
-	LivenessProbe            *Probe                       `json:"livenessProbe,omitempty"`
-	ReadinessProbe           *Probe                       `json:"readinessProbe,omitempty"`
+	StartupProbe             *StrimziProbe                `json:"startupProbe,omitempty"`
+	LivenessProbe            *StrimziProbe                `json:"livenessProbe,omitempty"`
+	ReadinessProbe           *StrimziProbe                `json:"readinessProbe,omitempty"`
 	Resources                *corev1.ResourceRequirements `json:"resources,omitempty"`
 	Logging                  *Logging                     `json:"logging,omitempty"`
 	JvmOptions               *JvmOptions                  `json:"jvmOptions,omitempty"`
@@ -1261,8 +1297,8 @@ type KafkaClusterSpec struct {
 	Authorization       *KafkaAuthorization    `json:"authorization,omitempty"`
 	Rack                *Rack                  `json:"rack,omitempty"`
 	BrokerRackInitImage string                 `json:"brokerRackInitImage,omitempty"`
-	LivenessProbe       *Probe                 `json:"livenessProbe,omitempty"`
-	ReadinessProbe      *Probe                 `json:"readinessProbe,omitempty"`
+	LivenessProbe       *StrimziProbe          `json:"livenessProbe,omitempty"`
+	ReadinessProbe      *StrimziProbe          `json:"readinessProbe,omitempty"`
 	JvmOptions          *JvmOptions            `json:"jvmOptions,omitempty"`
 	JmxOptions          *KafkaJmxOptions       `json:"jmxOptions,omitempty"`
 	MetricsConfig       *MetricsConfig         `json:"metricsConfig,omitempty"`
@@ -1308,7 +1344,7 @@ type RemoteStorageManager struct {
 }
 
 type KafkaClusterTemplate struct {
-	Pod                      *PodTemplate                 `json:"pod,omitempty"`
+	Pod                      *StatefulPodTemplate         `json:"pod,omitempty"`
 	BootstrapService         *InternalServiceTemplate     `json:"bootstrapService,omitempty"`
 	BrokersService           *InternalServiceTemplate     `json:"brokersService,omitempty"`
 	ExternalBootstrapService *ResourceTemplate            `json:"externalBootstrapService,omitempty"`
