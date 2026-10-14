@@ -30,7 +30,7 @@ import (
 )
 
 type Interface interface {
-	Discovery() discovery.DiscoveryInterface
+	Discovery() discovery.DiscoveryInterfaces
 	CoreV1() corev1.CoreV1Interface
 	KafkaV1() kafkav1.KafkaV1Interface
 }
@@ -53,7 +53,7 @@ func (c *Clientset) KafkaV1() kafkav1.KafkaV1Interface {
 }
 
 // Discovery retrieves the DiscoveryClient
-func (c *Clientset) Discovery() discovery.DiscoveryInterface {
+func (c *Clientset) Discovery() discovery.DiscoveryInterfaces {
 	if c == nil {
 		return nil
 	}

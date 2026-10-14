@@ -34,11 +34,39 @@ import (
 )
 
 // KafkaConnectInformer provides access to a shared informer and lister for
-// KafkaConnects.
+// KafkaConnects. Prefer using the type-safe variant (see [TypedKafkaConnectInformer]).
 type KafkaConnectInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() kafkastrimziiov1.KafkaConnectLister
 }
+
+// TypedKafkaConnectInformer provides access to a shared informer and lister for
+// KafkaConnects, including the type-safe TypedInformer variant.
+// It is a superset of KafkaConnectInformer.
+type TypedKafkaConnectInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() KafkaConnectIndexInformer
+	Lister() kafkastrimziiov1.KafkaConnectLister
+}
+
+// KafkaConnectIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type KafkaConnectIndexInformer cache.TypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnect]
+
+// KafkaConnectHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for KafkaConnect.
+type KafkaConnectHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiskafkastrimziiov1.KafkaConnect]
+
+// KafkaConnectDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for KafkaConnect.
+type KafkaConnectDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiskafkastrimziiov1.KafkaConnect]
+
+// KafkaConnectFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for KafkaConnect.
+type KafkaConnectFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiskafkastrimziiov1.KafkaConnect]
+
+// KafkaConnectIndexers is a specialization of [cache.TypedIndexers] for KafkaConnect.
+type KafkaConnectIndexers = cache.TypedIndexers[*apiskafkastrimziiov1.KafkaConnect]
+
+// DeletedKafkaConnect is a specialization of [cache.DeletedObject] for KafkaConnect.
+type DeletedKafkaConnect = cache.DeletedObject[*apiskafkastrimziiov1.KafkaConnect]
 
 type kafkaConnectInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type kafkaConnectInformer struct {
 // NewKafkaConnectInformer constructs a new informer for KafkaConnect type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaConnectInformer]).
 func NewKafkaConnectInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewKafkaConnectInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedKafkaConnectInformer constructs a new informer for KafkaConnect type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaConnectInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaConnectIndexers) KafkaConnectIndexInformer {
+	return NewTypedKafkaConnectInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredKafkaConnectInformer constructs a new informer for KafkaConnect type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredKafkaConnectInformer]).
 func NewFilteredKafkaConnectInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewKafkaConnectInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedKafkaConnectInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredKafkaConnectInformer constructs a new informer for KafkaConnect type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredKafkaConnectInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaConnectIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) KafkaConnectIndexInformer {
+	return NewTypedKafkaConnectInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewKafkaConnectInformerWithOptions constructs a new informer for KafkaConnect type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaConnectInformerWithOptions]).
 func NewKafkaConnectInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedKafkaConnectInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedKafkaConnectInformerWithOptions constructs a new informer for KafkaConnect type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaConnectInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) KafkaConnectIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "kafka.strimzi.io", Version: "v1", Resource: "kafkaconnects"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnect](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewKafkaConnectInformerWithOptions(client versioned.Interface, namespace st
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *kafkaConnectInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewKafkaConnectInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedKafkaConnectInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *kafkaConnectInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiskafkastrimziiov1.KafkaConnect{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *kafkaConnectInformer) TypedInformer() KafkaConnectIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnect](f.factory.InformerFor(&apiskafkastrimziiov1.KafkaConnect{}, f.defaultInformer))
 }
 
 func (f *kafkaConnectInformer) Lister() kafkastrimziiov1.KafkaConnectLister {
 	return kafkastrimziiov1.NewKafkaConnectLister(f.Informer().GetIndexer())
+}
+
+// ToTypedKafkaConnectInformer converts an untyped informer into a TypedKafkaConnectInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaConnect. If that is not the case, calling type-safe methods of the returned
+// TypedKafkaConnectInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedKafkaConnectInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedKafkaConnectInformer(informer KafkaConnectInformer) TypedKafkaConnectInformer {
+	if informer, ok := informer.(TypedKafkaConnectInformer); ok {
+		return informer
+	}
+	return &kafkaConnectTypedInformerAdapter{informer}
+}
+
+type kafkaConnectTypedInformerAdapter struct {
+	KafkaConnectInformer
+}
+
+func (a *kafkaConnectTypedInformerAdapter) TypedInformer() KafkaConnectIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnect](a.Informer())
+}
+
+// ToKafkaConnectIndexInformer converts an untyped informer into a KafkaConnectIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaConnect. If that is not the case, calling type-safe methods of the returned
+// KafkaConnectIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a KafkaConnectIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToKafkaConnectIndexInformer(informer cache.SharedIndexInformer) KafkaConnectIndexInformer {
+	if informer, ok := informer.(KafkaConnectIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnect](informer)
 }

@@ -34,11 +34,39 @@ import (
 )
 
 // StrimziPodSetInformer provides access to a shared informer and lister for
-// StrimziPodSets.
+// StrimziPodSets. Prefer using the type-safe variant (see [TypedStrimziPodSetInformer]).
 type StrimziPodSetInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() corestrimziiov1.StrimziPodSetLister
 }
+
+// TypedStrimziPodSetInformer provides access to a shared informer and lister for
+// StrimziPodSets, including the type-safe TypedInformer variant.
+// It is a superset of StrimziPodSetInformer.
+type TypedStrimziPodSetInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() StrimziPodSetIndexInformer
+	Lister() corestrimziiov1.StrimziPodSetLister
+}
+
+// StrimziPodSetIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type StrimziPodSetIndexInformer cache.TypedSharedIndexInformer[*apiscorestrimziiov1.StrimziPodSet]
+
+// StrimziPodSetHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for StrimziPodSet.
+type StrimziPodSetHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiscorestrimziiov1.StrimziPodSet]
+
+// StrimziPodSetDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for StrimziPodSet.
+type StrimziPodSetDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiscorestrimziiov1.StrimziPodSet]
+
+// StrimziPodSetFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for StrimziPodSet.
+type StrimziPodSetFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiscorestrimziiov1.StrimziPodSet]
+
+// StrimziPodSetIndexers is a specialization of [cache.TypedIndexers] for StrimziPodSet.
+type StrimziPodSetIndexers = cache.TypedIndexers[*apiscorestrimziiov1.StrimziPodSet]
+
+// DeletedStrimziPodSet is a specialization of [cache.DeletedObject] for StrimziPodSet.
+type DeletedStrimziPodSet = cache.DeletedObject[*apiscorestrimziiov1.StrimziPodSet]
 
 type strimziPodSetInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type strimziPodSetInformer struct {
 // NewStrimziPodSetInformer constructs a new informer for StrimziPodSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedStrimziPodSetInformer]).
 func NewStrimziPodSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewStrimziPodSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedStrimziPodSetInformer constructs a new informer for StrimziPodSet type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedStrimziPodSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers StrimziPodSetIndexers) StrimziPodSetIndexInformer {
+	return NewTypedStrimziPodSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredStrimziPodSetInformer constructs a new informer for StrimziPodSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredStrimziPodSetInformer]).
 func NewFilteredStrimziPodSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewStrimziPodSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedStrimziPodSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredStrimziPodSetInformer constructs a new informer for StrimziPodSet type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredStrimziPodSetInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers StrimziPodSetIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) StrimziPodSetIndexInformer {
+	return NewTypedStrimziPodSetInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewStrimziPodSetInformerWithOptions constructs a new informer for StrimziPodSet type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedStrimziPodSetInformerWithOptions]).
 func NewStrimziPodSetInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedStrimziPodSetInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedStrimziPodSetInformerWithOptions constructs a new informer for StrimziPodSet type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedStrimziPodSetInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) StrimziPodSetIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "core.strimzi.io", Version: "v1", Resource: "strimzipodsets"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiscorestrimziiov1.StrimziPodSet](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewStrimziPodSetInformerWithOptions(client versioned.Interface, namespace s
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *strimziPodSetInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewStrimziPodSetInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedStrimziPodSetInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *strimziPodSetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiscorestrimziiov1.StrimziPodSet{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *strimziPodSetInformer) TypedInformer() StrimziPodSetIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiscorestrimziiov1.StrimziPodSet](f.factory.InformerFor(&apiscorestrimziiov1.StrimziPodSet{}, f.defaultInformer))
 }
 
 func (f *strimziPodSetInformer) Lister() corestrimziiov1.StrimziPodSetLister {
 	return corestrimziiov1.NewStrimziPodSetLister(f.Informer().GetIndexer())
+}
+
+// ToTypedStrimziPodSetInformer converts an untyped informer into a TypedStrimziPodSetInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *StrimziPodSet. If that is not the case, calling type-safe methods of the returned
+// TypedStrimziPodSetInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedStrimziPodSetInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedStrimziPodSetInformer(informer StrimziPodSetInformer) TypedStrimziPodSetInformer {
+	if informer, ok := informer.(TypedStrimziPodSetInformer); ok {
+		return informer
+	}
+	return &strimziPodSetTypedInformerAdapter{informer}
+}
+
+type strimziPodSetTypedInformerAdapter struct {
+	StrimziPodSetInformer
+}
+
+func (a *strimziPodSetTypedInformerAdapter) TypedInformer() StrimziPodSetIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiscorestrimziiov1.StrimziPodSet](a.Informer())
+}
+
+// ToStrimziPodSetIndexInformer converts an untyped informer into a StrimziPodSetIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *StrimziPodSet. If that is not the case, calling type-safe methods of the returned
+// StrimziPodSetIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a StrimziPodSetIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToStrimziPodSetIndexInformer(informer cache.SharedIndexInformer) StrimziPodSetIndexInformer {
+	if informer, ok := informer.(StrimziPodSetIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiscorestrimziiov1.StrimziPodSet](informer)
 }

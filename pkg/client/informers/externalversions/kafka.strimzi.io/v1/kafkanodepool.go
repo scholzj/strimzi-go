@@ -34,11 +34,39 @@ import (
 )
 
 // KafkaNodePoolInformer provides access to a shared informer and lister for
-// KafkaNodePools.
+// KafkaNodePools. Prefer using the type-safe variant (see [TypedKafkaNodePoolInformer]).
 type KafkaNodePoolInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() kafkastrimziiov1.KafkaNodePoolLister
 }
+
+// TypedKafkaNodePoolInformer provides access to a shared informer and lister for
+// KafkaNodePools, including the type-safe TypedInformer variant.
+// It is a superset of KafkaNodePoolInformer.
+type TypedKafkaNodePoolInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() KafkaNodePoolIndexInformer
+	Lister() kafkastrimziiov1.KafkaNodePoolLister
+}
+
+// KafkaNodePoolIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type KafkaNodePoolIndexInformer cache.TypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaNodePool]
+
+// KafkaNodePoolHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for KafkaNodePool.
+type KafkaNodePoolHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiskafkastrimziiov1.KafkaNodePool]
+
+// KafkaNodePoolDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for KafkaNodePool.
+type KafkaNodePoolDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiskafkastrimziiov1.KafkaNodePool]
+
+// KafkaNodePoolFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for KafkaNodePool.
+type KafkaNodePoolFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiskafkastrimziiov1.KafkaNodePool]
+
+// KafkaNodePoolIndexers is a specialization of [cache.TypedIndexers] for KafkaNodePool.
+type KafkaNodePoolIndexers = cache.TypedIndexers[*apiskafkastrimziiov1.KafkaNodePool]
+
+// DeletedKafkaNodePool is a specialization of [cache.DeletedObject] for KafkaNodePool.
+type DeletedKafkaNodePool = cache.DeletedObject[*apiskafkastrimziiov1.KafkaNodePool]
 
 type kafkaNodePoolInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type kafkaNodePoolInformer struct {
 // NewKafkaNodePoolInformer constructs a new informer for KafkaNodePool type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaNodePoolInformer]).
 func NewKafkaNodePoolInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewKafkaNodePoolInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedKafkaNodePoolInformer constructs a new informer for KafkaNodePool type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaNodePoolInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaNodePoolIndexers) KafkaNodePoolIndexInformer {
+	return NewTypedKafkaNodePoolInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredKafkaNodePoolInformer constructs a new informer for KafkaNodePool type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredKafkaNodePoolInformer]).
 func NewFilteredKafkaNodePoolInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewKafkaNodePoolInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedKafkaNodePoolInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredKafkaNodePoolInformer constructs a new informer for KafkaNodePool type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredKafkaNodePoolInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaNodePoolIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) KafkaNodePoolIndexInformer {
+	return NewTypedKafkaNodePoolInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewKafkaNodePoolInformerWithOptions constructs a new informer for KafkaNodePool type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaNodePoolInformerWithOptions]).
 func NewKafkaNodePoolInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedKafkaNodePoolInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedKafkaNodePoolInformerWithOptions constructs a new informer for KafkaNodePool type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaNodePoolInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) KafkaNodePoolIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "kafka.strimzi.io", Version: "v1", Resource: "kafkanodepools"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaNodePool](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewKafkaNodePoolInformerWithOptions(client versioned.Interface, namespace s
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *kafkaNodePoolInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewKafkaNodePoolInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedKafkaNodePoolInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *kafkaNodePoolInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiskafkastrimziiov1.KafkaNodePool{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *kafkaNodePoolInformer) TypedInformer() KafkaNodePoolIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaNodePool](f.factory.InformerFor(&apiskafkastrimziiov1.KafkaNodePool{}, f.defaultInformer))
 }
 
 func (f *kafkaNodePoolInformer) Lister() kafkastrimziiov1.KafkaNodePoolLister {
 	return kafkastrimziiov1.NewKafkaNodePoolLister(f.Informer().GetIndexer())
+}
+
+// ToTypedKafkaNodePoolInformer converts an untyped informer into a TypedKafkaNodePoolInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaNodePool. If that is not the case, calling type-safe methods of the returned
+// TypedKafkaNodePoolInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedKafkaNodePoolInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedKafkaNodePoolInformer(informer KafkaNodePoolInformer) TypedKafkaNodePoolInformer {
+	if informer, ok := informer.(TypedKafkaNodePoolInformer); ok {
+		return informer
+	}
+	return &kafkaNodePoolTypedInformerAdapter{informer}
+}
+
+type kafkaNodePoolTypedInformerAdapter struct {
+	KafkaNodePoolInformer
+}
+
+func (a *kafkaNodePoolTypedInformerAdapter) TypedInformer() KafkaNodePoolIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaNodePool](a.Informer())
+}
+
+// ToKafkaNodePoolIndexInformer converts an untyped informer into a KafkaNodePoolIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaNodePool. If that is not the case, calling type-safe methods of the returned
+// KafkaNodePoolIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a KafkaNodePoolIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToKafkaNodePoolIndexInformer(informer cache.SharedIndexInformer) KafkaNodePoolIndexInformer {
+	if informer, ok := informer.(KafkaNodePoolIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaNodePool](informer)
 }

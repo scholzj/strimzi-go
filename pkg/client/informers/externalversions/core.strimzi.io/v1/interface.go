@@ -25,7 +25,7 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// StrimziPodSets returns a StrimziPodSetInformer.
-	StrimziPodSets() StrimziPodSetInformer
+	StrimziPodSets() TypedStrimziPodSetInformer
 }
 
 type version struct {
@@ -39,7 +39,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// StrimziPodSets returns a StrimziPodSetInformer.
-func (v *version) StrimziPodSets() StrimziPodSetInformer {
+// StrimziPodSets returns a TypedStrimziPodSetInformer.
+func (v *version) StrimziPodSets() TypedStrimziPodSetInformer {
 	return &strimziPodSetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

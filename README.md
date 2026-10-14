@@ -21,6 +21,7 @@ The following table shows the supported Strimzi versions
 | `0.9.x`        | 1.0.x (`v1` API only) |
 | `0.10.x`       | 1.1.x (`v1` API only) |
 | `0.11.x`       | 1.2.x (`v1` API only) |
+| `0.12.x`       | 1.3.x (`v1` API only) |
 
 ## Examples
 
