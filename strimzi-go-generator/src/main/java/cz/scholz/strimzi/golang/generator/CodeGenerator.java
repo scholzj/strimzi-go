@@ -241,6 +241,7 @@ public class CodeGenerator {
             case "io.fabric8.kubernetes.api.model.Toleration" -> "corev1.Toleration";
             case "io.fabric8.kubernetes.api.model.TopologySpreadConstraint" -> "corev1.TopologySpreadConstraint";
             case "io.fabric8.kubernetes.api.model.VolumeMount" -> "corev1.VolumeMount";
+            case "io.fabric8.kubernetes.api.model.ServiceAccountTokenProjection" -> "corev1.ServiceAccountTokenProjection";
             case "io.fabric8.kubernetes.api.model.networking.v1.NetworkPolicyPeer" -> "networkingv1.NetworkPolicyPeer";
             case "io.fabric8.kubernetes.api.model.gatewayapi.v1.ParentReference" -> "gatewayapiv1.ParentReference";
             default -> {

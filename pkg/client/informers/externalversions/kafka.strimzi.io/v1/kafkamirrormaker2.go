@@ -34,11 +34,39 @@ import (
 )
 
 // KafkaMirrorMaker2Informer provides access to a shared informer and lister for
-// KafkaMirrorMaker2s.
+// KafkaMirrorMaker2s. Prefer using the type-safe variant (see [TypedKafkaMirrorMaker2Informer]).
 type KafkaMirrorMaker2Informer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() kafkastrimziiov1.KafkaMirrorMaker2Lister
 }
+
+// TypedKafkaMirrorMaker2Informer provides access to a shared informer and lister for
+// KafkaMirrorMaker2s, including the type-safe TypedInformer variant.
+// It is a superset of KafkaMirrorMaker2Informer.
+type TypedKafkaMirrorMaker2Informer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() KafkaMirrorMaker2IndexInformer
+	Lister() kafkastrimziiov1.KafkaMirrorMaker2Lister
+}
+
+// KafkaMirrorMaker2IndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type KafkaMirrorMaker2IndexInformer cache.TypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaMirrorMaker2]
+
+// KafkaMirrorMaker2HandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for KafkaMirrorMaker2.
+type KafkaMirrorMaker2HandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiskafkastrimziiov1.KafkaMirrorMaker2]
+
+// KafkaMirrorMaker2DetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for KafkaMirrorMaker2.
+type KafkaMirrorMaker2DetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiskafkastrimziiov1.KafkaMirrorMaker2]
+
+// KafkaMirrorMaker2FilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for KafkaMirrorMaker2.
+type KafkaMirrorMaker2FilteringHandler = cache.TypedFilteringResourceEventHandler[*apiskafkastrimziiov1.KafkaMirrorMaker2]
+
+// KafkaMirrorMaker2Indexers is a specialization of [cache.TypedIndexers] for KafkaMirrorMaker2.
+type KafkaMirrorMaker2Indexers = cache.TypedIndexers[*apiskafkastrimziiov1.KafkaMirrorMaker2]
+
+// DeletedKafkaMirrorMaker2 is a specialization of [cache.DeletedObject] for KafkaMirrorMaker2.
+type DeletedKafkaMirrorMaker2 = cache.DeletedObject[*apiskafkastrimziiov1.KafkaMirrorMaker2]
 
 type kafkaMirrorMaker2Informer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type kafkaMirrorMaker2Informer struct {
 // NewKafkaMirrorMaker2Informer constructs a new informer for KafkaMirrorMaker2 type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaMirrorMaker2Informer]).
 func NewKafkaMirrorMaker2Informer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewKafkaMirrorMaker2InformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedKafkaMirrorMaker2Informer constructs a new informer for KafkaMirrorMaker2 type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaMirrorMaker2Informer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaMirrorMaker2Indexers) KafkaMirrorMaker2IndexInformer {
+	return NewTypedKafkaMirrorMaker2InformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredKafkaMirrorMaker2Informer constructs a new informer for KafkaMirrorMaker2 type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredKafkaMirrorMaker2Informer]).
 func NewFilteredKafkaMirrorMaker2Informer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewKafkaMirrorMaker2InformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedKafkaMirrorMaker2InformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredKafkaMirrorMaker2Informer constructs a new informer for KafkaMirrorMaker2 type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredKafkaMirrorMaker2Informer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaMirrorMaker2Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) KafkaMirrorMaker2IndexInformer {
+	return NewTypedKafkaMirrorMaker2InformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewKafkaMirrorMaker2InformerWithOptions constructs a new informer for KafkaMirrorMaker2 type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaMirrorMaker2InformerWithOptions]).
 func NewKafkaMirrorMaker2InformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedKafkaMirrorMaker2InformerWithOptions(client, namespace, options)
+}
+
+// NewTypedKafkaMirrorMaker2InformerWithOptions constructs a new informer for KafkaMirrorMaker2 type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaMirrorMaker2InformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) KafkaMirrorMaker2IndexInformer {
 	gvr := schema.GroupVersionResource{Group: "kafka.strimzi.io", Version: "v1", Resource: "kafkamirrormaker2s"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaMirrorMaker2](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewKafkaMirrorMaker2InformerWithOptions(client versioned.Interface, namespa
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *kafkaMirrorMaker2Informer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewKafkaMirrorMaker2InformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedKafkaMirrorMaker2InformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *kafkaMirrorMaker2Informer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiskafkastrimziiov1.KafkaMirrorMaker2{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *kafkaMirrorMaker2Informer) TypedInformer() KafkaMirrorMaker2IndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaMirrorMaker2](f.factory.InformerFor(&apiskafkastrimziiov1.KafkaMirrorMaker2{}, f.defaultInformer))
 }
 
 func (f *kafkaMirrorMaker2Informer) Lister() kafkastrimziiov1.KafkaMirrorMaker2Lister {
 	return kafkastrimziiov1.NewKafkaMirrorMaker2Lister(f.Informer().GetIndexer())
+}
+
+// ToTypedKafkaMirrorMaker2Informer converts an untyped informer into a TypedKafkaMirrorMaker2Informer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaMirrorMaker2. If that is not the case, calling type-safe methods of the returned
+// TypedKafkaMirrorMaker2Informer leads to runtime panics. A safer alternative is to pass
+// around a TypedKafkaMirrorMaker2Informer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedKafkaMirrorMaker2Informer(informer KafkaMirrorMaker2Informer) TypedKafkaMirrorMaker2Informer {
+	if informer, ok := informer.(TypedKafkaMirrorMaker2Informer); ok {
+		return informer
+	}
+	return &kafkaMirrorMaker2TypedInformerAdapter{informer}
+}
+
+type kafkaMirrorMaker2TypedInformerAdapter struct {
+	KafkaMirrorMaker2Informer
+}
+
+func (a *kafkaMirrorMaker2TypedInformerAdapter) TypedInformer() KafkaMirrorMaker2IndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaMirrorMaker2](a.Informer())
+}
+
+// ToKafkaMirrorMaker2IndexInformer converts an untyped informer into a KafkaMirrorMaker2IndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaMirrorMaker2. If that is not the case, calling type-safe methods of the returned
+// KafkaMirrorMaker2IndexInformer leads to runtime panics. A safer alternative is to pass
+// around a KafkaMirrorMaker2IndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToKafkaMirrorMaker2IndexInformer(informer cache.SharedIndexInformer) KafkaMirrorMaker2IndexInformer {
+	if informer, ok := informer.(KafkaMirrorMaker2IndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaMirrorMaker2](informer)
 }

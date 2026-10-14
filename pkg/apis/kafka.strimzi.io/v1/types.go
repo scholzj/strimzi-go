@@ -570,6 +570,15 @@ type AdditionalVolume struct {
 	PersistentVolumeClaim *corev1.PersistentVolumeClaimVolumeSource `json:"persistentVolumeClaim,omitempty"`
 	Csi                   *corev1.CSIVolumeSource                   `json:"csi,omitempty"`
 	Image                 *corev1.ImageVolumeSource                 `json:"image,omitempty"`
+	Projected             *ProjectedVolume                          `json:"projected,omitempty"`
+}
+
+type ProjectedVolume struct {
+	Sources []ProjectedVolumeSource `json:"sources,omitempty"`
+}
+
+type ProjectedVolumeSource struct {
+	ServiceAccountToken *corev1.ServiceAccountTokenProjection `json:"serviceAccountToken,omitempty"`
 }
 
 type EmptyDirVolume struct {
@@ -1233,17 +1242,49 @@ type CruiseControlTemplate struct {
 
 type CertificateAuthority struct {
 	GenerateCertificateAuthority bool                        `json:"generateCertificateAuthority,omitempty"`
+	Type                         CertificateManagerType      `json:"type,omitempty"`
 	GenerateSecretOwnerReference bool                        `json:"generateSecretOwnerReference,omitempty"`
 	ValidityDays                 int32                       `json:"validityDays,omitempty"`
 	RenewalDays                  int32                       `json:"renewalDays,omitempty"`
 	CertificateExpirationPolicy  CertificateExpirationPolicy `json:"certificateExpirationPolicy,omitempty"`
+	CertManager                  *CertManager                `json:"certManager,omitempty"`
 }
+
+type CertManager struct {
+	IssuerRef *IssuerRef `json:"issuerRef,omitempty"`
+	CaCertRef *CaCertRef `json:"caCertRef,omitempty"`
+}
+
+type CaCertRef struct {
+	SecretName  string `json:"secretName,omitempty"`
+	Certificate string `json:"certificate,omitempty"`
+}
+
+type IssuerRef struct {
+	Name  string     `json:"name,omitempty"`
+	Kind  IssuerKind `json:"kind,omitempty"`
+	Group string     `json:"group,omitempty"`
+}
+
+type IssuerKind string
+
+const (
+	ISSUER_ISSUERKIND         IssuerKind = "Issuer"
+	CLUSTER_ISSUER_ISSUERKIND IssuerKind = "ClusterIssuer"
+)
 
 type CertificateExpirationPolicy string
 
 const (
 	RENEW_CERTIFICATE_CERTIFICATEEXPIRATIONPOLICY CertificateExpirationPolicy = "renew-certificate"
 	REPLACE_KEY_CERTIFICATEEXPIRATIONPOLICY       CertificateExpirationPolicy = "replace-key"
+)
+
+type CertificateManagerType string
+
+const (
+	STRIMZI_CERTIFICATEMANAGERTYPE      CertificateManagerType = "strimzi"
+	CERT_MANAGER_CERTIFICATEMANAGERTYPE CertificateManagerType = "cert-manager"
 )
 
 type EntityOperatorSpec struct {

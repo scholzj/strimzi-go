@@ -34,11 +34,39 @@ import (
 )
 
 // KafkaRebalanceInformer provides access to a shared informer and lister for
-// KafkaRebalances.
+// KafkaRebalances. Prefer using the type-safe variant (see [TypedKafkaRebalanceInformer]).
 type KafkaRebalanceInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() kafkastrimziiov1.KafkaRebalanceLister
 }
+
+// TypedKafkaRebalanceInformer provides access to a shared informer and lister for
+// KafkaRebalances, including the type-safe TypedInformer variant.
+// It is a superset of KafkaRebalanceInformer.
+type TypedKafkaRebalanceInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() KafkaRebalanceIndexInformer
+	Lister() kafkastrimziiov1.KafkaRebalanceLister
+}
+
+// KafkaRebalanceIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type KafkaRebalanceIndexInformer cache.TypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaRebalance]
+
+// KafkaRebalanceHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for KafkaRebalance.
+type KafkaRebalanceHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiskafkastrimziiov1.KafkaRebalance]
+
+// KafkaRebalanceDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for KafkaRebalance.
+type KafkaRebalanceDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiskafkastrimziiov1.KafkaRebalance]
+
+// KafkaRebalanceFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for KafkaRebalance.
+type KafkaRebalanceFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiskafkastrimziiov1.KafkaRebalance]
+
+// KafkaRebalanceIndexers is a specialization of [cache.TypedIndexers] for KafkaRebalance.
+type KafkaRebalanceIndexers = cache.TypedIndexers[*apiskafkastrimziiov1.KafkaRebalance]
+
+// DeletedKafkaRebalance is a specialization of [cache.DeletedObject] for KafkaRebalance.
+type DeletedKafkaRebalance = cache.DeletedObject[*apiskafkastrimziiov1.KafkaRebalance]
 
 type kafkaRebalanceInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type kafkaRebalanceInformer struct {
 // NewKafkaRebalanceInformer constructs a new informer for KafkaRebalance type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaRebalanceInformer]).
 func NewKafkaRebalanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewKafkaRebalanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedKafkaRebalanceInformer constructs a new informer for KafkaRebalance type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaRebalanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaRebalanceIndexers) KafkaRebalanceIndexInformer {
+	return NewTypedKafkaRebalanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredKafkaRebalanceInformer constructs a new informer for KafkaRebalance type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredKafkaRebalanceInformer]).
 func NewFilteredKafkaRebalanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewKafkaRebalanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedKafkaRebalanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredKafkaRebalanceInformer constructs a new informer for KafkaRebalance type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredKafkaRebalanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaRebalanceIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) KafkaRebalanceIndexInformer {
+	return NewTypedKafkaRebalanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewKafkaRebalanceInformerWithOptions constructs a new informer for KafkaRebalance type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaRebalanceInformerWithOptions]).
 func NewKafkaRebalanceInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedKafkaRebalanceInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedKafkaRebalanceInformerWithOptions constructs a new informer for KafkaRebalance type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaRebalanceInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) KafkaRebalanceIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "kafka.strimzi.io", Version: "v1", Resource: "kafkarebalances"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaRebalance](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewKafkaRebalanceInformerWithOptions(client versioned.Interface, namespace 
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *kafkaRebalanceInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewKafkaRebalanceInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedKafkaRebalanceInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *kafkaRebalanceInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiskafkastrimziiov1.KafkaRebalance{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *kafkaRebalanceInformer) TypedInformer() KafkaRebalanceIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaRebalance](f.factory.InformerFor(&apiskafkastrimziiov1.KafkaRebalance{}, f.defaultInformer))
 }
 
 func (f *kafkaRebalanceInformer) Lister() kafkastrimziiov1.KafkaRebalanceLister {
 	return kafkastrimziiov1.NewKafkaRebalanceLister(f.Informer().GetIndexer())
+}
+
+// ToTypedKafkaRebalanceInformer converts an untyped informer into a TypedKafkaRebalanceInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaRebalance. If that is not the case, calling type-safe methods of the returned
+// TypedKafkaRebalanceInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedKafkaRebalanceInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedKafkaRebalanceInformer(informer KafkaRebalanceInformer) TypedKafkaRebalanceInformer {
+	if informer, ok := informer.(TypedKafkaRebalanceInformer); ok {
+		return informer
+	}
+	return &kafkaRebalanceTypedInformerAdapter{informer}
+}
+
+type kafkaRebalanceTypedInformerAdapter struct {
+	KafkaRebalanceInformer
+}
+
+func (a *kafkaRebalanceTypedInformerAdapter) TypedInformer() KafkaRebalanceIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaRebalance](a.Informer())
+}
+
+// ToKafkaRebalanceIndexInformer converts an untyped informer into a KafkaRebalanceIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaRebalance. If that is not the case, calling type-safe methods of the returned
+// KafkaRebalanceIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a KafkaRebalanceIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToKafkaRebalanceIndexInformer(informer cache.SharedIndexInformer) KafkaRebalanceIndexInformer {
+	if informer, ok := informer.(KafkaRebalanceIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaRebalance](informer)
 }

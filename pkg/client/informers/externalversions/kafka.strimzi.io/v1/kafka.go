@@ -34,11 +34,39 @@ import (
 )
 
 // KafkaInformer provides access to a shared informer and lister for
-// Kafkas.
+// Kafkas. Prefer using the type-safe variant (see [TypedKafkaInformer]).
 type KafkaInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() kafkastrimziiov1.KafkaLister
 }
+
+// TypedKafkaInformer provides access to a shared informer and lister for
+// Kafkas, including the type-safe TypedInformer variant.
+// It is a superset of KafkaInformer.
+type TypedKafkaInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() KafkaIndexInformer
+	Lister() kafkastrimziiov1.KafkaLister
+}
+
+// KafkaIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type KafkaIndexInformer cache.TypedSharedIndexInformer[*apiskafkastrimziiov1.Kafka]
+
+// KafkaHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for Kafka.
+type KafkaHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiskafkastrimziiov1.Kafka]
+
+// KafkaDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for Kafka.
+type KafkaDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiskafkastrimziiov1.Kafka]
+
+// KafkaFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for Kafka.
+type KafkaFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiskafkastrimziiov1.Kafka]
+
+// KafkaIndexers is a specialization of [cache.TypedIndexers] for Kafka.
+type KafkaIndexers = cache.TypedIndexers[*apiskafkastrimziiov1.Kafka]
+
+// DeletedKafka is a specialization of [cache.DeletedObject] for Kafka.
+type DeletedKafka = cache.DeletedObject[*apiskafkastrimziiov1.Kafka]
 
 type kafkaInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type kafkaInformer struct {
 // NewKafkaInformer constructs a new informer for Kafka type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaInformer]).
 func NewKafkaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewKafkaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedKafkaInformer constructs a new informer for Kafka type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaIndexers) KafkaIndexInformer {
+	return NewTypedKafkaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredKafkaInformer constructs a new informer for Kafka type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredKafkaInformer]).
 func NewFilteredKafkaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewKafkaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedKafkaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredKafkaInformer constructs a new informer for Kafka type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredKafkaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) KafkaIndexInformer {
+	return NewTypedKafkaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewKafkaInformerWithOptions constructs a new informer for Kafka type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaInformerWithOptions]).
 func NewKafkaInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedKafkaInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedKafkaInformerWithOptions constructs a new informer for Kafka type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) KafkaIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "kafka.strimzi.io", Version: "v1", Resource: "kafkas"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.Kafka](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewKafkaInformerWithOptions(client versioned.Interface, namespace string, o
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *kafkaInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewKafkaInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedKafkaInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *kafkaInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiskafkastrimziiov1.Kafka{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *kafkaInformer) TypedInformer() KafkaIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.Kafka](f.factory.InformerFor(&apiskafkastrimziiov1.Kafka{}, f.defaultInformer))
 }
 
 func (f *kafkaInformer) Lister() kafkastrimziiov1.KafkaLister {
 	return kafkastrimziiov1.NewKafkaLister(f.Informer().GetIndexer())
+}
+
+// ToTypedKafkaInformer converts an untyped informer into a TypedKafkaInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Kafka. If that is not the case, calling type-safe methods of the returned
+// TypedKafkaInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedKafkaInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedKafkaInformer(informer KafkaInformer) TypedKafkaInformer {
+	if informer, ok := informer.(TypedKafkaInformer); ok {
+		return informer
+	}
+	return &kafkaTypedInformerAdapter{informer}
+}
+
+type kafkaTypedInformerAdapter struct {
+	KafkaInformer
+}
+
+func (a *kafkaTypedInformerAdapter) TypedInformer() KafkaIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.Kafka](a.Informer())
+}
+
+// ToKafkaIndexInformer converts an untyped informer into a KafkaIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Kafka. If that is not the case, calling type-safe methods of the returned
+// KafkaIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a KafkaIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToKafkaIndexInformer(informer cache.SharedIndexInformer) KafkaIndexInformer {
+	if informer, ok := informer.(KafkaIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.Kafka](informer)
 }

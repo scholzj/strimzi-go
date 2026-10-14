@@ -34,11 +34,39 @@ import (
 )
 
 // KafkaConnectorInformer provides access to a shared informer and lister for
-// KafkaConnectors.
+// KafkaConnectors. Prefer using the type-safe variant (see [TypedKafkaConnectorInformer]).
 type KafkaConnectorInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() kafkastrimziiov1.KafkaConnectorLister
 }
+
+// TypedKafkaConnectorInformer provides access to a shared informer and lister for
+// KafkaConnectors, including the type-safe TypedInformer variant.
+// It is a superset of KafkaConnectorInformer.
+type TypedKafkaConnectorInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() KafkaConnectorIndexInformer
+	Lister() kafkastrimziiov1.KafkaConnectorLister
+}
+
+// KafkaConnectorIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type KafkaConnectorIndexInformer cache.TypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnector]
+
+// KafkaConnectorHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for KafkaConnector.
+type KafkaConnectorHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiskafkastrimziiov1.KafkaConnector]
+
+// KafkaConnectorDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for KafkaConnector.
+type KafkaConnectorDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiskafkastrimziiov1.KafkaConnector]
+
+// KafkaConnectorFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for KafkaConnector.
+type KafkaConnectorFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiskafkastrimziiov1.KafkaConnector]
+
+// KafkaConnectorIndexers is a specialization of [cache.TypedIndexers] for KafkaConnector.
+type KafkaConnectorIndexers = cache.TypedIndexers[*apiskafkastrimziiov1.KafkaConnector]
+
+// DeletedKafkaConnector is a specialization of [cache.DeletedObject] for KafkaConnector.
+type DeletedKafkaConnector = cache.DeletedObject[*apiskafkastrimziiov1.KafkaConnector]
 
 type kafkaConnectorInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type kafkaConnectorInformer struct {
 // NewKafkaConnectorInformer constructs a new informer for KafkaConnector type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaConnectorInformer]).
 func NewKafkaConnectorInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewKafkaConnectorInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedKafkaConnectorInformer constructs a new informer for KafkaConnector type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaConnectorInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaConnectorIndexers) KafkaConnectorIndexInformer {
+	return NewTypedKafkaConnectorInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredKafkaConnectorInformer constructs a new informer for KafkaConnector type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredKafkaConnectorInformer]).
 func NewFilteredKafkaConnectorInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewKafkaConnectorInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedKafkaConnectorInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredKafkaConnectorInformer constructs a new informer for KafkaConnector type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredKafkaConnectorInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers KafkaConnectorIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) KafkaConnectorIndexInformer {
+	return NewTypedKafkaConnectorInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewKafkaConnectorInformerWithOptions constructs a new informer for KafkaConnector type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedKafkaConnectorInformerWithOptions]).
 func NewKafkaConnectorInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedKafkaConnectorInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedKafkaConnectorInformerWithOptions constructs a new informer for KafkaConnector type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedKafkaConnectorInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) KafkaConnectorIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "kafka.strimzi.io", Version: "v1", Resource: "kafkaconnectors"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnector](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewKafkaConnectorInformerWithOptions(client versioned.Interface, namespace 
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *kafkaConnectorInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewKafkaConnectorInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedKafkaConnectorInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *kafkaConnectorInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiskafkastrimziiov1.KafkaConnector{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *kafkaConnectorInformer) TypedInformer() KafkaConnectorIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnector](f.factory.InformerFor(&apiskafkastrimziiov1.KafkaConnector{}, f.defaultInformer))
 }
 
 func (f *kafkaConnectorInformer) Lister() kafkastrimziiov1.KafkaConnectorLister {
 	return kafkastrimziiov1.NewKafkaConnectorLister(f.Informer().GetIndexer())
+}
+
+// ToTypedKafkaConnectorInformer converts an untyped informer into a TypedKafkaConnectorInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaConnector. If that is not the case, calling type-safe methods of the returned
+// TypedKafkaConnectorInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedKafkaConnectorInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedKafkaConnectorInformer(informer KafkaConnectorInformer) TypedKafkaConnectorInformer {
+	if informer, ok := informer.(TypedKafkaConnectorInformer); ok {
+		return informer
+	}
+	return &kafkaConnectorTypedInformerAdapter{informer}
+}
+
+type kafkaConnectorTypedInformerAdapter struct {
+	KafkaConnectorInformer
+}
+
+func (a *kafkaConnectorTypedInformerAdapter) TypedInformer() KafkaConnectorIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnector](a.Informer())
+}
+
+// ToKafkaConnectorIndexInformer converts an untyped informer into a KafkaConnectorIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *KafkaConnector. If that is not the case, calling type-safe methods of the returned
+// KafkaConnectorIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a KafkaConnectorIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToKafkaConnectorIndexInformer(informer cache.SharedIndexInformer) KafkaConnectorIndexInformer {
+	if informer, ok := informer.(KafkaConnectorIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiskafkastrimziiov1.KafkaConnector](informer)
 }
